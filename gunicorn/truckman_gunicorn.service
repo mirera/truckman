@@ -1,6 +1,6 @@
 [Unit] 
 Description=gunicorn daemon for truckman
-Requires=truckman_gunicorn
+Requires=truckman_gunicorn.socket
 After=network.target
 [Service]
 User=ubuntu

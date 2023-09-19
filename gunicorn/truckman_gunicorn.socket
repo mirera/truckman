@@ -4,3 +4,4 @@ Description=gunicorn socket
 ListenStream=/run/truckman_gunicorn.sock
 [Install]
 WantedBy=sockets.target
+
