@@ -8,3 +8,5 @@ sudo systemctl enable celery-beat.service
 
 sudo systemctl start celery.service
 sudo systemctl enable celery.service 
+
+#remove
