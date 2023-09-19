@@ -1,0 +1,281 @@
+
+{% extends 'base.html' %}  
+
+{% block content %}
+<!-- content @s -->
+{% if messages %}
+{% for message in messages %}
+    <div class="alert {% if message.tags == 'error' %}alert-danger{% elif message.tags == 'success' %}alert-success{% else %}alert-primary{% endif %}">
+        {{ message }}
+    </div>
+{% endfor %}
+{% endif %}
+<div class="nk-content ">
+    <div class="container-fluid">
+        <div class="nk-content-inner">
+            <div class="nk-content-body">
+                <div class="nk-block-head nk-block-head-sm">
+                    <div class="nk-block-between">
+                        <div class="nk-block-head-content">
+                            <h3 class="nk-block-title page-title">Update Driver</h3>
+                            <div class="nk-block-des text-soft">
+                                <p>Update {{driver.first_name}} {{driver.last_name}} details.</p>
+                            </div>
+                        </div><!-- .nk-block-head-content -->
+                    </div><!-- .nk-block-between -->
+                </div><!-- .nk-block-head -->
+                <div class="nk-block">
+                    <div class="card card-bordered">
+                        <div class="card-inner-group">
+                            <form action="{% url 'update_driver' driver.id %}" method="POST" enctype="multipart/form-data" >
+                                {% csrf_token %}
+                                <div class="card-inner">
+                                    <div class="nk-block-head">
+                                        <div class="nk-block-head-content">
+                                            <h5 class="title nk-block-title">Basic Details:</h5>
+                                            <p>Add driver basic detials. </p>
+                                        </div>
+                                    </div>
+                                    <div class="nk-block">
+                                        <div class="row gy-4">
+                                            <div class="col-xxl-3 col-md-4">
+                                                <div class="form-group">
+                                                    <label class="form-label" for="name">First Name</label>
+                                                    <!--<input type="text" name="plate_number" class="form-control" id="name" placeholder="Registration Number" required> -->
+                                                    {{ form.first_name }}
+                                                </div>
+                                            </div><!--col-->
+                                            <div class="col-xxl-3 col-md-4">
+                                                <div class="form-group">
+                                                    <label class="form-label" for="generic">Last Name</label>
+                                                    <!--<input type="text" name="trailer_number" class="form-control" id="generic" placeholder="Trailer Number">-->
+                                                    {{ form.last_name }}
+                                                </div>
+                                            </div><!--col-->
+                                            <div class="col-xxl-3 col-md-4">
+                                                <div class="form-group">
+                                                    <label class="form-label" for="sKU">ID No</label>
+                                                    <!--<input type="text" name="vin" class="form-control" id="sKU" placeholder="Vehicle Identification Number">-->
+                                                    {{ form.id_no }}
+                                                </div>
+                                            </div><!--col-->
+                                            <div class="col-xxl-3 col-md-4">
+                                                <div class="form-group">
+                                                    <label class="form-label">Home Telephone</label>
+                                                    <div class="form-control-wrap">
+                                                        {{ form.tel_home }}
+                                                    </div>
+                                                </div>
+                                            </div><!--col-->
+                                            <div class="col-xxl-3 col-md-4">
+                                                <div class="form-group">
+                                                    <label class="form-label">Roaming Telephone</label>
+                                                    <div class="form-control-wrap">
+                                                        {{ form.tel_roam }}
+                                                    </div>
+                                                </div>
+                                            </div><!--col-->
+                                            <div class="col-xxl-3 col-md-4">
+                                                <div class="form-group">
+                                                    <label class="form-label">Date Hired</label>
+                                                    <div class="form-control-wrap">
+                                                        <div class="form-icon form-icon-right">
+                                                            <em class="icon ni ni-calendar"></em>
+                                                        </div>
+                                                        <!--<input type="text" name="insurance_expiry" class="form-control date-picker" data-date-format="yyyy-mm-dd" placeholder="yyyy-mm-dd">-->
+                                                        {{ form.date_hired }}
+                                                    </div>
+                                                </div>
+                                            </div><!--col-->
+                                            <div class="col-xxl-3 col-md-4">
+                                                <div class="form-group">
+                                                    <label class="form-label" for="customFileLabel">Passport Photo</label>
+                                                    <div class="form-control-wrap">
+                                                        <div class="form-file">
+                                                            {{ form.driver_photo }}
+                                                            <label class="form-file-label" for="customFile">Choose file</label>
+                                                        </div>
+                                                    </div>
+                                                    {% if driver.driver_photo %}
+                                                    <p>Current Passport Photo: <a href="{{ driver.driver_photo.url }}" target="_blank">{{ driver.driver_photo.name }}</a></p>
+                                                    {% endif %}
+                                                </div>
+                                            </div>
+                                            <div class="col-xxl-3 col-md-4">
+                                                <div class="form-group">
+                                                    <label class="form-label" for="customFileLabel">ID Image</label>
+                                                    <div class="form-control-wrap">
+                                                        <div class="form-file">
+                                                            {{ form.id_img }}
+                                                            <label class="form-file-label" for="customFile">Choose file</label>
+                                                        </div>
+                                                    </div>
+                                                    {% if driver.id_img %}
+                                                    <p>Current ID: <a href="{{ driver.id_img.url }}" target="_blank">{{ driver.id_img.name }}</a></p>
+                                                    {% endif %}
+                                                </div>
+                                            </div>
+                                        </div><!--row-->
+                                    </div>
+                                </div><!-- .card-inner-group -->
+                                <div class="card-inner">
+                                    <div class="nk-block-head">
+                                        <div class="nk-block-head-content">
+                                            <h5 class="title nk-block-title">Driving Licence & Passport Details:</h5>
+                                            <p>Add driver driving licence and passport detials. </p>
+                                        </div>
+                                    </div>
+                                    <div class="nk-block">
+                                        <div class="row gy-4">
+                                            <div class="col-xxl-3 col-md-4">
+                                                <div class="form-group">
+                                                    <label class="form-label">Driving Licence No.</label>
+                                                    <div class="form-control-wrap">
+                                                        {{ form.dl_no }}
+                                                    </div>
+                                                </div>
+                                            </div><!--col-->
+                                            <div class="col-xxl-3 col-md-4">
+                                                <div class="form-group">
+                                                    <label class="form-label">DL Issuing Authority</label>
+                                                    <div class="form-control-wrap">
+                                                        {{ form.dl_issuing_authority }}
+                                                    </div>
+                                                </div>
+                                            </div><!--col-->
+                                            <div class="col-xxl-3 col-md-4">
+                                                <div class="form-group">
+                                                    <label class="form-label" for="customFileLabel">DL Front Image</label>
+                                                    <div class="form-control-wrap">
+                                                        <div class="form-file">
+                                                            {{ form.dl_front_img }}
+                                                            <label class="form-file-label" for="customFile">Choose file</label>
+                                                        </div>
+                                                    </div>
+                                                    {% if driver.dl_front_img %}
+                                                    <p>Current DL Front: <a href="{{ driver.dl_front_img.url }}" target="_blank">{{ driver.dl_front_img.name }}</a></p>
+                                                    {% endif %}
+                                                </div>
+                                            </div>
+                                            <div class="col-xxl-3 col-md-4">
+                                                <div class="form-group">
+                                                    <label class="form-label" for="customFileLabel">DL Back Image</label>
+                                                    <div class="form-control-wrap">
+                                                        <div class="form-file">
+                                                            {{ form.dl_back_img }}
+                                                            <label class="form-file-label" for="customFile">Choose file</label>
+                                                        </div>
+                                                    </div>
+                                                    {% if driver.dl_back_img %}
+                                                    <p>Current DL Back: <a href="{{ driver.dl_back_img.url }}" target="_blank">{{ driver.dl_back_img.name }}</a></p>
+                                                    {% endif %}
+                                                </div>
+                                            </div>
+                                            <div class="col-xxl-3 col-md-4">
+                                                <div class="form-group">
+                                                    <label class="form-label">Passport Number</label>
+                                                    <div class="form-control-wrap">
+                                                        {{ form.passport_number }}
+                                                    </div>
+                                                </div>
+                                            </div><!--col-->
+                                            <div class="col-xxl-3 col-md-4">
+                                                <div class="form-group">
+                                                    <label class="form-label" for="customFileLabel">Passport</label>
+                                                    <div class="form-control-wrap">
+                                                        <div class="form-file">
+                                                            {{ form.passport_image }}
+                                                            <label class="form-file-label" for="customFile">Choose file</label>
+                                                        </div>
+                                                    </div>
+                                                    {% if driver.passport_image %}
+                                                    <p>Passport: <a href="{{ driver.passport_image.url }}" target="_blank">{{ driver.passport_image.name }}</a></p>
+                                                    {% endif %}
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div><!-- .card-inner-group -->
+                                <div class="card-inner">
+                                    <div class="nk-block-head">
+                                        <div class="nk-block-head-content">
+                                            <h5 class="title nk-block-title">Next of Kin Details:</h5>
+                                            <p>Add driver Emergency Contact Person detials. </p>
+                                        </div>
+                                    </div>
+                                    <div class="nk-block">
+                                        <div class="row gy-4">
+                                            <div class="col-xxl-3 col-md-4">
+                                                <div class="form-group">
+                                                    <label class="form-label">Emergency Contact Person</label>
+                                                    <div class="form-control-wrap">
+                                                        {{ form.emergency_contact_person }}
+                                                    </div>
+                                                </div>
+                                            </div><!--col-->
+                                            <div class="col-xxl-3 col-md-4">
+                                                <div class="form-group">
+                                                    <label class="form-label">Relationship</label>
+                                                    <div class="form-control-wrap">
+                                                        {{ form.emergency_contact_person_rlshp }}
+                                                    </div>
+                                                </div>
+                                            </div><!--col-->
+                                            <div class="col-xxl-3 col-md-4">
+                                                <div class="form-group">
+                                                    <label class="form-label">Emergency Contact Number</label>
+                                                    <div class="form-control-wrap">
+                                                        {{ form.emergency_contact_no }}
+                                                    </div>
+                                                </div>
+                                            </div><!--col-->
+                                            <div class="col-xxl-3 col-md-4">
+                                                <div class="form-group">
+                                                    <label class="form-label">Emergency Contact Number II</label>
+                                                    <div class="form-control-wrap">
+                                                        {{ form.emergency_contact_two }}
+                                                    </div>
+                                                </div>
+                                            </div><!--col-->
+                                        </div><!--row-->
+                                    </div>
+                                </div><!-- .card-inner-group -->
+                                <div class="card-inner">
+                                    <div class="nk-block-head">
+                                        <div class="nk-block-head-content">
+                                            <h5 class="title nk-block-title">Assign Truck:</h5>
+                                            <p>Assign this driver a truck. </p>
+                                            <div class="alert alert-fill alert-icon alert-light" role="alert">
+                                                <em class="icon ni ni-alert-circle"></em> 
+                                                Trucks already assigned to drivers are not available for assigning. 
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="nk-block">
+                                        <div class="row gy-4">
+                                            <div class="col-xxl-3 col-md-4">
+                                                <div class="form-group">
+                                                    <label class="form-label">Assign Truck</label>
+                                                    <div class="form-control-wrap">
+                                                        {{ form.assigned_vehicle }}
+                                                    </div>
+                                                </div>
+                                            </div><!--col-->
+                                            <div class="col-12">
+                                                <div class="form-group">
+                                                    <button type="submit" class="btn btn-primary">Update Driver</button>
+                                                </div>
+                                            </div><!--col-->
+                                        </div><!--row-->
+                                    </div>
+                                </div><!-- .card-inner-group -->
+                            </form>
+                        </div>
+                    </div><!-- .card -->
+                </div><!-- .nk-block -->
+            </div>
+        </div>
+    </div>
+</div>
+<!-- content @e -->
+{% endblock content %} 

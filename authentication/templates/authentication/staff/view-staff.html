@@ -1,0 +1,147 @@
+{% extends 'base.html' %} 
+
+{% block content %}
+{% if messages %}
+    {% for message in messages %} 
+        <div id="msg" class="alert {% if message.tags == 'error' %}alert-danger{% elif message.tags == 'success' %}alert-success{% else %}alert-primary{% endif %}">
+            {{ message }}
+        </div>
+    {% endfor %}
+{% endif %} 
+<!-- content @s -->
+<div class="nk-content ">
+    <div class="container-fluid">
+        <div class="nk-content-inner">
+            <div class="nk-content-body">
+                <div class="nk-block">
+                    <div class="card card-bordered">
+                        <div class="card-aside-wrap">
+                            <div class="card-inner card-inner-lg">
+                                <div class="nk-block-head nk-block-head-lg">
+                                    <div class="nk-block-between">
+                                        <div class="nk-block-head-content">
+                                            <h4 class="nk-block-title">Staff Personal Information</h4>
+                                        </div>
+                                        <div class="nk-block-head-content align-self-start d-lg-none">
+                                            <a href="#" class="toggle btn btn-icon btn-trigger mt-n1" data-target="userAside"><em class="icon ni ni-menu-alt-r"></em></a>
+                                        </div>
+                                    </div>
+                                </div><!-- .nk-block-head -->
+                                <div class="nk-block">
+                                    <div class="nk-data data-list">
+                                        <div class="data-head">
+                                            <h6 class="overline-title">Basics</h6>
+                                        </div>
+                                        <div class="data-item" data-bs-toggle="modal" data-bs-target="#profileEdit">
+                                            <div class="data-col">
+                                                <span class="data-label">Full Name</span>
+                                                <span class="data-value">{{staff.first_name}} {{staff.last_name}} </span>
+                                            </div>
+                                            <div class="data-col data-col-end"><span class="data-more"><em class="icon ni ni-forward-ios"></em></span></div>
+                                        </div><!-- data-item -->
+                                        <div class="data-item" data-bs-toggle="modal" data-bs-target="#profileEdit">
+                                            <div class="data-col">
+                                                <span class="data-label">email</span>
+                                                <span class="data-value">{{staff.email}}</span>
+                                            </div>
+                                            <div class="data-col data-col-end"><span class="data-more"><em class="icon ni ni-forward-ios"></em></span></div>
+                                        </div><!-- data-item -->
+                                        <div class="data-item">
+                                            <div class="data-col">
+                                                <span class="data-label">Username</span>
+                                                <span class="data-value">{{staff.username}}</span>
+                                            </div>
+                                            <div class="data-col data-col-end"><span class="data-more disable"><em class="icon ni ni-lock-alt"></em></span></div>
+                                        </div><!-- data-item -->
+                                        <div class="data-item" data-bs-toggle="modal" data-bs-target="#profileEdit">
+                                            <div class="data-col">
+                                                <span class="data-label">Phone Number</span>
+                                                <span class="data-value text-soft">{{staff.phone}}</span>
+                                            </div>
+                                            <div class="data-col data-col-end"><span class="data-more"><em class="icon ni ni-forward-ios"></em></span></div>
+                                        </div><!-- data-item -->
+                                        <div class="data-item" data-bs-toggle="modal" data-bs-target="#profileEdit">
+                                            <div class="data-col">
+                                                <span class="data-label">Date Added</span>
+                                                <span class="data-value">{{staff.date_joined}}</span>
+                                            </div>
+                                            <div class="data-col data-col-end"><span class="data-more"><em class="icon ni ni-forward-ios"></em></span></div>
+                                        </div><!-- data-item -->
+                                    </div><!-- data-list -->
+                                    <div class="nk-data data-list">
+                                        <div class="data-head">
+                                            <h6 class="overline-title">Organizational Preferences</h6>
+                                        </div>
+                                        <div class="data-item">
+                                            <div class="data-col">
+                                                <span class="data-label">Department</span>
+                                                <span class="data-value">{{staff.department}}</span>
+                                            </div>
+                                        </div><!-- data-item -->
+                                        <div class="data-item">
+                                            <div class="data-col">
+                                                <span class="data-label">Designation</span>
+                                                <span class="data-value"> {{staff.designation}}</span>
+                                            </div>
+                                        </div><!-- data-item -->
+                                        <div class="data-item">
+                                            <div class="data-col">
+                                                <span class="data-label">Staff Permissions</span>
+                                                <span class="data-value"> {{ staff_user.user_permissions.all }}</span>
+                                            </div>
+                                        </div><!-- data-item -->
+                                    </div><!-- data-list -->
+                                </div><!-- .nk-block -->
+                            </div>
+                            <div class="card-aside card-aside-left user-aside toggle-slide toggle-slide-left toggle-break-lg" data-toggle-body="true" data-content="userAside" data-toggle-screen="lg" data-toggle-overlay="true">
+                                <div class="card-inner-group" data-simplebar>
+                                    <div class="card-inner">
+                                        <div class="user-card">
+                                            <div class="user-avatar bg-primary">
+                                                <img src="{{staff_user.profile_photo.url}}">
+                                            </div>
+                                            <div class="user-info">
+                                                <span class="lead-text">{{staff.first_name}} {{staff.last_name}}</span>
+                                                <span class="sub-text">{{staff.email}}</span>
+                                            </div>
+                                        </div><!-- .user-card -->
+                                    </div><!-- .card-inner -->
+                                    <div class="card-inner">
+                                        <div class="user-account-info py-0">
+                                            <h6 class="overline-title-alt"> Account Details</h6>
+                                            <!--
+                                            <div class="user-balance">1,295,769 <small class="currency currency-btc">{{company_currency}}</small></div>
+                                            
+                                            <div class="user-balance-sub">Loan Disbursed: <span>{{number_loans_disbursed}}</span></div>
+                                            <div class="user-balance-sub">Total Disbursed: <span>{{company_currency}}{{total_disbursed}}</span></div> -->
+                                        </div>
+                                    </div><!-- .card-inner -->
+                                    <div class="card-inner p-0">
+                                        <ul class="link-list-menu">
+                                           <!-- <li><a class="active" href="html/user-profile-regular.html"><em class="icon ni ni-user-fill-c"></em><span>Personal Infomation</span></a></li>
+                                            <li><a href="html/user-profile-notification.html"><em class="icon ni ni-bell-fill"></em><span>Notifications</span></a></li>
+                                            <li><a href="html/user-profile-activity.html"><em class="icon ni ni-activity-round-fill"></em><span>Account Activity</span></a></li>
+                                            <li><a href="html/user-profile-setting.html"><em class="icon ni ni-lock-alt-fill"></em><span>Security Settings</span></a></li>
+                                            <li><a href="html/user-profile-social.html"><em class="icon ni ni-grid-add-fill-c"></em><span>Connected with Social</span></a></li> -->
+                                        </ul>
+                                    </div><!-- .card-inner -->
+                                </div><!-- .card-inner-group -->
+                            </div><!-- card-aside -->
+                        </div><!-- .card-aside-wrap -->
+                    </div><!-- .card -->
+                </div><!-- .nk-block -->
+            </div>
+        </div>
+    </div>
+</div>
+<!-- content @e -->
+
+<!--  ends-->
+<script>
+    setTimeout(function(){
+        if ($('#msg').length > 0) {
+            $('#msg').remove();
+        }
+    }, 10000)    // 2000 millisecond
+</script>
+{% endblock content %}

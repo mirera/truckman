@@ -1,0 +1,165 @@
+{% extends 'base.html' %}  
+
+{% block content %}
+<!-- content @s -->
+{% if messages %}
+{% for message in messages %}
+    <div class="alert {% if message.tags == 'error' %}alert-danger{% elif message.tags == 'success' %}alert-success{% else %}alert-primary{% endif %}">
+        {{ message }}
+    </div>
+{% endfor %}
+{% endif %}
+<div class="nk-content ">
+    <div class="container-fluid">
+        <div class="nk-content-inner">
+            <div class="nk-content-body">
+                <div class="nk-block-head nk-block-head-sm">
+                    <div class="nk-block-between g-3">
+                        <div class="nk-block-head-content">
+                            <h3 class="nk-block-title page-title">{{ vehicle.plate_number }} details</h3>
+                        </div>
+                        <div class="nk-block-head-content">
+                            <a href="{% url 'list_vehicles' %}" class="btn btn-outline-light bg-white d-none d-sm-inline-flex"><em class="icon ni ni-arrow-left"></em><span>Back</span></a>
+                            <a href="{% url 'list_vehicles' %}" class="btn btn-icon btn-outline-light bg-white d-inline-flex d-sm-none"><em class="icon ni ni-arrow-left"></em></a>
+                        </div>
+                    </div>
+                </div><!--.nk-block-head-->
+                <div class="nk-block">
+                    <div class="card card-bordered">
+                        <div class="card-aside-wrap">
+                            <div class="card-content">
+                                <div class="card-inner">
+                                    <div class="nk-block">
+                                        <div class="nk-block-head nk-block-head-sm nk-block-between">
+                                            <h5 class="title">Vehicle Information</h5>
+                                        </div><!-- .nk-block-head -->
+                                        <div class="row gy-5">
+                                            <div class="col-md-3 col-lg-2 col-6">
+                                                <div class="profile-stats">
+                                                    <span class="profile-ud-label">Plate Number</span>
+                                                    <span>{{ vehicle.plate_number }}</span>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-3 col-lg-2  col-6">
+                                                <div class="profile-stats">
+                                                    <span class="profile-ud-label">Trailer Number</span>
+                                                    <span>{{ vehicle.trailer_number }}</span>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-3 col-lg-2  col-6">
+                                                <div class="profile-stats">
+                                                    <span class="profile-ud-label">VIN</span>
+                                                    <span>{{ vehicle.vin }}</span>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-3 col-lg-2  col-6">
+                                                <div class="profile-stats">
+                                                    <span class="profile-ud-label">Make</span>
+                                                    <span>{{ vehicle.make }} - {{ vehicle.model }} </span>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-3 col-lg-2  col-6">
+                                                <div class="profile-stats">
+                                                    <span class="profile-ud-label">Milage</span>
+                                                    <span>{{ vehicle.milage }} {{vehicle.milage_unit}}</span>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-3 col-lg-2 col-6">
+                                                <div class="profile-stats">
+                                                    <span class="profile-ud-label">Insurance Expiry</span>
+                                                    <span>{{ vehicle.insurance_expiry }}</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="row gy-5">
+                                            <div class="col-md-3 col-lg-2 col-6">
+                                                <div class="profile-stats">
+                                                    <span class="profile-ud-label">Reliability</span>
+                                                    <div>
+                                                        <em class="icon ni ni-star-fill text-warning"></em>
+                                                        <em class="icon ni ni-star-fill text-warning"></em>
+                                                        <em class="icon ni ni-star-fill text-warning"></em>
+                                                        <em class="icon ni ni-star-fill text-warning"></em>
+                                                        <em class="icon ni ni-star-fill text-warning"></em>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div><!-- .nk-block -->
+                                    <div class="nk-divider divider md"></div>
+                                    <div class="nk-block">
+                                        <div class="nk-block-head nk-block-head-sm nk-block-between">
+                                            <h5 class="title">Stock</h5>
+                                        </div><!-- .nk-block-head -->
+                                        <div class="row gy-5">
+                                            <div class="col-md-3 col-sm-4">
+                                                <div class="profile-stats">
+                                                    <span class="profile-ud-label">Starting Stock</span>
+                                                    <span class="amount">{{ vehicle.plate_number }}</span>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-3 col-sm-4">
+                                                <div class="profile-stats">
+                                                    <span class="profile-ud-label">Current Stock</span>
+                                                    <span class="amount">{{ vehicle.plate_number }}</span>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-3 col-sm-4">
+                                                <div class="profile-stats">
+                                                    <span class="profile-ud-label">Vehicle Condition</span>
+                                                    {% if vehicle.condition == 'operational' %}
+                                                    <span class="badge bg-primary">Operational</span>
+                                                    {% else %}
+                                                    <span class="badge bg-warning">Grounded</span>
+                                                    {% endif %}
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="row gy-5">
+                                            <div class="col-lg-4 col-8">
+                                                <div class="profile-stats">
+                                                    <span class="profile-ud-label">Remaining</span>
+                                                    <div class="progress progress-lg">
+                                                        <div class="progress-bar progress-bar-striped progress-bar-animated" data-progress="75">75%</div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div><!-- .nk-block -->
+                                    <div class="nk-divider divider md"></div>
+                                    <div class="nk-block">
+                                        <div class="nk-block-head nk-block-head-sm nk-block-between">
+                                            <h5 class="title">Estimate</h5>
+                                        </div><!-- .nk-block-head -->
+                                        <div class="row gy-5">
+                                            <div class="col-md-3 col-sm-4">
+                                                <div class="profile-stats">
+                                                    <span class="profile-ud-label">Manufacture price</span>
+                                                    <span class="amount">{{ vehicle.plate_number }}</span>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-3 col-sm-4">
+                                                <div class="profile-stats">
+                                                    <span class="profile-ud-label">Seeling price</span>
+                                                    <span class="amount">{{ vehicle.plate_number }} </span>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-3 col-sm-4">
+                                                <div class="profile-stats">
+                                                    <span class="profile-ud-label">Wholesale Price</span>
+                                                    <span class="amount">{{ vehicle.plate_number }}</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div><!-- .nk-block -->
+                                </div><!-- .card-inner -->
+                            </div><!-- .card-content -->
+                        </div><!-- .card-aside-wrap -->
+                    </div><!-- .card -->
+                </div><!-- .nk-block -->
+            </div>
+        </div>
+    </div>
+</div>
+<!-- content @e -->
+{% endblock content %} 

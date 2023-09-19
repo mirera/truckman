@@ -1,0 +1,398 @@
+
+{% extends 'base.html' %}  
+
+{% block content %}
+<!-- content @s -->
+<!-- displaying flash messages -->
+{% if messages %}
+{% for message in messages %}
+    <div class="alert {% if message.tags == 'error' %}alert-danger{% elif message.tags == 'success' %}alert-success{% else %}alert-primary{% endif %}">
+        {{ message }}
+    </div>
+{% endfor %}
+{% endif %}
+<div class="nk-content ">
+    <div class="container-fluid">
+        <div class="nk-content-inner">
+            <div class="nk-content-body">
+                <div class="nk-block-head nk-block-head-sm">
+                    <div class="nk-block-between">
+                        <div class="nk-block-head-content">
+                            <h3 class="nk-block-title page-title">Expenses</h3>
+                        </div><!-- .nk-block-head-content -->
+                        <div class="nk-block-head-content">
+                            <div class="toggle-wrap nk-block-tools-toggle">
+                                <a href="#" class="btn btn-icon btn-trigger toggle-expand me-n1" data-target="pageMenu"><em class="icon ni ni-menu-alt-r"></em></a>
+                                <div class="toggle-expand-content" data-content="pageMenu">
+                                    <ul class="nk-block-tools g-3">
+                                        <li>
+                                            <div class="drodown">
+                                                <a href="#" class="dropdown-toggle btn btn-white btn-dim btn-outline-light" data-bs-toggle="dropdown"><em class="d-none d-sm-inline icon ni ni-filter-alt"></em><span><span class="d-none d-md-inline"></span>Filtered By</span></a>
+                                                <div class="dropdown-menu dropdown-menu-end">
+                                                    <ul class="link-list-opt no-bdr">
+                                                        <li><a href="#"><span>Last 7 Days</span></a></li>
+                                                        <li><a href="#"><span>Last 30 Days</span></a></li>
+                                                        <li><a href="#"><span>Last 6 Month</span></a></li>
+                                                    </ul>
+                                                </div>
+                                            </div>
+                                        </li>
+                                        <li class="nk-block-tools-opt">
+                                            <a data-bs-toggle="modal" class="btn btn-primary" href="#addExpense"><em class="icon ni ni-plus"></em><span>Add Expense</span></a>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div><!-- .toggle-wrap -->
+                        </div><!-- .nk-block-head-content -->
+                    </div><!-- .nk-block-between -->
+                </div><!-- .nk-block-head -->
+                <div class="nk-block">
+                    <div class="row g-gs">
+                        <div class="col-xxl-3 col-sm-6">
+                            <div class="card">
+                                <div class="nk-ecwg nk-ecwg6">
+                                    <div class="card-inner">
+                                        <div class="card-title-group">
+                                            <div class="card-title">
+                                                <h6 class="title">Electricity Charges</h6>
+                                            </div>
+                                        </div>
+                                        <div class="data">
+                                            <div class="data-group">
+                                                <div class="amount">$7,955</div>
+                                                <div class="nk-ecwg6-ck">
+                                                    <canvas class="ecommerce-line-chart-s3" id="electricity"></canvas>
+                                                </div>
+                                            </div>
+                                            <div class="info"><span class="change down text-danger"><em class="icon ni ni-arrow-long-down"></em>2.23%</span><span> vs. last month</span></div>
+                                        </div>
+                                    </div><!-- .card-inner -->
+                                </div><!-- .nk-ecwg -->
+                            </div><!-- .card -->
+                        </div><!-- .col -->
+                        <div class="col-xxl-3 col-sm-6">
+                            <div class="card">
+                                <div class="nk-ecwg nk-ecwg6">
+                                    <div class="card-inner">
+                                        <div class="card-title-group">
+                                            <div class="card-title">
+                                                <h6 class="title">Equipements</h6>
+                                            </div>
+                                        </div>
+                                        <div class="data">
+                                            <div class="data-group">
+                                                <div class="amount">$8,830</div>
+                                                <div class="nk-ecwg6-ck">
+                                                    <canvas class="ecommerce-line-chart-s3" id="equipements"></canvas>
+                                                </div>
+                                            </div>
+                                            <div class="info"><span class="change up text-danger"><em class="icon ni ni-arrow-long-up"></em>1.12%</span><span> vs. last month</span></div>
+                                        </div>
+                                    </div><!-- .card-inner -->
+                                </div><!-- .nk-ecwg -->
+                            </div><!-- .card -->
+                        </div><!-- .col -->
+                        <div class="col-xxl-3 col-sm-6">
+                            <div class="card">
+                                <div class="nk-ecwg nk-ecwg6">
+                                    <div class="card-inner">
+                                        <div class="card-title-group">
+                                            <div class="card-title ">
+                                                <h6 class="title">Maintenance</h6>
+                                            </div>
+                                        </div>
+                                        <div class="data">
+                                            <div class="data-group">
+                                                <div class="amount">$8,974</div>
+                                                <div class="nk-ecwg6-ck">
+                                                    <canvas class="ecommerce-line-chart-s3" id="maintenance"></canvas>
+                                                </div>
+                                            </div>
+                                            <div class="info"><span class="change down text-danger"><em class="icon ni ni-arrow-long-down"></em>1.36%</span><span> vs. last month</span></div>
+                                        </div>
+                                    </div><!-- .card-inner -->
+                                </div><!-- .nk-ecwg -->
+                            </div><!-- .card -->
+                        </div><!-- .col -->
+                        <div class="col-xxl-3 col-sm-6">
+                            <div class="card">
+                                <div class="nk-ecwg nk-ecwg6">
+                                    <div class="card-inner">
+                                        <div class="card-title-group">
+                                            <div class="card-title">
+                                                <h6 class="title">Rents</h6>
+                                            </div>
+                                        </div>
+                                        <div class="data">
+                                            <div class="data-group">
+                                                <div class="amount">$30,485</div>
+                                                <div class="nk-ecwg6-ck">
+                                                    <canvas class="ecommerce-line-chart-s3" id="rents"></canvas>
+                                                </div>
+                                            </div>
+                                            <div class="info"><span class="change up text-primary"><em class="icon ni ni-arrow-long-up"></em>1.34%</span><span> vs. last month</span></div>
+                                        </div>
+                                    </div><!-- .card-inner -->
+                                </div><!-- .nk-ecwg -->
+                            </div><!-- .card -->
+                        </div><!-- .col -->
+                    </div><!-- .row -->
+                </div><!-- .nk-block -->
+                <div class="nk-block">
+                    <div class="card card-bordered card-stretch">
+                        <div class="card-inner-group">
+                            <div class="card-inner position-relative card-tools-toggle">
+                                <div class="card-title-group">
+                                    <div class="card-title">
+                                        <h5 class="title">Expenses List</h5>
+                                    </div>
+                                    <div class="card-tools me-n1">
+                                        <ul class="btn-toolbar gx-1">
+                                            <li>
+                                                <a href="#" class="btn btn-icon search-toggle toggle-search" data-target="search"><em class="icon ni ni-search"></em></a>
+                                            </li><!-- li -->
+                                            <li class="btn-toolbar-sep"></li><!-- li -->
+                                            <li>
+                                                <div class="dropdown">
+                                                    <a href="#" class="btn btn-trigger btn-icon dropdown-toggle" data-bs-toggle="dropdown">
+                                                        <em class="icon ni ni-setting"></em>
+                                                    </a>
+                                                    <div class="dropdown-menu dropdown-menu-end dropdown-menu-xs">
+                                                        <ul class="link-check">
+                                                            <li><span>Show</span></li>
+                                                            <li class="active"><a href="#">10</a></li>
+                                                            <li><a href="#">20</a></li>
+                                                            <li><a href="#">50</a></li>
+                                                        </ul>
+                                                        <ul class="link-check">
+                                                            <li><span>Order</span></li>
+                                                            <li class="active"><a href="#">DESC</a></li>
+                                                            <li><a href="#">ASC</a></li>
+                                                        </ul>
+                                                        <ul class="link-check">
+                                                            <li><span>Density</span></li>
+                                                            <li class="active"><a href="#">Regular</a></li>
+                                                            <li><a href="#">Compact</a></li>
+                                                        </ul>
+                                                    </div>
+                                                </div><!-- .dropdown -->
+                                            </li><!-- li -->
+                                        </ul><!-- .btn-toolbar -->
+                                    </div><!-- .card-tools -->
+                                </div><!-- .card-title-group -->
+                                <div class="card-search search-wrap" data-search="search">
+                                    <div class="card-body">
+                                        <div class="search-content">
+                                            <a href="#" class="search-back btn btn-icon toggle-search" data-target="search"><em class="icon ni ni-arrow-left"></em></a>
+                                            <input type="text" class="form-control border-transparent form-focus-none" placeholder="Search by expense head">
+                                            <button class="search-submit btn btn-icon"><em class="icon ni ni-search"></em></button>
+                                        </div>
+                                    </div>
+                                </div><!-- .card-search -->
+                            </div><!-- .card-inner -->
+                            <div class="card-inner p-0">
+                                <div class="nk-tb-list nk-tb-ulist is-compact">
+                                    <div class="nk-tb-item nk-tb-head bg-lighter">
+                                        <div class="nk-tb-col nk-tb-col-check">
+                                            <div class="custom-control custom-control-sm custom-checkbox notext">
+                                                <input type="checkbox" class="custom-control-input" id="uid">
+                                                <label class="custom-control-label" for="uid"></label>
+                                            </div>
+                                        </div>
+                                        <div class="nk-tb-col tb-col-mb"><span class="sub-text">Trip</span></div>
+                                        <div class="nk-tb-col"><span class="sub-text">Category</span></div>
+                                        <div class="nk-tb-col tb-col-lg"><span class="sub-text">Date</span></div>
+                                        <div class="nk-tb-col tb-col-md"><span class="sub-text">Expense Head</span></div>
+                                        <div class="nk-tb-col"><span class="sub-text">Amount</span></div>
+                                    </div><!-- .nk-tb-item -->
+                                    {% for expense in expenses %}
+                                    <div class="nk-tb-item">
+                                        <div class="nk-tb-col nk-tb-col-check">
+                                            <div class="custom-control custom-control-sm custom-checkbox notext">
+                                                <input type="checkbox" class="custom-control-input" id="uid1">
+                                                <label class="custom-control-label" for="uid1"></label>
+                                            </div>
+                                        </div>
+                                        <div class="nk-tb-col tb-col-mb">
+                                            {% if expense.trip %}
+                                            <span class="fw-medium"><a href="{% url 'view_trip' expense.trip.id %}">#{{expense.trip.trip_id}}</a></span>
+                                            {% endif %}
+                                        </div>
+                                        <div class="nk-tb-col">
+                                            <span>{{expense.expense_category.name}}</span>
+                                        </div>
+                                        <div class="nk-tb-col tb-col-lg">
+                                            <span>{{expense.date_paid}}</span>
+                                        </div>
+                                        <div class="nk-tb-col tb-col-md">
+                                            <span>{{ expense.paid_to }}</span>
+                                        </div>
+                                        <div class="nk-tb-col">
+                                            <span class="tb-amount">${{expense.amount}}</span>
+                                        </div>
+                                    </div><!-- .nk-tb-item -->
+                                    {% endfor %}
+                                </div><!-- .nk-tb-list -->
+                            </div><!-- .card-inner -->
+                            <div class="card-inner">
+                                <div class="nk-block-between-md g-3">
+                                    <div class="g">
+                                        <ul class="pagination justify-content-center justify-content-md-start">
+                                            <li class="page-item"><a class="page-link" href="#">Prev</a></li>
+                                            <li class="page-item"><a class="page-link" href="#">1</a></li>
+                                            <li class="page-item"><a class="page-link" href="#">2</a></li>
+                                            <li class="page-item"><span class="page-link"><em class="icon ni ni-more-h"></em></span></li>
+                                            <li class="page-item"><a class="page-link" href="#">6</a></li>
+                                            <li class="page-item"><a class="page-link" href="#">7</a></li>
+                                            <li class="page-item"><a class="page-link" href="#">Next</a></li>
+                                        </ul><!-- .pagination -->
+                                    </div>
+                                    <div class="g">
+                                        <div class="pagination-goto d-flex justify-content-center justify-content-md-start gx-3">
+                                            <div>Page</div>
+                                            <div>
+                                                <select class="form-select js-select2" data-search="on" data-dropdown="xs center">
+                                                    <option value="page-1">1</option>
+                                                    <option value="page-2">2</option>
+                                                    <option value="page-4">4</option>
+                                                    <option value="page-5">5</option>
+                                                    <option value="page-6">6</option>
+                                                    <option value="page-7">7</option>
+                                                    <option value="page-8">8</option>
+                                                    <option value="page-9">9</option>
+                                                    <option value="page-10">10</option>
+                                                    <option value="page-11">11</option>
+                                                    <option value="page-12">12</option>
+                                                    <option value="page-13">13</option>
+                                                    <option value="page-14">14</option>
+                                                    <option value="page-15">15</option>
+                                                    <option value="page-16">16</option>
+                                                    <option value="page-17">17</option>
+                                                    <option value="page-18">18</option>
+                                                    <option value="page-19">19</option>
+                                                    <option value="page-20">20</option>
+                                                </select>
+                                            </div>
+                                            <div>OF 102</div>
+                                        </div>
+                                    </div><!-- .pagination-goto -->
+                                </div><!-- .nk-block-between -->
+                            </div><!-- .card-inner -->
+                        </div><!-- .card-inner-group -->
+                    </div><!-- .card -->
+                </div><!-- .nk-block -->
+            </div>
+        </div>
+    </div>
+</div>
+<!-- content @e -->
+
+<!-- Add Expense-->
+<div class="modal fade" tabindex="-1" role="dialog" id="addExpense">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <a href="#" class="close" data-bs-dismiss="modal"><em class="icon ni ni-cross-sm"></em></a>
+            <div class="modal-body modal-body-md">
+                <h5 class="modal-title">Add Expense</h5>
+                <form action="{% url 'add_expense' %}" class="mt-4" method="POST">
+                    {% csrf_token %}
+                    <div class="row g-gs">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label class="form-label" for="invoiceId">Expense Category</label> <a data-bs-toggle="modal" href="#addExpenseCategory" class="btn btn-sm btn-outline-primary"><span>Add Category</span><em class="icon ni ni-plus-sm"></em></a>
+                                <div class="form-control-wrap">
+                                    {{ form.expense_category }}
+                                </div>
+                            </div>
+                        </div><!-- .col -->
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label class="form-label" for="category">Trip</label>
+                                <div class="form-control-wrap">
+                                    {{ form.trip }}
+                                </div>
+                            </div>
+                        </div><!-- .col -->
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label class="form-label" for="category">Amount</label>
+                                <div class="form-control-wrap">
+                                    {{ form.amount }}
+                                </div>
+                            </div>
+                        </div><!-- .col -->
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label class="form-label">Date Paid</label>
+                                <div class="form-control-wrap">
+                                    <div class="form-icon form-icon-right">
+                                        <em class="icon ni ni-calendar"></em>
+                                    </div>
+                                    {{form.date_paid}}
+                                </div>
+                            </div>
+                        </div><!--col-->
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label class="form-label" for="expenseHead">Paid To</label>
+                                <div class="form-control-wrap">
+                                    {{ form.paid_to }}
+                                </div>
+                            </div>
+                        </div><!-- .col -->
+                        
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label class="form-label" for="customFileLabel">Receipt</label>
+                                <div class="form-control-wrap">
+                                    <div class="form-file">
+                                        <!--<input type="file" class="form-file-input" id="customFile">-->
+                                        {{ form.receipt }}
+                                        <label class="form-file-label" for="customFile">Choose file</label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div><!-- .col -->
+                        <div class="col-12">
+                            <ul class="align-center flex-wrap flex-sm-nowrap gx-4 gy-2">
+                                <button type="submit" class="btn btn-primary">Add Expense</button>
+                            </ul>
+                        </div>
+                    </div>
+                </form>
+            </div><!-- .modal-body -->
+        </div><!-- .modal-content -->
+    </div><!-- .modal-dialog -->
+</div><!-- .modal -->
+
+<!-- Add Expense Category -->
+<div class="modal fade" tabindex="-1" role="dialog" id="addExpenseCategory">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <a href="#" class="close" data-bs-dismiss="modal"><em class="icon ni ni-cross-sm"></em></a>
+            <div class="modal-body modal-body-md">
+                <h5 class="modal-title">Add Expense Category</h5>
+                <form action="{% url 'add_expense_category' %}" class="mt-4" method="POST">
+                    {% csrf_token %}
+                    <div class="row g-gs">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label class="form-label" for="category">Expense Category Name</label> 
+                                <div class="form-control-wrap">
+                                    {{ category_form.name }}
+                                </div>
+                            </div>
+                        </div><!-- .col -->
+                        <div class="col-12">
+                            <ul class="align-center flex-wrap flex-sm-nowrap gx-4 gy-2">
+                                <button type="submit" class="btn btn-primary">Add Category</button>
+                            </ul>
+                        </div>
+                    </div>
+                </form>
+            </div><!-- .modal-body -->
+        </div><!-- .modal-content -->
+    </div><!-- .modal-dialog -->
+</div><!-- .modal -->
+
+{% endblock content %}

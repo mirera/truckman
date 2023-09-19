@@ -1,0 +1,119 @@
+{% extends 'base.html' %}  
+
+{% block content %}
+<!-- content @s -->
+{% if messages %}
+{% for message in messages %}
+    <div class="alert {% if message.tags == 'error' %}alert-danger{% elif message.tags == 'success' %}alert-success{% else %}alert-primary{% endif %}">
+        {{ message }}
+    </div>
+{% endfor %}
+{% endif %}
+<div class="nk-content ">
+    <div class="container-fluid">
+        <div class="nk-content-inner">
+            <div class="nk-content-body">
+                <div class="nk-block-head nk-block-head-sm">
+                    <div class="nk-block-between">
+                        <div class="nk-block-head-content">
+                            <h3 class="nk-block-title page-title">Update Staff</h3>
+                            <div class="nk-block-des text-soft">
+                                <p>Update {{staff.first_name}} details.</p>
+                            </div>
+                        </div><!-- .nk-block-head-content -->
+                    </div><!-- .nk-block-between -->
+                </div><!-- .nk-block-head -->
+                <div class="nk-block">
+                    <div class="card card-bordered">
+                        <div class="card-inner">
+                            <form action="{% url 'update_staff' staff.id %}" method="POST" enctype="multipart/form-data" >
+                                {% csrf_token %}
+                                <div class="row gy-4">
+                                    <div class="col-xxl-3 col-md-4">
+                                        <div class="form-group">
+                                            <label class="form-label" for="name">First Name</label>
+                                            <!--<input type="text" name="plate_number" class="form-control" id="name" placeholder="Registration Number" required> -->
+                                            {{ form.first_name }}
+                                        </div>
+                                    </div><!--col-->
+                                    <div class="col-xxl-3 col-md-4">
+                                        <div class="form-group">
+                                            <label class="form-label" for="generic">Last Name</label>
+                                            <!--<input type="text" name="trailer_number" class="form-control" id="generic" placeholder="Trailer Number">-->
+                                            {{ form.last_name }}
+                                        </div>
+                                    </div><!--col-->
+                                    <div class="col-xxl-3 col-md-4">
+                                        <div class="form-group">
+                                            <label class="form-label">Contact Email</label>
+                                            <div class="form-control-wrap">
+                                                {{ form.email }}
+                                            </div>
+                                        </div>
+                                    </div><!--col-->
+                                    <div class="col-xxl-3 col-md-4">
+                                        <div class="form-group">
+                                            <label class="form-label" for="sKU">Phone</label>
+                                            <!--<input type="text" name="vin" class="form-control" id="sKU" placeholder="Vehicle Identification Number">-->
+                                            {{ form.phone }}
+                                        </div>
+                                    </div><!--col-->
+                                    <div class="col-xxl-3 col-md-4">
+                                        <div class="form-group">
+                                            <label class="form-label">Role</label>
+                                            <div class="form-control-wrap">
+                                                {{ form.role }}
+                                            </div>
+                                        </div>
+                                    </div><!--col-->
+                                    <div class="col-xxl-3 col-md-4">
+                                        <div class="form-group">
+                                            <label class="form-label">Department</label>
+                                            <div class="form-control-wrap">
+                                                {{ form.department }}
+                                            </div>
+                                        </div>
+                                    </div><!--col-->
+                                    <div class="col-xxl-3 col-md-4">
+                                        <div class="form-group">
+                                            <label class="form-label">Designation</label>
+                                            <div class="form-control-wrap">
+                                                {{ form.designation }}
+                                            </div>
+                                        </div>
+                                    </div><!--col-->
+                                    <div class="col-xxl-3 col-md-4">
+                                        <div class="form-group">
+                                            <label class="form-label">Date Joined</label>
+                                            <div class="form-control-wrap">
+                                                {{ form.date_joined }}
+                                            </div>
+                                        </div>
+                                    </div><!--col-->
+                                    <div class="col-xxl-3 col-md-4"> 
+                                        <div class="form-group">
+                                            <label class="form-label" for="customFileLabel">Profile Photo</label>
+                                            <div class="form-control-wrap">
+                                                <div class="form-file">
+                                                    {{ form.profile_photo }}
+                                                    <label class="form-file-label" for="customFile">Choose File</label>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-12">
+                                        <div class="form-group">
+                                            <button type="submit" class="btn btn-primary">Update Staff</button>
+                                        </div>
+                                    </div><!--col-->
+                                </div><!--row-->
+                            </form>
+                        </div><!-- .card-inner-group -->
+                    </div><!-- .card -->
+                </div><!-- .nk-block -->
+            </div>
+        </div>
+    </div>
+</div>
+<!-- content @e -->
+{% endblock content %} 

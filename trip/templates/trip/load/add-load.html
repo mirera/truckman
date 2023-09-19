@@ -1,0 +1,228 @@
+{% extends 'base.html' %}  
+
+{% block content %}
+<!-- content @s -->
+<!-- displaying flash messages -->
+{% if messages %}
+{% for message in messages %}
+    <div class="alert {% if message.tags == 'error' %}alert-danger{% elif message.tags == 'success' %}alert-success{% else %}alert-primary{% endif %}">
+        {{ message }}
+    </div>
+{% endfor %}
+{% endif %}
+<div class="nk-content ">
+    <div class="container-fluid">
+        <div class="nk-content-inner">
+            <div class="nk-content-body">
+                <div class="nk-block-head nk-block-head-sm">
+                    <div class="nk-block-between">
+                        <div class="nk-block-head-content">
+                            <h3 class="nk-block-title page-title">Add Planned Load</h3>
+                            <div class="nk-block-des text-soft">
+                                <p>Input new planned load information carefully.</p>
+                            </div>
+                        </div><!-- .nk-block-head-content -->
+                    </div><!-- .nk-block-between -->
+                </div><!-- .nk-block-head -->
+                <div class="nk-block">
+                    <div class="card card-bordered">
+                        <div class="card-inner-group">
+                            <form action="{% url 'add_load' %}" method="POST" enctype="multipart/form-data">
+                                {% csrf_token %}
+                                <div class="card-inner">
+                                    <div class="nk-block-head">
+                                        <div class="nk-block-head-content">
+                                            <h5 class="title nk-block-title">Basic Details </h5>
+                                            <p>Add load basic details. </p>
+                                        </div>
+                                    </div>
+                                    <div class="nk-block">
+                                        <div class="row gy-4">
+                                            <div class="col-xxl-3 col-md-4">
+                                                <div class="form-group">
+                                                    <label class="form-label">Select Quotation</label>
+                                                    <div class="form-control-wrap">
+                                                        {{form.estimate}}
+                                                    </div>
+                                                </div>
+                                            </div><!--col-->
+                                            <div class="col-xxl-3 col-md-4">
+                                                <div class="form-group">
+                                                    <label class="form-label">Quotation Amount</label>
+                                                    <div class="form-control-wrap">
+                                                        <input type="number" name="quoteAmount" class="form-control" id="quoteAmount" value=" " readonly>
+                                                    </div>
+                                                </div>
+                                            </div><!--col-->
+                                            <div class="col-xxl-3 col-md-4">
+                                                <div class="form-group">
+                                                    <label class="form-label" for="full-name">Customer</label>
+                                                    <div class="form-control-wrap">
+                                                        <input type="text" name="customer" class="form-control" id="customer" value=" " readonly>
+                                                    </div>
+                                                </div>
+                                            </div><!--col-->
+                                            <div class="col-xxl-3 col-md-4">
+                                                <div class="form-group">
+                                                    <label class="form-label" for="phone-no">Commodity</label>
+                                                    <div class="form-control-wrap">
+                                                        <input type="text" name="commodity" class="form-control" id="commodity" value=" " readonly>
+                                                    </div>
+                                                </div>
+                                            </div><!--col-->
+                                            <div class="col-xxl-3 col-md-4">
+                                                <div class="form-group">
+                                                    <label class="form-label" for="phone-no">Quantity</label>
+                                                    <div class="form-control-wrap">
+                                                        <input type="number" name="quantity" class="form-control" id="quantity" value=" " readonly>
+                                                    </div>
+                                                </div>
+                                            </div><!--col-->
+                                            <div class="col-xxl-3 col-md-4">
+                                                <div class="form-group">
+                                                    <label class="form-label" for="phone-no">Quantity Type</label>
+                                                    <div class="form-control-wrap">
+                                                        {{form.quantity_type}}
+                                                    </div>
+                                                </div>
+                                            </div><!--col-->
+                                            <div class="col-xxl-3 col-md-4">
+                                                <div class="form-group">
+                                                    <label class="form-label" for="phone-no">Weight</label>
+                                                    <div class="form-control-wrap">
+                                                        {{form.weight}}
+                                                    </div>
+                                                </div>
+                                            </div><!--col-->
+                                            <div class="col-xxl-3 col-md-4">
+                                                <div class="form-group">
+                                                    <label class="form-label">Description</label>
+                                                    <div class="form-control-wrap">
+                                                        {{form.notes}}
+                                                    </div>
+                                                </div>
+                                            </div><!--col-->
+                                        </div><!--row-->
+                                    </div>
+                                </div><!-- .card-inner -->
+                                <div class="card-inner">
+                                    <div class="nk-block-head">
+                                        <div class="nk-block-head-content">
+                                            <h5 class="title nk-block-title">Stops: Pickup & Delivery</h5>
+                                            <p>Pick up and Delivery information. </p>
+                                        </div>
+                                    </div>
+                                    <div class="nk-block">
+                                        <div class="row gy-4">
+                                            <div class="col-xxl-3 col-md-4">
+                                                <div class="form-group">
+                                                    <label class="form-label">Shipper</label>
+                                                    <div class="form-control-wrap">
+                                                        {{form.shipper}}
+                                                    </div>
+                                                </div>
+                                            </div><!--col-->
+                                            <div class="col-xxl-3 col-md-4">
+                                                <div class="form-group">
+                                                    <label class="form-label">Pickup Date</label>
+                                                    <div class="form-control-wrap">
+                                                        <div class="form-icon form-icon-right">
+                                                            <em class="icon ni ni-calendar"></em>
+                                                        </div>
+                                                        {{form.pickup_date}}
+                                                    </div>
+                                                </div>
+                                            </div><!--col-->
+                                            <div class="col-xxl-3 col-md-4">
+                                                <div class="form-group">
+                                                    <label class="form-label">Consignee</label>
+                                                    {{form.consignee}}
+                                                </div>
+                                            </div><!--col-->
+                                            <div class="col-xxl-3 col-md-4">
+                                                <div class="form-group">
+                                                    <label class="form-label">Delivery Date</label>
+                                                    <div class="form-control-wrap">
+                                                        <div class="form-icon form-icon-right">
+                                                            <em class="icon ni ni-calendar"></em>
+                                                        </div>
+                                                        {{form.delivery_date}}
+                                                    </div>
+                                                </div>
+                                            </div><!--col-->
+                                            <div class="col-xxl-3 col-md-8">
+                                                <div class="form-group">
+                                                    <label class="form-label">Drivers Instructions</label>
+                                                    {{form.driver_instructions}}
+                                                </div>
+                                            </div><!--col-->
+                                            
+                                        </div><!--row-->
+                                    </div>
+                                </div><!-- .card-inner -->
+                                <div class="card-inner">
+                                    <div class="nk-block-head">
+                                        <div class="nk-block-head-content">
+                                            <h5 class="title nk-block-title">Disclaimer</h5>
+                                            <p>Add disclaimer if any. </p>
+                                        </div>
+                                    </div>
+                                    <div class="nk-block">
+                                        <div class="row gy-4">
+                                            <div class="col-xxl-3 col-md-8">
+                                                <div class="form-group">
+                                                    <label class="form-label" for="default-02">Legal Disclaimer</label>
+                                                    <div class="form-control-wrap">
+                                                        <!--<textarea name="notes" class="form-control" id="default-textarea">Add more details</textarea>-->
+                                                        {{ form.legal_disclaimer }}
+                                                    </div>
+                                                </div>
+                                            </div><!--col-->
+                                            <div class="col-12">
+                                                <div class="form-group">
+                                                    <button type="submit" class="btn btn-primary">Add Load</button>
+                                                </div>
+                                            </div><!--col-->
+                                        </div><!--row-->
+                                    </div>
+                                </div><!-- .card-inner -->
+                            </form>
+                        </div>
+                    </div><!-- .card -->
+                </div><!-- .nk-block -->
+            </div>
+        </div>
+    </div>
+</div>
+<!-- content @e -->
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+<!-- get estimate/quotation details on choosing a estimate -->
+<script>
+    $(document).ready(function () {
+        // Get references to the input fields and select field
+        var estimateSelect = $("#estimate");
+        var estimateAmountInput = $("#quoteAmount");
+        var estimateItemInput = $("#commodity");
+        var estimateQuantityInput = $("#quantity");
+        var estimateCustomerInput = $("#customer");
+
+        // Add an event listener to the "Estimate" select field
+        estimateSelect.on("change", function () {
+            // Get the selected estimate ID
+            var estimateId = $(this).val();
+
+            // Send a GET request to fetch estimate  information
+            $.get("/trip/get_estimate_info/" + estimateId, function (data) {
+                // Update the quotation amount input fields with the fetched data
+                estimateAmountInput.val(data.amount);
+                estimateItemInput.val(data.item);
+                estimateQuantityInput.val(data.quantity);
+                estimateCustomerInput.val(data.customer);
+            });
+        });
+    });
+</script>
+<!-- end -->
+{% endblock content %}  

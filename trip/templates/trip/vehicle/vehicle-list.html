@@ -1,0 +1,277 @@
+{% extends 'base.html' %}  
+
+{% block content %}
+<!-- content @s -->
+<!-- displaying flash messages -->
+{% if messages %}
+{% for message in messages %}
+    <div class="alert {% if message.tags == 'error' %}alert-danger{% elif message.tags == 'success' %}alert-success{% else %}alert-primary{% endif %}">
+        {{ message }}
+    </div>
+{% endfor %}
+{% endif %}
+<div class="nk-content ">
+    <div class="container-fluid">
+        <div class="nk-content-inner">
+            <div class="nk-content-body">
+                <div class="nk-block-head nk-block-head-sm">
+                    <div class="nk-block-between">
+                        <div class="nk-block-head-content">
+                            <h3 class="nk-block-title page-title">Vehicles</h3>
+                            <div class="nk-block-des text-soft">
+                                <p>Here is the vehicles list.</p>
+                            </div>
+                        </div><!-- .nk-block-head-content -->
+                        <div class="nk-block-head-content">
+                            <div class="toggle-wrap nk-block-tools-toggle">
+                                <a href="#" class="btn btn-icon btn-trigger toggle-expand me-n1" data-target="pageMenu"><em class="icon ni ni-more-v"></em></a>
+                                <div class="toggle-expand-content" data-content="pageMenu">
+                                    <ul class="nk-block-tools g-3">
+                                        <li>
+                                            <div class="form-control-wrap">
+                                                <div class="form-icon form-icon-right">
+                                                    <em class="icon ni ni-search"></em>
+                                                </div>
+                                                <input type="text" class="form-control" id="default-04" placeholder="Quick search by name">
+                                            </div>
+                                        </li>
+                                        <li>
+                                            <div class="drodown">
+                                                <a href="#" class="dropdown-toggle btn btn-white btn-dim btn-outline-light" data-bs-toggle="dropdown"><em class="d-none d-sm-inline icon ni ni-filter-alt"></em><span><span class="d-none d-md-inline"></span>Filtered By</span><em class="dd-indc icon ni ni-chevron-right"></em></a>
+                                                <div class="dropdown-menu dropdown-menu-end">
+                                                    <ul class="link-list-opt no-bdr">
+                                                        <li><a href="#"><span>Alphabetically, A-Z</span></a></li>
+                                                        <li><a href="#"><span>Alphabetically, Z-A</span></a></li>
+                                                        <li><a href="#"><span>Best Selling</span></a></li>
+                                                    </ul>
+                                                </div>
+                                            </div>
+                                        </li>
+                                        <li class="nk-block-tools-opt">
+                                            <a href="html/pharmacy/add-medicine.html" class="btn btn-icon btn-primary d-md-none"><em class="icon ni ni-plus"></em></a>
+                                            <a href="{% url 'add_vehicle' %}" class="btn btn-primary d-none d-md-inline-flex"><em class="icon ni ni-plus"></em><span>Add Vehicle</span></a>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div><!-- .nk-block-head-content -->
+                    </div><!-- .nk-block-between -->
+                </div><!-- .nk-block-head -->
+                <div class="nk-block">
+                    <div class="card card-bordered">
+                        <div class="card-inner-group">
+                            <div class="card-inner p-0">
+                                <div class="nk-tb-list">
+                                    <div class="nk-tb-item nk-tb-head">
+                                        <div class="nk-tb-col nk-tb-col-check">
+                                            <div class="custom-control custom-control-sm custom-checkbox notext">
+                                                <input type="checkbox" class="custom-control-input" id="pid">
+                                                <label class="custom-control-label" for="pid"></label>
+                                            </div>
+                                        </div>
+                                        <div class="nk-tb-col"><span>Plate Number</span></div>
+                                        <div class="nk-tb-col tb-col-lg"><span>VIN</span></div>
+                                        <div class="nk-tb-col tb-col-md"><span>Make</span></div>
+                                        <div class="nk-tb-col tb-col-lg"><span>Milage</span></div>
+                                        <div class="nk-tb-col tb-col-lg"><span>Insurance Expiry</span></div>
+                                        <div class="nk-tb-col tb-col-md"><span class="sub-text">Condition</span></div>
+                                        <div class="nk-tb-col nk-tb-col-tools">
+                                            <ul class="nk-tb-actions gx-1 my-n1">
+                                                <li class="me-n1">
+                                                    <div class="dropdown">
+                                                        <a href="#" class="dropdown-toggle btn btn-icon btn-trigger" data-bs-toggle="dropdown"><em class="icon ni ni-more-h"></em></a>
+                                                        <div class="dropdown-menu dropdown-menu-end">
+                                                            <ul class="link-list-opt no-bdr">
+                                                                <li><a data-bs-toggle="modal" href="#modalDelete"><em class="icon ni ni-trash"></em><span>Remove Selected</span></a></li>
+                                                            </ul>
+                                                        </div>
+                                                    </div>
+                                                </li>
+                                            </ul>
+                                        </div>
+                                    </div><!-- .nk-tb-item -->
+                                    {% for vehicle in vehicles %}
+                                    <div class="nk-tb-item">
+                                        <div class="nk-tb-col nk-tb-col-check">
+                                            <div class="custom-control custom-control-sm custom-checkbox notext">
+                                                <input type="checkbox" class="custom-control-input" id="pid1">
+                                                <label class="custom-control-label" for="pid1"></label>
+                                            </div>
+                                        </div>
+                                        <div class="nk-tb-col">
+                                            <a href="{% url 'view_vehicle' vehicle.id %}">
+                                                <span class="tb-product">
+                                                    <div class="row">
+                                                        <div class="col-md-12">
+                                                            <span class="title">{{ vehicle.plate_number }}</span>
+                                                        </div>
+                                                        <div class="col-md-12">
+                                                            <span class="small-font">{{ vehicle.trailer_number }}</span>
+                                                        </div>
+                                                    </div>
+                                                </span>
+                                            </a>
+                                        </div>
+                                        <div class="nk-tb-col tb-col-lg">
+                                            <span>{{vehicle.vin}}</span>
+                                        </div>
+                                        <div class="nk-tb-col tb-col-md">
+                                            <span>{{vehicle.make.name}}</span>
+                                        </div>
+                                        <div class="nk-tb-col tb-col-lg">
+                                            <span>{{ vehicle.milage}}</span>
+                                        </div>
+                                        <div class="nk-tb-col tb-col-lg">
+                                            <span class="tb-date">{{ vehicle.insurance_expiry}}</span>
+                                        </div>
+                                        <div class="nk-tb-col tb-col-md">
+                                            {% if vehicle.condition == 'operational' %}
+                                            <span class="tb-status text-success">{{vehicle.condition}}</span>
+                                            {% elif vehicle.condition == 'grounded' %}
+                                            <span class="tb-status text-warning">{{vehicle.condition}}</span>
+                                            {% endif %}
+                                        </div>
+                                        <div class="nk-tb-col nk-tb-col-tools">
+                                            <ul class="nk-tb-actions gx-1 my-n1">
+                                                <li class="me-n1">
+                                                    <div class="dropdown">
+                                                        <a href="#" class="dropdown-toggle btn btn-icon btn-trigger" data-bs-toggle="dropdown"><em class="icon ni ni-more-h"></em></a>
+                                                        <div class="dropdown-menu dropdown-menu-end">
+                                                            <ul class="link-list-opt no-bdr">
+                                                                <li><a href="{% url 'view_vehicle' vehicle.id %}"><em class="icon ni ni-eye"></em><span>View Details</span></a></li>
+                                                                <li><a href="{% url 'update_vehicle' vehicle.id %}"><em class="icon ni ni-edit"></em><span>Update </span></a></li>
+                                                                <li><a data-bs-toggle="modal" class="delete-button" href="#deleteVehicle" data-pk="{{ vehicle.id }}"><em class="icon ni ni-trash"></em><span>Remove Vehicle</span></a></li>
+                                                            </ul>
+                                                        </div>
+                                                    </div>
+                                                </li>
+                                            </ul>
+                                        </div>
+                                    </div><!-- .nk-tb-item -->
+                                    {% endfor %}
+                                </div><!-- .nk-tb-list -->
+                            </div>
+                            <div class="card-inner">
+                                <div class="nk-block-between-md g-3">
+                                    <div class="g">
+                                        <ul class="pagination justify-content-center justify-content-md-start">
+                                            <li class="page-item"><a class="page-link" href="#"><em class="icon ni ni-chevrons-left"></em></a></li>
+                                            <li class="page-item"><a class="page-link" href="#">1</a></li>
+                                            <li class="page-item"><a class="page-link" href="#">2</a></li>
+                                            <li class="page-item"><span class="page-link"><em class="icon ni ni-more-h"></em></span></li>
+                                            <li class="page-item"><a class="page-link" href="#">6</a></li>
+                                            <li class="page-item"><a class="page-link" href="#">7</a></li>
+                                            <li class="page-item"><a class="page-link" href="#"><em class="icon ni ni-chevrons-right"></em></a></li>
+                                        </ul><!-- .pagination -->
+                                    </div>
+                                    <div class="g">
+                                        <div class="pagination-goto d-flex justify-content-center justify-content-md-start gx-3">
+                                            <div>Page</div>
+                                            <div>
+                                                <select class="form-select form-select-sm js-select2" data-search="on" data-dropdown="xs center">
+                                                    <option value="page-1">1</option>
+                                                    <option value="page-2">2</option>
+                                                    <option value="page-4">4</option>
+                                                    <option value="page-5">5</option>
+                                                    <option value="page-6">6</option>
+                                                    <option value="page-7">7</option>
+                                                    <option value="page-8">8</option>
+                                                    <option value="page-9">9</option>
+                                                    <option value="page-10">10</option>
+                                                    <option value="page-11">11</option>
+                                                    <option value="page-12">12</option>
+                                                    <option value="page-13">13</option>
+                                                    <option value="page-14">14</option>
+                                                    <option value="page-15">15</option>
+                                                    <option value="page-16">16</option>
+                                                    <option value="page-17">17</option>
+                                                    <option value="page-18">18</option>
+                                                    <option value="page-19">19</option>
+                                                    <option value="page-20">20</option>
+                                                </select>
+                                            </div>
+                                            <div>OF 102</div>
+                                        </div>
+                                    </div><!-- .pagination-goto -->
+                                </div><!-- .nk-block-between -->
+                            </div>
+                        </div>
+                    </div>
+                </div><!-- .nk-block -->
+                
+            </div>
+        </div>
+    </div>
+</div>
+<!-- content @e -->
+
+<div class="modal fade" id="deleteVehicle">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <a href="#" class="close" data-bs-dismiss="modal"><em class="icon ni ni-cross"></em></a>
+            <div class="modal-body modal-body-sm text-center">
+                <div class="nk-modal py-4">
+                    <em class="nk-modal-icon icon icon-circle icon-circle-xxl ni ni-cross bg-danger"></em>
+                    <h4 class="nk-modal-title">Are You Sure ?</h4>
+                    <div class="nk-modal-text mt-n2">
+                        <p class="text-soft">This vehicle will be removed permanently.</p>
+                    </div>
+                    <ul class="d-flex justify-content-center gx-4 mt-4">
+                        <form id="delete-form" method="POST">
+                            {% csrf_token %}
+                        <li>
+                            <button type="submit" data-bs-dismiss="modal" id="deleteObj" class="btn btn-primary">Yes, Delete.</button>
+                        </li>
+                        </form>
+                        <li>
+                            <button data-bs-dismiss="modal" data-toggle="modal" data-target="#editEventPopup" class="btn btn-danger btn-dim">Cancel</button>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div><!-- .Delete role  Modal-content -->
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+    //-- deleteRole modal script
+    function showDeleteModalForm() {
+    // Implementation of showModalForm() to display the modal
+    $('#deleteVehicle').modal('show');
+}
+
+    $(document).ready(function() {
+    // Get all the delete buttons
+    var deleteButtons = document.getElementsByClassName('delete-button');
+
+    // Loop through each delete button
+    for (var i = 0; i < deleteButtons.length; i++) {
+        // Add click event listener
+        deleteButtons[i].addEventListener('click', function() {
+            // Get the pk from the data attribute
+            var pk = this.dataset.pk;
+
+            // Update the form's action with the correct URL
+            // Replace '0' with the actual value of pk from your Django template context
+            var form = document.getElementById('delete-form');
+            form.action = '{% url "remove_vehicle" 0 %}'.replace('0', pk);
+
+            // Display the modal form
+            // Assuming you have code to display the modal form
+            showDeleteModalForm();
+
+            // You can add additional logic here if needed, e.g., pre-fill form fields, etc.
+
+            // Let the user manually click the submit button
+            // Assuming you have a submit button with id 'delete-submit-button'
+            document.getElementById('deleteObj').addEventListener('click', function() {
+                // Submit the form
+                form.submit();
+            });
+        });
+    }
+});
+//-- ends
+</script>
+{% endblock content %} 

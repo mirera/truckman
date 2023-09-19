@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="zxx" class="js">
+{% load static %}
+<head>
+    <!-- StyleSheets  -->
+    <link rel="stylesheet" href="{% static 'css/dashlite.css' %}">
+    <link id="skin-default" rel="stylesheet" href="{% static 'css/theme.css' %}">
+</head>
+<!-- content @s -->
+<div class="nk-content ">
+    <div class="container-fluid">
+        <div class="nk-content-inner">
+            <div class="nk-content-body">
+                
+                <div class="nk-block">
+                    <div class="invoice">
+                        <div class="invoice-wrap">
+                            {% if company.logo %}
+                            <div class="invoice-brand text-left">
+                                <img src="{{ company.logo.url }}" srcset="{{ company.logo.url }} 2x" alt="">
+                            </div>
+                            {% endif %}
+                            <div class="invoice-head">
+                                <div class="row">
+                                    <div class="col-md-8 mb-4">
+                                        <div class="invoice-contact">
+                                            <span class="overline-title">Invoice From</span>
+                                            <div class="invoice-contact-info">
+                                                <h4 class="title">{{ company.name }}</h4>
+                                                <ul class="list-plain">
+                                                    <li><em class="icon ni ni-map-pin-fill"></em><span>{{ company.address }}, {{ company.city }}, {{ company.country }}</span></li>
+                                                    <li><em class="icon ni ni-mail"></em><span>{{ company.email }}</span></li>
+                                                    <li><em class="icon ni ni-call-fill"></em><span>{{ company.phone_no }}</span></li>
+                                                    
+                                                </ul>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-8 mb-4">
+                                        <div class="invoice-contact">
+                                            <span class="overline-title">Invoice To</span>
+                                            <div class="invoice-contact-info">
+                                                <h4 class="title">{{ invoice.trip.load.estimate.customer.name }}</h4>
+                                                <ul class="list-plain">
+                                                    <li><em class="icon ni ni-map-pin-fill"></em><span>{{ invoice.trip.load.estimate.customer.address_one }}, {{ invoice.trip.load.estimate.customer.city }}, {{ invoice.trip.load.estimate.customer.country }} </span></li>
+                                                    <li><em class="icon ni ni-mail"></em><span>{{ invoice.trip.load.estimate.customer.email }}</span></li>
+                                                    <li><em class="icon ni ni-call-fill"></em><span>{{ invoice.trip.load.estimate.customer.phone }}</span></li>
+                                                </ul>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="invoice-desc">
+                                        <h3 class="title">Invoice</h3>
+                                        <ul class="list-plain">
+                                            <li class="invoice-id"><span>Invoice ID</span>:<span>{{ invoice.invoice_id }}</span></li>
+                                            <li class="invoice-date"><span>Invoice Date</span>:<span>{{ invoice.invoice_date }}</span></li>
+                                            <li class="invoice-date"><span>Date Due</span>:<span>{{ invoice.due_date }}</span></li>
+                                        </ul>
+                                    </div>
+                                    <div>
+                                        {% if invoice.status == 'Paid' %}
+                                        <a  class="btn btn-lg btn-outline-success">{{ invoice.status }}</a>
+                                        {% elif invoice.status == 'Unpaid' %}
+                                        <a class="btn btn-lg btn-outline-warning">{{ invoice.status }}</a>
+                                        {% else %}
+                                        <a class="btn btn-lg btn-outline-secondary">{{ invoice.status }}</a>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div><!-- .invoice-head -->
+                            <div class="invoice-bills">
+                                <div class="table-responsive">
+                                    <table class="table table-striped">
+                                        <thead>
+                                            <tr>
+                                                <th class="w-150px">Item ID</th>
+                                                <th class="w-60">Description</th>
+                                                <th>Price</th>
+                                                <th>Qty</th>
+                                                <th>Amount</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            
+                                            <tr>
+                                                <td>{{ invoice.item }}</td>
+                                                <td>{{ invoice.description }}</td>
+                                                <td>${{ invoice.unit_price }}</td>
+                                                <td>{{ invoice.quantity}}</td>
+                                                <td>${{ invoice.sub_total }}</td>
+                                            </tr>
+                                        </tbody>
+                                        <tfoot>
+                                            <tr>
+                                                <td colspan="2"></td>
+                                                <td colspan="2">Subtotal</td>
+                                                <td>${{ invoice.sub_total }}</td>
+                                            </tr>
+                                            <tr>
+                                                <td colspan="2"></td>
+                                                <td colspan="2">Discount</td>
+                                                <td>${{ invoice.discount }}</td>
+                                            </tr>
+                                            <tr>
+                                                <td colspan="2"></td>
+                                                <td colspan="2">Tax</td>
+                                                <td>${{ invoice.tax }}</td>
+                                            </tr>
+                                            <tr>
+                                                <td colspan="2"></td>
+                                                <td colspan="2">Total</td>
+                                                <td>${{ invoice.total }}</td>
+                                            </tr>
+                                            <tr>
+                                                <td colspan="2"></td>
+                                                <td colspan="2">Amount Paid</td>
+                                                <td>${{ invoice.amount_paid }}</td>
+                                            </tr>
+                                            <tr>
+                                                <td colspan="2"></td>
+                                                <td colspan="2" class="fw-bold">Balance</td>
+                                                <td class="fw-bold">${{ invoice.balance }}</td>
+                                            </tr>
+                                        </tfoot>
+                                    </table>
+                                    <div class="col-6">
+                                        <h6 class="text-soft fs-11px">Payment Details:</h6>
+                                        <span class="text-soft fs-11px">{{ invoice.note }}</span>
+                                    </div> <br>
+                                    <div class="nk-notes ff-italic fs-12px text-soft"> Invoice was system generated and is valid without the signature and seal. </div>
+                                </div>
+                            </div><!-- .invoice-bills -->
+                        </div><!-- .invoice-wrap -->
+                    </div><!-- .invoice -->
+                </div><!-- .nk-block -->
+            </div>
+        </div>
+    </div>
+</div>
+<!-- content @e -->

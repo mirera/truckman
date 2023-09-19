@@ -1,0 +1,144 @@
+{% extends 'base.html' %}  
+
+{% block content %}
+<!-- content @s -->
+{% if messages %}
+{% for message in messages %}
+    <div class="alert {% if message.tags == 'error' %}alert-danger{% elif message.tags == 'success' %}alert-success{% else %}alert-primary{% endif %}">
+        {{ message }}
+    </div>
+{% endfor %}
+{% endif %}
+<div class="nk-content ">
+    <div class="container-fluid">
+        <div class="nk-content-inner">
+            <div class="nk-content-body">
+                <div class="nk-block-head nk-block-head-sm">
+                    <div class="nk-block-between">
+                        <div class="nk-block-head-content">
+                            <h3 class="nk-block-title page-title">Add Customer</h3>
+                            <div class="nk-block-des text-soft">
+                                <p>Add a customer.</p>
+                            </div>
+                        </div><!-- .nk-block-head-content -->
+                    </div><!-- .nk-block-between -->
+                </div><!-- .nk-block-head -->
+                <div class="nk-block">
+                    <div class="card card-bordered">
+                        <div class="card-inner">
+                            <form action="{% url 'add_customer' %}" method="POST" class="form-validate" enctype="multipart/form-data" >
+                                {% csrf_token %}
+                                <div class="row gy-4">
+                                    <div class="col-xxl-3 col-md-4">
+                                        <div class="form-group">
+                                            <label class="form-label" for="name">Customer Name</label>
+                                            <!--<input type="text" name="plate_number" class="form-control" id="name" placeholder="Registration Number" required> -->
+                                            {{ form.name }}
+                                        </div>
+                                    </div><!--col-->
+                                    <div class="col-xxl-3 col-md-4">
+                                        <div class="form-group">
+                                            <label class="form-label" for="generic">Contact Person Name</label>
+                                            <!--<input type="text" name="trailer_number" class="form-control" id="generic" placeholder="Trailer Number">-->
+                                            {{ form.contact_person }}
+                                        </div>
+                                    </div><!--col-->
+                                    <div class="col-xxl-3 col-md-4">
+                                        <div class="form-group">
+                                            <label class="form-label" for="sKU">Contact Phone</label>
+                                            <!--<input type="text" name="vin" class="form-control" id="sKU" placeholder="Vehicle Identification Number">-->
+                                            {{ form.phone }}
+                                        </div>
+                                    </div><!--col-->
+                                    <div class="col-xxl-3 col-md-4">
+                                        <div class="form-group">
+                                            <label class="form-label">Contact Email</label>
+                                            <div class="form-control-wrap">
+                                                {{ form.email }} 
+                                            </div>
+                                        </div>
+                                    </div><!--col-->
+                                    <div class="col-xxl-3 col-md-4">
+                                        <div class="form-group">
+                                            <label class="form-label">Address One</label>
+                                            <div class="form-control-wrap">
+                                                {{ form.address_one }}
+                                            </div>
+                                        </div>
+                                    </div><!--col-->
+                                    <div class="col-xxl-3 col-md-4">
+                                        <div class="form-group">
+                                            <label class="form-label">Address Two</label>
+                                            <div class="form-control-wrap">
+                                                {{ form.address_two }}
+                                            </div>
+                                        </div>
+                                    </div><!--col-->
+                                    <div class="col-xxl-3 col-md-4">
+                                        <div class="form-group">
+                                            <label class="form-label">Country</label>
+                                            <div class="form-control-wrap">
+                                                {{ form.country }}
+                                            </div>
+                                        </div>
+                                    </div><!--col-->
+                                    <div class="col-xxl-3 col-md-4">
+                                        <div class="form-group">
+                                            <label class="form-label">City</label>
+                                            <div class="form-control-wrap">
+                                                {{ form.city }}
+                                            </div>
+                                        </div>
+                                    </div><!--col-->
+                                    <div class="col-xxl-3 col-md-4">
+                                        <div class="form-group">
+                                            <label class="form-label">Website</label>
+                                            <div class="form-control-wrap">
+                                                {{ form.website }}
+                                            </div>
+                                        </div>
+                                    </div><!--col-->
+                                    <div class="col-xxl-3 col-md-4">
+                                        <div class="form-group">
+                                            <label class="form-label">Credit Limit</label>
+                                            <div class="form-control-wrap">
+                                                {{ form.credit_limit }}
+                                            </div>
+                                        </div>
+                                    </div><!--col-->
+                                    <div class="col-xxl-3 col-md-4">
+                                        <div class="form-group">
+                                            <label class="form-label">Payment Term</label>
+                                            <div class="form-control-wrap">
+                                                {{ form.payment_term }}
+                                            </div>
+                                        </div>
+                                    </div><!--col-->
+                                    <div class="col-xxl-3 col-md-4"> 
+                                        <div class="form-group">
+                                            <label class="form-label" for="customFileLabel">Company Logo</label>
+                                            <div class="form-control-wrap">
+                                                <div class="form-file">
+                                                    <!--<input type="file" class="form-file-input" id="customFile">-->
+                                                    {{ form.logo }}
+                                                    <label class="form-file-label" for="customFile">Choose file</label>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-12">
+                                        <div class="form-group">
+                                            <button type="submit" class="btn btn-primary">Add Customer</button>
+                                        </div>
+                                    </div><!--col-->
+                                </div><!--row-->
+                            </form>
+                        </div><!-- .card-inner-group -->
+                    </div><!-- .card -->
+                </div><!-- .nk-block -->
+            </div>
+        </div>
+    </div>
+</div>
+<!-- content @e -->
+{% endblock content %} 

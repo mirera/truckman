@@ -1,0 +1,12 @@
+[Unit] 
+Description=gunicorn daemon for truckman
+Requires=truckman_gunicorn
+After=network.target
+[Service]
+User=ubuntu
+Group=www-data
+WorkingDirectory=/home/ubuntu/truckman
+ExecStart=/home/ubuntu/truckman_env/bin/gunicorn --access-logfile - --workers 3 --bind unix:/home/ubuntu/truckman/truckman/truckman.sock truckman.wsgi:application
+       
+[Install]
+WantedBy=multi-user.target 

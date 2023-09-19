@@ -1,0 +1,777 @@
+{% extends 'base.html' %}  
+
+{% block content %}
+<!-- content @s -->
+<!-- displaying flash messages -->
+{% if messages %}
+{% for message in messages %}
+    <div class="alert {% if message.tags == 'error' %}alert-danger{% elif message.tags == 'success' %}alert-success{% else %}alert-primary{% endif %}">
+        {{ message }}
+    </div>
+{% endfor %}
+{% endif %}
+
+<!-- content @s -->
+<div class="nk-content ">
+    <div class="container-fluid">
+        <div class="nk-content-inner">
+            <div class="nk-content-body">
+                <div class="nk-block-head nk-block-head-sm">
+                    <div class="nk-block-between">
+                        <div class="nk-block-head-content">
+                            <h3 class="nk-block-title page-title">General Settings</h3>
+                        </div><!-- .nk-block-head-content -->
+                    </div><!-- .nk-block-between -->
+                </div><!-- .nk-block-head -->
+                <div class="nk-block nk-block-lg">
+                    <div class="card card-bordered card-stretch">
+                        <ul class="nav nav-tabs nav-tabs-mb-icon nav-tabs-card">
+                            <li class="nav-item">
+                                <a class="nav-link active" data-bs-toggle="tab" href="#site"><em class="icon ni ni-laptop"></em><span>General</span></a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" data-bs-toggle="tab" href="#system"><em class="icon ni ni-setting"></em><span>Preferences</span></a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" data-bs-toggle="tab" href="#email"><em class="icon ni ni-mail-fill"></em><span>Email</span> </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" data-bs-toggle="tab" href="#mpesa"><em class="icon ni ni-wallet"></em><span>Mpesa</span></a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" data-bs-toggle="tab" href="#sms"><em class="icon ni ni-emails"></em><span>SMS</span></a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" data-bs-toggle="tab" href="#security"><em class="icon ni ni-cc-secure-fill"></em><span>Security</span></a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" data-bs-toggle="tab" href="#templates"><em class="icon ni ni-cc-alt2-fill"></em><span>Templates</span></a>
+                            </li>
+                        </ul>
+                        <div class="tab-content">
+                            <div class="tab-pane active" id="site">
+                                <div class="card-inner pt-0">
+                                    <h4 class="title nk-block-title">General setting</h4>
+                                    <p>Set the organization details.</p>
+                                    <form action="{% url 'global_settings' %}" class="gy-3 form-settings" method="POST" enctype="multipart/form-data">
+                                        {% csrf_token %}
+                                        <div class="row g-3 align-center">
+                                            <div class="col-lg-5">
+                                                <div class="form-group">
+                                                    <label class="form-label">Organization Logo</label>
+                                                    <div style="width: 100px; height: 50px;">
+                                                        {% if company.logo %}
+                                                        <img src="{{ company.logo.url }}" srcset="{{ company.logo.url }}"> 
+                                                        {% endif %}
+                                                    </div><br><br><br>
+                                                    <input type="file" id="logoInput" style="display: none;" name="logo">
+                                                    <a href="#" id="changeLogoButton" class="btn btn-dim btn-primary">Change Logo</a> 
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="row g-3 align-center">
+                                            <div class="col-lg-5">
+                                                <div class="form-group">
+                                                    <label class="form-label" for="site-name">Organization Name</label>
+                                                    <span class="form-note">Type the name of your Organization.</span>
+                                                </div>
+                                            </div>
+                                            <div class="col-lg-7">
+                                                <div class="form-group">
+                                                    <div class="form-control-wrap">
+                                                        {{form.name}}
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="row g-3 align-center">
+                                            <div class="col-lg-5">
+                                                <div class="form-group">
+                                                    <label class="form-label">Country </label> 
+                                                    <span class="form-note">Country where organization headquaters are based .</span>
+                                                </div>
+                                            </div>
+                                            <div class="col-lg-7">
+                                                <div class="form-group">
+                                                    <div class="form-control-wrap">
+                                                        {{form.country}}
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="row g-3 align-center">
+                                            <div class="col-lg-5">
+                                                <div class="form-group">
+                                                    <label class="form-label" for="site-copyright">Organization Telephone No.</label>
+                                                    <span class="form-note">Contact for your organization.</span>
+                                                </div>
+                                            </div>
+                                            <div class="col-lg-7">
+                                                <div class="form-group">
+                                                    <div class="form-control-wrap">
+                                                        <div class="input-group">
+                                                            <div class="input-group-prepend">
+                                                                <span id="fv-phone">{{ form.phone_code }}</span>
+                                                            </div>
+                                                            {{form.phone_no}}
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="row g-3 align-center">
+                                            <div class="col-lg-5">
+                                                <div class="form-group">
+                                                    <label class="form-label" for="site-copyright">Organization Email</label>
+                                                    <span class="form-note">Contact email for your organization.</span>
+                                                </div>
+                                            </div>
+                                            <div class="col-lg-7">
+                                                <div class="form-group">
+                                                    <div class="form-control-wrap">
+                                                        {{form.email}}
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="row g-3 align-center">
+                                            <div class="col-lg-5">
+                                                <div class="form-group">
+                                                    <label class="form-label" for="site-address">Organization Address</label>
+                                                    <span class="form-note">Specify your organization address.</span>
+                                                </div>
+                                            </div>
+                                            <div class="col-lg-7">
+                                                <div class="form-group">
+                                                    <div class="form-control-wrap">
+                                                        {{form.address}}
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="row g-3 align-center">
+                                            <div class="col-lg-5">
+                                                <div class="form-group">
+                                                    <label class="form-label">Payment Details </label>
+                                                    <span class="form-note"> Type payment details to appear on invoices</span>
+                                                </div>
+                                            </div>
+                                            <div class="col-lg-7">
+                                                <div class="form-group">
+                                                    <div class="form-control-wrap">
+                                                        {{form.invoice_payment_details}}
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="row g-3 align-center">
+                                            <div class="col-lg-5">
+                                                <div class="form-group">
+                                                    <label class="form-label">Currency </label>
+                                                    <span class="form-note">Your organization preffered currency.</span>
+                                                </div>
+                                            </div>
+                                            <div class="col-lg-7">
+                                                <div class="form-group">
+                                                    <div class="form-control-wrap">
+                                                        {{form.currency}}
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="row g-3 align-center">
+                                            <div class="col-lg-5">
+                                                <div class="form-group">
+                                                    <label class="form-label">Timezone</label>
+                                                    <span class="form-note">Your organization headquater timezone</span>
+                                                </div>
+                                            </div>
+                                            <div class="col-lg-7">
+                                                <div class="form-group">
+                                                    <div class="form-control-wrap">
+                                                        {{form.timezone}}
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="row g-3">
+                                            <div class="col-lg-7">
+                                                <div class="form-group mt-2">
+                                                    <button type="submit" class="btn btn-lg btn-primary">Update</button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                            <!--tab pan -->
+                            <div class="tab-pane" id="system">
+                                <form action="{% url 'update_preferences' company.id %}" method="POST" >
+                                    {% csrf_token %}
+                                    <div class="card-inner pt-0">
+                                        <div class="nk-block-head">
+                                            <div class="nk-block-head-content">
+                                                <h4 class="title nk-block-title">System Preferences</h4>
+                                                <p>Tailor the system to your needs.</p>
+                                                <div class="alert alert-icon alert-warning" role="alert">
+                                                    <em class="icon ni ni-alert-circle"></em> 
+                                                    <strong>Auto-disburse is turned on and your Mpesa credentials are not set or upto date.</strong>Consider updating your Mpesa settings.  
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="row g-gs">
+                                            <div class="row g-3 align-center">
+                                                <div class="col-lg-5">
+                                                    <div class="form-group">
+                                                        <label class="form-label" for="site-off">Auto Disburse Loans</label>
+                                                        <span class="form-note">Set auto disburse on to auto-disburse loans once approved.</span>
+                                                    </div>
+                                                </div>
+                                                <div class="col-lg-7">
+                                                    <div class="form-group">
+                                                        <div class="custom-control custom-switch">
+                                                            <!-- <input type="checkbox" class="custom-control-input" name="is_auto_disburse" id="auto_disburse"> -->
+                                                            {{form_preferences.is_auto_disburse}}
+                                                            <label class="custom-control-label" for="auto_disburse">On</label> 
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div> <!-- .row --> 
+                                        <br>
+                                        <div class="row g-gs">
+                                            <div class="row g-3 align-center">
+                                                <div class="col-lg-5">
+                                                    <div class="form-group">
+                                                        <label class="form-label" for="site-off">SMS Notification</label>
+                                                        <span class="form-note">Set SMS Notification on to send sms to members and staff when required.</span>
+                                                    </div>
+                                                </div>
+                                                <div class="col-lg-7">
+                                                    <div class="form-group">
+                                                        <div class="custom-control custom-switch">
+                                                            {{form_preferences.is_send_sms}}
+                                                            <label class="custom-control-label" for="send_sms">On</label>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div> <!-- .row -->
+                                        <br>
+                                        <div class="row g-gs">
+                                            <div class="row g-3 align-center">
+                                                <div class="col-lg-5">
+                                                    <div class="form-group">
+                                                        <label class="form-label" for="site-off">Email Notification</label>
+                                                        <span class="form-note">Set Email Notification on to send sms to notify upon an action.</span>
+                                                    </div>
+                                                </div>
+                                                <div class="col-lg-7">
+                                                    <div class="form-group">
+                                                        <div class="custom-control custom-switch">
+                                                            {{form_preferences.is_send_email}}
+                                                            <label class="custom-control-label" for="send_email">On</label>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div> <!-- .row -->
+                                        <br>
+                                        <div class="row g-gs">
+                                            <div class="col-md-12">
+                                                <div class="form-group">
+                                                    <label class="form-label">SMS to Member</label>
+                                                    <ul class="custom-control-group g-3 align-center">
+                                                       <li>
+                                                            <div class="custom-control custom-control-sm custom-checkbox">
+                                                                {{form_preferences.on_joining}}
+                                                                <label class="custom-control-label" for="on_joining">On Joining </label>
+                                                            </div>
+                                                        </li> 
+                                                        <li>
+                                                            <div class="custom-control custom-control-sm custom-checkbox">
+                                                                {{form_preferences.loan_pending}}
+                                                                <label class="custom-control-label" for="loan-pending">Loan Pending</label>
+                                                            </div>
+                                                        </li>
+                                                        <li>
+                                                            <div class="custom-control custom-control-sm custom-checkbox">
+                                                                {{form_preferences.before_due_date}}
+                                                                <label class="custom-control-label" for="before-due-date">Before Due Date</label>
+                                                            </div>
+                                                        </li>
+                                                        <li>
+                                                            <div class="custom-control custom-control-sm custom-checkbox">
+                                                                {{form_preferences.missed_payment}}
+                                                                <label class="custom-control-label" for="missed-payment">Missed Repayment</label>
+                                                            </div>
+                                                        </li>
+                                                        <li>
+                                                            <div class="custom-control custom-control-sm custom-checkbox">
+                                                                {{form_preferences.loan_rejected}}
+                                                                <label class="custom-control-label" for="loan-rejected">Loan Rejected</label>
+                                                            </div>
+                                                        </li>
+                                                    </ul>
+                                                </div>
+                                            </div><!-- .col -->
+                                            <div class="col-md-12">
+                                                <div class="form-group">
+                                                    <label class="form-label">E-mail to Members</label>
+                                                    <ul class="custom-control-group g-3 align-center">
+                                                        <li>
+                                                            <div class="custom-control custom-control-sm custom-checkbox">
+                                                                {{form_preferences.monthly_loan_statement}}
+                                                                <label class="custom-control-label" for="loan-statement">Monthly Loan Statements</label>
+                                                            </div>
+                                                        </li>
+                                                        <li>
+                                                            <div class="custom-control custom-control-sm custom-checkbox">
+                                                                {{form_preferences.new_loan_products}}
+                                                                <label class="custom-control-label" for="new-product">New Loan Products</label>
+                                                            </div>
+                                                        </li>
+                                                    </ul>
+                                                </div>
+                                            </div><!-- .col -->
+                                            <div class="col-md-12">
+                                                <div class="form-group">
+                                                    <label class="form-label">E-mail to Staff</label>
+                                                    <ul class="custom-control-group g-3 align-center">
+                                                        <li>
+                                                            <div class="custom-control custom-control-sm custom-checkbox">
+                                                                {{form_preferences.monthly_portfolio_performance}}
+                                                                <label class="custom-control-label" for="portfolio-performance">Monthly Portfolio Performance</label>
+                                                            </div>
+                                                        </li>
+                                                    </ul>
+                                                </div>
+                                            </div><!-- .col -->
+                                            <br>
+                                            <br>
+                                        </div> <!-- .row -->
+                                        <!-- ends -->
+                                        <br>
+                                        <div class="row g-3">
+                                            <div class="col-lg-7">
+                                                <div class="form-group mt-2">
+                                                    <button type="submit" class="btn btn-lg btn-primary">Update</button>
+                                                </div>
+                                            </div><!-- .col -->
+                                        </div><!-- .row -->
+                                    </div>
+                                </form>
+                            </div><!-- .tab-pane -->
+                            <!--tab pan -->
+                            <div class="tab-pane" id="email">
+                                <form action="{% url 'update_email' company.id %}" method="POST" class="form-validate">
+                                    {% csrf_token %}
+                                    <div class="card-inner pt-0">
+                                        <div class="nk-block-head">
+                                            <div class="nk-block-head-content">
+                                                <h4 class="title nk-block-title">Email-Settings</h4>
+                                                <p>Follow each step and fill as needed to get mailing fully set up for your account.</p>
+                                            </div>
+                                        </div>
+                                        <div class="row g-gs">
+                                            <div class="row g-3 align-center">
+                                                <div class="col-lg-5">
+                                                    <div class="form-group">
+                                                        <label class="form-label" for="site-copyright">From Email</label>
+                                                        <span class="form-note">The email address that emails are sent from.</span>
+                                                    </div>
+                                                </div>
+                                                <div class="col-lg-7">
+                                                    <div class="form-group">
+                                                        <div class="form-control-wrap">
+                                                            {{ form_email.from_email }}
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="row g-3 align-center">
+                                                <div class="col-lg-5">
+                                                    <div class="form-group">
+                                                        <label class="form-label" for="site-copyright">From Name</label>
+                                                        <span class="form-note">The name that emails are sent from.</span>
+                                                    </div>
+                                                </div>
+                                                <div class="col-lg-7">
+                                                    <div class="form-group">
+                                                        <div class="form-control-wrap">
+                                                            {{ form_email.from_name }}
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="row g-3 align-center">
+                                                <div class="col-lg-5">
+                                                    <div class="form-group">
+                                                        <label class="form-label" for="site-copyright">SMTP Host</label>
+                                                        <span class="form-note">This is your mail server.</span>
+                                                    </div>
+                                                </div>
+                                                <div class="col-lg-7">
+                                                    <div class="form-group">
+                                                        <div class="form-control-wrap">
+                                                            {{ form_email.smtp_host }}
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="row g-3 align-center">
+                                                <div class="col-lg-5">
+                                                    <div class="form-group">
+                                                        <label class="form-label" for="site-copyright">Encryption</label>
+                                                        <span class="form-note">For most servers TLS is the recommended option. If your SMTP provider offers both SSL and TLS options, we recommend using TLS.</span>
+                                                    </div>
+                                                </div>
+                                                <div class="col-lg-7">
+                                                    <div class="form-group">
+                                                        <div class="form-control-wrap">
+                                                            <div class="input-group">
+                                                                <div class="form-icon form-icon-right">
+                                                                    <em class="icon ni ni-home"></em>
+                                                                </div>
+                                                                {{ form_email.encryption }}
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                            </div>
+                                            <div class="row g-3 align-center">
+                                                <div class="col-lg-5">
+                                                    <div class="form-group">
+                                                        <label class="form-label" for="site-copyright">SMTP Port</label>
+                                                        <span class="form-note">This is your mail server.</span>
+                                                    </div>
+                                                </div>
+                                                <div class="col-lg-7">
+                                                    <div class="form-group">
+                                                        <div class="form-control-wrap">
+                                                            {{ form_email.smtp_port }} 
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="row g-3 align-center">
+                                                <div class="col-lg-5">
+                                                    <div class="form-group">
+                                                        <label class="form-label" for="site-copyright">SMTP Username</label>
+                                                        <span class="form-note">Usually the email of From Email</span>
+                                                    </div>
+                                                </div>
+                                                <div class="col-lg-7">
+                                                    <div class="form-group">
+                                                        <div class="form-control-wrap">
+                                                            {{ form_email.smtp_username }}
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="row g-3 align-center">
+                                                <div class="col-lg-5">
+                                                    <div class="form-group">
+                                                        <label class="form-label" for="site-copyright">SMTP Password</label>
+                                                        <span class="form-note">The password is encrypted in the database.</span>
+                                                    </div>
+                                                </div>
+                                                <div class="col-lg-7">
+                                                    <div class="form-group">
+                                                        <div class="form-control-wrap">
+                                                            {{ form_email.smtp_password }}
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div> <!-- .row -->
+                                        <div class="row g-3">
+                                            <div class="col-lg-7">
+                                                <div class="form-group mt-2">
+                                                    <button type="submit" class="btn btn-lg btn-primary">Update</button>
+                                                </div>
+                                            </div><!-- .col -->
+                                        </div><!-- .row -->
+                                    </div>
+                                </form> <br>
+                                <div class="card">
+                                    <form action="{% url 'test_email' company.id %}" method="POST" class="form-validate">
+                                        {% csrf_token %}
+                                        <div class="card-inner pt-0">
+                                            <div class="nk-block-head">
+                                                <div class="nk-block-head-content">
+                                                    <h5 class="title nk-block-title">Send Test Email</h5>
+                                                    <p>Confirm whether you email credentials are correct</p>
+                                                </div>
+                                            </div>
+                                            <div class="row g-gs">
+                                                <div class="row g-3 align-center">
+                                                    <div class="col-lg-5">
+                                                        <div class="form-group">
+                                                            <label class="form-label" for="site-copyright">Email To</label>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-lg-7">
+                                                        <div class="form-group">
+                                                            <div class="form-control-wrap">
+                                                                <input type="email" class="form-control form-control-outlined" name="email"  id="outlined" placeholder="recipient email" required>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="row g-3 align-center">
+                                                    <div class="col-lg-5">
+                                                        <div class="form-group">
+                                                            <label class="form-label" for="site-copyright">Message</label>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-lg-7">
+                                                        <div class="form-group">
+                                                            <div class="form-control-wrap">
+                                                                <textarea class="form-control" id="default-textarea" name="message" placeholder="Test message" required></textarea>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div> <!-- .row -->
+                                            <div class="row g-3">
+                                                <div class="col-lg-7">
+                                                    <div class="form-group mt-2">
+                                                        <button type="submit" class="btn btn-lg btn-primary">Send</button>
+                                                    </div>
+                                                </div><!-- .col -->
+                                            </div><!-- .row -->
+                                        </div>
+                                    </form>
+                                </div>
+                            </div><!-- .tab-pane -->
+                            <div class="tab-pane" id="sms">
+                                <form action="{% url 'update_sms' company.id %}" method="POST" >
+                                    {% csrf_token %}
+                                    <div class="card-inner pt-0">
+                                        <div class="nk-block-head">
+                                            <div class="nk-block-head-content">
+                                                <h4 class="title nk-block-title">SMS Gateway Settings</h4>
+                                                <p>The available service provider is Erranium</p>
+                                            </div>
+                                        </div>
+                                        <div class="row g-gs">
+                                            <div class="row g-3 align-center">
+                                                <div class="col-lg-5">
+                                                    <div class="form-group">
+                                                        <label class="form-label" for="site-copyright">Sender ID</label>
+                                                        <span class="form-note">Your sms sender ID</span>
+                                                    </div>
+                                                </div>
+                                                <div class="col-lg-7">
+                                                    <div class="form-group">
+                                                        <div class="form-control-wrap">
+                                                            {{form_sms.sender_id}}
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="row g-3 align-center">
+                                                <div class="col-lg-5">
+                                                    <div class="form-group">
+                                                        <label class="form-label" for="site-copyright">API Token</label>
+                                                        <span class="form-note">Your api token from Erranium.</span>
+                                                    </div>
+                                                </div>
+                                                <div class="col-lg-7">
+                                                    <div class="form-group">
+                                                        <div class="form-control-wrap">
+                                                            {{form_sms.api_token}}
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div> <!-- .row -->
+                                        <div class="row g-3">
+                                            <div class="col-lg-7">
+                                                <div class="form-group mt-2">
+                                                    <button type="submit" class="btn btn-lg btn-primary">Update</button>
+                                                </div>
+                                            </div><!-- .col -->
+                                        </div><!-- .row -->
+                                    </div>
+                                </form>
+                            </div><!-- .tab-pane -->
+                            <div class="tab-pane" id="security">
+                                <div class="card-inner card-inner-lg">
+                                    <div class="nk-block-head nk-block-head-lg">
+                                        <div class="nk-block-between">
+                                            <div class="nk-block-head-content">
+                                                <h5 class="nk-block-title">Security Settings</h5>
+                                                <span>These settings are helps you keep your account secure.</span>
+                                                <span class="text-success"><em class="icon ni ni-shield-check"></em></span>
+                                            </div><!-- .nk-block-head-content -->
+                                            <div class="nk-block-head-content align-self-start d-lg-none">
+                                                <a href="#" class="toggle btn btn-icon btn-trigger mt-n1" data-target="userAside"><em class="icon ni ni-menu-alt-r"></em></a>
+                                            </div>
+                                        </div>
+                                    </div><!-- .nk-block-head -->
+                                    <div class="nk-block">
+                                        <div class="card card-bordered">
+                                            <div class="card-inner-group">
+                                                <div class="card-inner">
+                                                    <div class="between-center flex-wrap flex-md-nowrap g-3">
+                                                        <div class="nk-block-text">
+                                                            <h6>Save my Activity Logs</h6>
+                                                            <p>You can save your all activity logs including unusual activity detected.</p>
+                                                        </div>
+                                                        <div class="nk-block-actions">
+                                                            <ul class="align-center gx-3">
+                                                                <li class="order-md-last">
+                                                                    <div class="custom-control custom-switch me-n2">
+                                                                        <input type="checkbox" class="custom-control-input" checked="" id="activity-log">
+                                                                        <label class="custom-control-label" for="activity-log"></label>
+                                                                    </div>
+                                                                </li>
+                                                            </ul>
+                                                        </div>
+                                                    </div>
+                                                </div><!-- .card-inner -->
+                                                <div class="card-inner">
+                                                    <div class="between-center flex-wrap g-3">
+                                                        <div class="nk-block-text">
+                                                            <h6>Change Password</h6>
+                                                            <p>Set a unique password to protect your account.</p>
+                                                        </div>
+                                                        <div class="nk-block-actions flex-shrink-sm-0">
+                                                            <ul class="align-center flex-wrap flex-sm-nowrap gx-3 gy-2">
+                                                                <li class="order-md-last">
+                                                                    <a href="{% url 'forgot_password' %}" class="btn btn-primary">Change Password</a>
+                                                                </li>
+                                                                <li>
+                                                                    <em class="text-soft text-date fs-12px">Last changed: <span>Oct 2, 2019</span></em>
+                                                                </li>
+                                                            </ul>
+                                                        </div>
+                                                    </div>
+                                                </div><!-- .card-inner -->
+                                                <div class="card-inner">
+                                                    <div class="between-center flex-wrap flex-md-nowrap g-3">
+                                                        <div class="nk-block-text">
+                                                            {% if security_setting.two_fa_auth %}
+                                                            <h6>2 Factor Auth &nbsp; <span class="badge bg-success ms-0">Enabled</span></h6>
+                                                            {% else %}
+                                                            <h6>2 Factor Auth &nbsp; <span class="badge bg-danger ms-0">Disabled</span></h6>
+                                                            {% endif %}
+                                                            <p>Secure your account with 2FA security. When it is activated you will need to enter not only your password, but also a special OTP sent to your SMS. </p>
+                                                        </div>
+                                                        <div class="nk-block-actions">
+                                                            {% if security_setting.two_fa_auth %}
+                                                            <a href="{% url 'disable_2fa' company.id %}" class="btn btn-primary">Disable</a>
+                                                            {% else %}
+                                                            <a href="{% url 'enable_2fa' company.id %}" class="btn btn-danger">Enable</a>
+                                                            {% endif %}
+                                                        </div>
+                                                    </div>
+                                                </div><!-- .card-inner -->
+                                                <div class="card-inner">
+                                                    <div class="between-center flex-wrap g-3">
+                                                        <div class="nk-block-text">
+                                                            <h6>Auto Logout</h6>
+                                                            <p>Set a auto logout time to disconnect your account from all sessions.</p>
+                                                        </div>
+                                                        <div class="nk-block-actions flex-shrink-sm-0">
+                                                            <ul class="align-center flex-wrap flex-sm-nowrap gx-3 gy-2">
+                                                                <li class="order-md-last">
+                                                                    <a href="#" class="btn btn-primary">Update</a>
+                                                                </li>
+                                                            </ul>
+                                                        </div>
+                                                    </div>
+                                                </div><!-- .card-inner -->
+                                                <div class="card-inner">
+                                                    <div class="between-center flex-wrap flex-md-nowrap g-3">
+                                                        <div class="nk-block-text">
+                                                            <h6>Turn on login alerts <span class="badge bg-success ms-0">Enabled</span></h6>
+                                                            <p>Be notified if anyone logs in account from unknown or new device</p>
+                                                        </div>
+                                                        <div class="nk-block-actions">
+                                                            <a href="#" class="btn btn-primary">Disable</a>
+                                                        </div>
+                                                    </div>
+                                                </div><!-- .card-inner -->
+                                            </div>
+                                        </div><!-- .card -->
+                                    </div><!-- .nk-block -->
+                                </div><!-- .card-inner -->
+                            </div><!-- .tab-pane -->
+                        </div><!-- .tab-content -->
+                    </div>
+                    <!--card-->
+                </div>
+                <!--nk-block-->
+            </div>
+        </div>
+    </div>
+</div>
+<!-- content @e -->
+
+<!-- change company logo -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+    $(document).ready(function() {
+        const logoInput = $("#logoInput");
+        const changeLogoButton = $("#changeLogoButton");
+
+        changeLogoButton.click(function(e) {
+            e.preventDefault(); // Prevent the default behavior of the anchor
+            // Trigger the file input click event
+            logoInput.click();
+        });
+
+        logoInput.change(function() {
+            // Check if a file has been selected
+            if (logoInput[0].files.length > 0) {
+                const formData = new FormData();
+                formData.append("logo", logoInput[0].files[0]);
+
+                // Make an AJAX request to the 'change_logo' URL
+                $.ajax({
+                    type: "POST",
+                    url: "{% url 'change_logo' %}",
+                    data: formData,
+                    processData: false,
+                    contentType: false,
+                    headers: {
+                        "X-CSRFToken": getCookie("csrftoken"), // Replace with your CSRF token retrieval method
+                    },
+                    success: function(data) {
+                        // Handle the response data (e.g., success or error message)
+                        console.log(data);
+                        // Reload the page to reflect the logo change
+                        window.location.reload();
+                    },
+                    error: function(error) {
+                        // Handle errors
+                        console.error(error);
+                    }
+                });
+            }
+        });
+
+        // Function to get the CSRF token (replace with your own implementation)
+        function getCookie(name) {
+            let cookieValue = null;
+            if (document.cookie && document.cookie !== "") {
+                const cookies = document.cookie.split(";");
+                for (let i = 0; i < cookies.length; i++) {
+                    const cookie = cookies[i].trim();
+                    if (cookie.substring(0, name.length + 1) === name + "=") {
+                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                        break;
+                    }
+                }
+            }
+            return cookieValue;
+        }
+    });
+</script>
+
+
+{% endblock %}

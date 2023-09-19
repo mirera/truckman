@@ -1,0 +1,259 @@
+{% extends 'base.html' %}  
+
+{% block content %}
+
+<!-- displaying flash messages -->
+{% if messages %}
+{% for message in messages %}
+    <div class="alert {% if message.tags == 'error' %}alert-danger{% elif message.tags == 'success' %}alert-success{% else %}alert-primary{% endif %}">
+        {{ message }}
+    </div>
+{% endfor %}
+{% endif %}
+<!-- content @s -->
+<div class="nk-content ">
+    <div class="container-fluid">
+        <div class="nk-content-inner">
+            <div class="nk-content-body">
+                <div class="nk-block-head nk-block-head-sm">
+                    <div class="nk-block-between">
+                        <div class="nk-block-head-content">
+                            <h3 class="nk-block-title page-title">Add Invoice</h3>
+                        </div><!-- .nk-block-head-content -->
+                    </div><!-- .nk-block-between -->
+                </div><!-- .nk-block-head -->
+                <div class="nk-block">
+                    <div class="card card-bordered">
+                        <form action="{% url 'add_invoice' %}" method="POST" enctype="multipart/form-data" >
+                            {% csrf_token %}
+                            <div class="card-inner">
+                                <div class="nk-block">
+                                    <div class="row gy-4">
+                                        <div class="col-xxl-3 col-md-4">
+                                            <div class="form-group">
+                                                <label class="form-label" for="trip">Trip</label>
+                                                <!--<input type="text" name="plate_number" class="form-control" id="name" placeholder="Registration Number" required> -->
+                                                {{ form.trip }}
+                                            </div>
+                                        </div><!--col-->
+                                        <div class="col-xxl-3 col-md-4">
+                                            <div class="form-group">
+                                                <label class="form-label" for="vehicle">Vehicle</label>
+                                                <input type="text" name="vehicle" class="form-control" id="vehicle" value="{{ trip.load.vehicle.plate_number }}" readonly>
+                                            </div>
+                                        </div><!--col-->
+                                        <div class="col-xxl-3 col-md-4">
+                                            <div class="form-group">
+                                                <label class="form-label" for="customer">Customer</label>
+                                                <input type="text" name="customer" class="form-control" id="customer" value ="{{ trip.load.customer.name }}" readonly>
+                                            </div>
+                                        </div><!--col-->
+                                        <div class="col-xxl-3 col-md-4">
+                                            <div class="form-group">
+                                                <label class="form-label">Invoice Date</label>
+                                                <div class="form-control-wrap">
+                                                    <div class="form-icon form-icon-right">
+                                                        <em class="icon ni ni-calendar"></em>
+                                                    </div>
+                                                    <!--<input type="text" name="insurance_expiry" class="form-control date-picker" data-date-format="yyyy-mm-dd" placeholder="yyyy-mm-dd">-->
+                                                    {{ form.invoice_date }}
+                                                </div>
+                                            </div>
+                                        </div><!--col-->
+                                        <div class="col-xxl-3 col-md-4">
+                                            <div class="form-group">
+                                                <label class="form-label">Due Date</label>
+                                                <div class="form-control-wrap">
+                                                    <div class="form-icon form-icon-right">
+                                                        <em class="icon ni ni-calendar"></em>
+                                                    </div>
+                                                    <!--<input type="text" name="insurance_expiry" class="form-control date-picker" data-date-format="yyyy-mm-dd" placeholder="yyyy-mm-dd">-->
+                                                    {{ form.due_date }}
+                                                </div>
+                                            </div>
+                                        </div><!--col-->
+                                    </div><!--row-->
+                                </div>
+                            </div>
+                            <!-- 
+                            <div class="card-inner">
+                                <div class="nk-block">
+                                    <div class="row gy-4">
+                                        <div class="col-xxl-3 col-md-4">
+                                            <div class="form-group">
+                                                <label class="form-label" for="name">Product/Service</label>
+                                                <!--<input type="text" name="plate_number" class="form-control" id="name" placeholder="Registration Number" required> 
+                                                {{ form.services }}
+                                            </div>
+                                        </div><!--col
+                                    </div><!--row
+                                </div>
+                            </div> -->
+                            <div class="card-inner">
+                                <div class="nk-block">
+                                    <div class="row gy-4">
+                                        <div class="col-xxl-3 col-md-3">
+                                            <div class="form-group">
+                                                <label class="form-label" for="name">Item</label>
+                                                <input type="text" name="name" class="form-control" id="name" placeholder="Steel rolls transport" required>
+                                            </div>
+                                        </div><!--col-->
+                                        <div class="col-xxl-2 col-md-2">
+                                            <div class="form-group">
+                                                <label class="form-label" for="quantity">Km/Ml</label>
+                                                <input type="text" name="unit" class="form-control" id="quantity" value="" >
+                                            </div>
+                                        </div><!--col-->
+                                        <div class="col-xxl-3 col-md-2">
+                                            <div class="form-group">
+                                                <label class="form-label" for="unitPrice">Unit Price</label>
+                                                <input type="text" name="unit_price" class="form-control" id="unitPrice" value="" >
+                                            </div>
+                                        </div><!--col-->
+                                        <div class="col-xxl-2 col-md-2">
+                                            <div class="form-group">
+                                                <label class="form-label" for="taxPc">Tax (%)</label>
+                                                <input type="number" name="tax" class="form-control" id="taxPc" value="" >
+                                            </div>
+                                        </div><!--col-->
+                                        <div class="col-xxl-3 col-md-2">
+                                            <div class="form-group">
+                                                <label class="form-label" for="amount">Amount</label>
+                                                <input type="number" name="trailer_number" class="form-control" id="amount" placeholder="2000" >
+                                            </div>
+                                        </div><!--col-->
+                                        <div class="col-xxl-3 col-md-6">
+                                            <div class="form-group">
+                                                <label class="form-label" for="description">Description</label>
+                                                <input type="text" name="trailer_number" class="form-control" id="description" placeholder="Steel transport from Kwale to Lusaka">
+                                            </div>
+                                        </div><!--col-->
+                                    </div><!--row-->
+                                </div>
+                            </div>
+                            <!--
+                            <div class="card-inner">
+                                <div class="nk-block">
+                                    <div class="row gy-4">
+                                        <div class="col-12">
+                                            <div class="form-group">
+                                                <button type="button" id="addItem" class="btn btn-primary">+ Add Item</button>
+                                            </div>
+                                        </div><!--col
+                                    </div><!--row
+                                </div>
+                            </div> -->
+                            <div class="card-inner">
+                                <div class="nk-block ">
+                                    <div class="row gy-4 justify-content-end">
+                                        <div class="col-xxl-3 col-md-2">
+                                            <div class="form-group">
+                                                <label class="form-label fw-medium" for="subTotal">Sub Total</label>
+                                                <input type="number" name="sub_total" class="form-control fw-medium" id="subTotal" value="" readonly>
+                                            </div>
+                                        </div><!--col-->
+                                        <div class="col-xxl-3 col-md-2">
+                                            <div class="form-group">
+                                                <label class="form-label" for="discount">Discount</label>
+                                                <input type="number" name="discount" class="form-control" id="discount" value="" readonly>
+                                            </div>
+                                        </div><!--col-->
+                                        <div class="col-xxl-3 col-md-2">
+                                            <div class="form-group">
+                                                <label class="form-label" for="tax">Tax</label>
+                                                <input type="number" name="tax" class="form-control" id="tax" value="" readonly>
+                                            </div>
+                                        </div><!--col-->
+                                        <div class="col-xxl-3 col-md-2">
+                                            <div class="form-group">
+                                                <label class="form-label text-uppercase fw-bold" for="grandTotal">Total</label>
+                                                <input type="number" name="total" class="form-control text-uppercase fw-bold" id="grandTotal" value="" readonly>
+                                            </div>
+                                        </div><!--col-->
+                                    </div><!--row-->
+                                </div>
+                            </div>
+                            <div class="card-inner">
+                                <div class="nk-block">
+                                    <div class="row gy-4">
+                                        <div class="col-12">
+                                            <div class="form-group">
+                                                <label class="form-label" for="name">Note</label>
+                                                <!--<input type="text" name="plate_number" class="form-control" id="name" placeholder="Registration Number" required> -->
+                                                {{ form.note }}
+                                            </div>
+                                        </div><!--col-->
+                                        <div class="col-12">
+                                            <div class="form-group">
+                                                <button type="submit" class="btn btn-primary">Save & Send Invoice</button>
+                                            </div>
+                                        </div><!--col-->
+                                    </div><!--row-->
+                                </div>
+                            </div>
+                        </form>
+                        </div><!-- .card-inner-group -->
+                    </div><!-- .card -->
+                </div><!-- .nk-block -->
+            </div>
+        </div>
+    </div>
+</div>
+<!-- content @e -->
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+<!-- autofill inputs-->
+<script>
+    $(document).ready(function() {
+        // Function to calculate and update values
+        function updateInvoice() {
+            var quantity = parseFloat($('#quantity').val()) || 0;
+            var unitPrice = parseFloat($('#unitPrice').val()) || 0;
+            var taxPc = parseFloat($('#taxPc').val()) || 0;
+            
+            var amount = quantity * unitPrice;
+            var subTotal = amount;
+            var discount = 0; // You can calculate the discount here if needed.
+            var tax = (taxPc / 100) * subTotal;
+            var grandTotal = subTotal - discount + tax;
+    
+            // Update the fields
+            $('#amount').val(amount.toFixed(2));
+            $('#subTotal').val(subTotal.toFixed(2));
+            $('#discount').val(discount.toFixed(2));
+            $('#tax').val(tax.toFixed(2));
+            $('#grandTotal').val(grandTotal.toFixed(2));
+        }
+    
+        // Attach the function to input change events
+        $('#quantity, #unitPrice, #taxPc').on('input', updateInvoice);
+    });
+</script>
+<!-- ends -->   
+
+<!-- get trip details on choosing a trip -->
+<script>
+    $(document).ready(function () {
+        // Get references to the input fields and select field
+        var tripSelect = $("#trip");
+        var vehicleInput = $("#vehicle");
+        var customerInput = $("#customer");
+
+        // Add an event listener to the "Trip" select field
+        tripSelect.on("change", function () {
+            // Get the selected trip ID
+            var tripId = $(this).val();
+
+            // Send a GET request to fetch vehicle and customer information
+            $.get("/trip/get_trip_info/" + tripId, function (data) {
+                // Update the vehicle and customer input fields with the fetched data
+                vehicleInput.val(data.vehicle);
+                customerInput.val(data.customer);
+            });
+        });
+    });
+</script>
+<!-- end -->
+
+{% endblock content %}

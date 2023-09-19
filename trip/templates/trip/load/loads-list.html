@@ -1,0 +1,411 @@
+{% extends 'base.html' %}  
+
+{% block content %}
+<!-- content @s -->
+<!-- displaying flash messages -->
+{% if messages %}
+{% for message in messages %}
+    <div class="alert {% if message.tags == 'error' %}alert-danger{% elif message.tags == 'success' %}alert-success{% else %}alert-primary{% endif %}">
+        {{ message }}
+    </div>
+{% endfor %}
+{% endif %} 
+<!-- content @s -->
+<div class="nk-content ">
+    <div class="container-fluid">
+        <div class="nk-content-inner">
+            <div class="nk-content-body">
+                <div class="nk-block-head nk-block-head-sm">
+                    <div class="nk-block-between">
+                        <div class="nk-block-head-content">
+                            <h3 class="nk-block-title page-title">Loads & Report</h3>
+                        </div><!-- .nk-block-head-content -->
+                        <div class="nk-block-head-content">
+                            <a  href="{% url 'add_load' %}" class="btn btn-icon btn-primary d-md-none"><em class="icon ni ni-plus"></em></a>
+                            <a  href="{% url 'add_load' %}" class="btn btn-primary d-none d-md-inline-flex"><em class="icon ni ni-plus"></em><span>Add Load</span></a>
+                        </div><!-- .nk-block-head-content -->
+                    </div><!-- .nk-block-between -->
+                </div><!-- .nk-block-head -->
+                <div class="nk-block">
+                    <div class="row g-gs">
+                        <div class="col-md-6 col-xxl-3">
+                            <div class="card">
+                                <div class="card-inner">
+                                    <ul class="nk-store-statistics">
+                                        <li class="item">
+                                            <div class="info">
+                                                <div class="fs-14px fw-bold">Total Items</div>
+                                                <div class="count">2,470</div>
+                                            </div>
+                                            <em class="icon bg-primary-dim ni ni-box"></em>
+                                        </li>
+                                    </ul>
+                                </div><!-- .card-inner -->
+                            </div><!-- .card -->
+                        </div><!-- .col -->
+                        <div class="col-md-6 col-xxl-3">
+                            <div class="card">
+                                <div class="card-inner">
+                                    <ul class="nk-store-statistics">
+                                        <li class="item">
+                                            <div class="info">
+                                                <div class="fs-14px fw-bold">Total Equipments</div>
+                                                <div class="count">607</div>
+                                            </div>
+                                            <em class="icon bg-info-dim ni ni-property-alt"></em>
+                                        </li>
+                                    </ul>
+                                </div><!-- .card-inner -->
+                            </div><!-- .card -->
+                        </div><!-- .col -->
+                        <div class="col-md-6 col-xxl-3">
+                            <div class="card">
+                                <div class="card-inner">
+                                    <ul class="nk-store-statistics">
+                                        <li class="item">
+                                            <div class="info">
+                                                <div class="fs-14px fw-bold">Total Tools</div>
+                                                <div class="count">653</div>
+                                            </div>
+                                            <em class="icon bg-pink-dim ni ni-scissor"></em>
+                                        </li>
+                                    </ul>
+                                </div><!-- .card-inner -->
+                            </div><!-- .card -->
+                        </div><!-- .col -->
+                        <div class="col-md-6 col-xxl-3">
+                            <div class="card">
+                                <div class="card-inner">
+                                    <ul class="nk-store-statistics">
+                                        <li class="item">
+                                            <div class="info">
+                                                <div class="fs-14px fw-bold">Medicine Categories</div>
+                                                <div class="count">24</div>
+                                            </div>
+                                            <em class="icon bg-purple-dim ni ni-capsule"></em>
+                                        </li>
+                                    </ul>
+                                </div><!-- .card-inner -->
+                            </div><!-- .card -->
+                        </div><!-- .col -->
+                        <div class="col-12">
+                            <div class="card card-bordered card-stretch">
+                                <div class="card-inner-group">
+                                    <div class="card-inner position-relative card-tools-toggle">
+                                        <div class="card-title-group">
+                                            <div class="card-tools">
+                                                <div class="form-inline flex-nowrap gx-3">
+                                                    <div class="form-wrap w-150px">
+                                                        <select class="form-select js-select2" data-search="off" data-placeholder="Bulk Action">
+                                                            <option value="">Bulk Action</option>
+                                                            <option value="cstatus">Change Status</option>
+                                                            <option value="delete">Delete</option>
+                                                        </select>
+                                                    </div>
+                                                    <div class="btn-wrap">
+                                                        <span class="d-none d-md-block"><button class="btn btn-dim btn-outline-light disabled">Apply</button></span>
+                                                        <span class="d-md-none"><button class="btn btn-dim btn-outline-light btn-icon disabled"><em class="icon ni ni-arrow-right"></em></button></span>
+                                                    </div>
+                                                </div><!-- .form-inline -->
+                                            </div><!-- .card-tools -->
+                                            <div class="card-tools me-n1">
+                                                <ul class="btn-toolbar gx-1">
+                                                    <li>
+                                                        <a href="#" class="btn btn-icon search-toggle toggle-search" data-target="search"><em class="icon ni ni-search"></em></a>
+                                                    </li><!-- li -->
+                                                    <li class="btn-toolbar-sep"></li><!-- li -->
+                                                    <li>
+                                                        <div class="toggle-wrap">
+                                                            <a href="#" class="btn btn-icon btn-trigger toggle" data-target="cardTools"><em class="icon ni ni-menu-right"></em></a>
+                                                            <div class="toggle-content" data-content="cardTools">
+                                                                <ul class="btn-toolbar gx-1">
+                                                                    <li class="toggle-close">
+                                                                        <a href="#" class="btn btn-icon btn-trigger toggle" data-target="cardTools"><em class="icon ni ni-arrow-left"></em></a>
+                                                                    </li><!-- li -->
+                                                                    <li>
+                                                                        <div class="dropdown">
+                                                                            <a href="#" class="btn btn-trigger btn-icon dropdown-toggle" data-bs-toggle="dropdown">
+                                                                                <div class="dot dot-primary"></div>
+                                                                                <em class="icon ni ni-filter-alt"></em>
+                                                                            </a>
+                                                                            <div class="filter-wg dropdown-menu dropdown-menu-xl dropdown-menu-end">
+                                                                                <div class="dropdown-head">
+                                                                                    <span class="sub-title dropdown-title">Filter Items Type</span>
+                                                                                    <div class="dropdown">
+                                                                                        <a href="#" class="btn btn-sm btn-icon">
+                                                                                            <em class="icon ni ni-more-h"></em>
+                                                                                        </a>
+                                                                                    </div>
+                                                                                </div>
+                                                                                <div class="dropdown-body dropdown-body-rg">
+                                                                                    <div class="row gx-6 gy-3">
+                                                                                        <div class="col-6">
+                                                                                            <div class="form-group">
+                                                                                                <label class="overline-title overline-title-alt">Catrgory</label>
+                                                                                                <select class="form-select js-select2">
+                                                                                                    <option value="any">Select</option>
+                                                                                                    <option value="equipements">Equipements</option>
+                                                                                                    <option value="tools">Tools</option>
+                                                                                                    <option value="medicine">Medicine</option>
+                                                                                                </select>
+                                                                                            </div>
+                                                                                        </div>
+                                                                                        <div class="col-6">
+                                                                                            <div class="form-group">
+                                                                                                <label class="overline-title overline-title-alt">Status</label>
+                                                                                                <select class="form-select js-select2">
+                                                                                                    <option value="any">Any Status</option>
+                                                                                                    <option value="available">Available</option>
+                                                                                                    <option value="low">Low</option>
+                                                                                                    <option value="out">Unavailable</option>
+                                                                                                </select>
+                                                                                            </div>
+                                                                                        </div>
+                                                                                        <div class="col-12">
+                                                                                            <div class="form-group">
+                                                                                                <button type="button" class="btn btn-secondary">Filter</button>
+                                                                                            </div>
+                                                                                        </div>
+                                                                                    </div>
+                                                                                </div>
+                                                                                <div class="dropdown-foot between">
+                                                                                    <a class="clickable" href="#">Reset Filter</a>
+                                                                                    <a href="#">Save Filter</a>
+                                                                                </div>
+                                                                            </div><!-- .filter-wg -->
+                                                                        </div><!-- .dropdown -->
+                                                                    </li><!-- li -->
+                                                                    <li>
+                                                                        <div class="dropdown">
+                                                                            <a href="#" class="btn btn-trigger btn-icon dropdown-toggle" data-bs-toggle="dropdown">
+                                                                                <em class="icon ni ni-setting"></em>
+                                                                            </a>
+                                                                            <div class="dropdown-menu dropdown-menu-xs dropdown-menu-end">
+                                                                                <ul class="link-check">
+                                                                                    <li><span>Show</span></li>
+                                                                                    <li class="active"><a href="#">10</a></li>
+                                                                                    <li><a href="#">20</a></li>
+                                                                                    <li><a href="#">50</a></li>
+                                                                                </ul>
+                                                                                <ul class="link-check">
+                                                                                    <li><span>Order</span></li>
+                                                                                    <li class="active"><a href="#">DESC</a></li>
+                                                                                    <li><a href="#">ASC</a></li>
+                                                                                </ul>
+                                                                            </div>
+                                                                        </div><!-- .dropdown -->
+                                                                    </li><!-- li -->
+                                                                </ul><!-- .btn-toolbar -->
+                                                            </div><!-- .toggle-content -->
+                                                        </div><!-- .toggle-wrap -->
+                                                    </li><!-- li -->
+                                                </ul><!-- .btn-toolbar -->
+                                            </div><!-- .card-tools -->
+                                        </div><!-- .card-title-group -->
+                                        <div class="card-search search-wrap" data-search="search">
+                                            <div class="card-body">
+                                                <div class="search-content">
+                                                    <a href="#" class="search-back btn btn-icon toggle-search" data-target="search"><em class="icon ni ni-arrow-left"></em></a>
+                                                    <input type="text" class="form-control border-transparent form-focus-none" placeholder="Search by name">
+                                                    <button class="search-submit btn btn-icon"><em class="icon ni ni-search"></em></button>
+                                                </div>
+                                            </div>
+                                        </div><!-- .card-search -->
+                                    </div><!-- .card-inner -->
+                                    <div class="card-inner p-0">
+                                        <div class="nk-tb-list nk-tb-ulist">
+                                            <div class="nk-tb-item nk-tb-head">
+                                                <div class="nk-tb-col nk-tb-col-check">
+                                                    <div class="custom-control custom-control-sm custom-checkbox notext">
+                                                        <input type="checkbox" class="custom-control-input" id="uid">
+                                                        <label class="custom-control-label" for="uid"></label>
+                                                    </div>
+                                                </div>
+                                                <div class="nk-tb-col"><span class="sub-text">Load ID</span></div>
+                                                <div class="nk-tb-col tb-col-md"><span class="sub-text">Customer</span></div>
+                                                <div class="nk-tb-col tb-col-lg"><span class="sub-text">Commodity</span></div>
+                                                <div class="nk-tb-col tb-col-md"><span class="sub-text">Total Quantity</span></div>
+                                                <div class="nk-tb-col tb-col-md"><span class="sub-text">Quotation</span></div>
+                                                <div class="nk-tb-col nk-tb-col-tools">
+                                                    <ul class="nk-tb-actions gx-1 my-n1">
+                                                        <li>
+                                                            <div class="drodown">
+                                                                <a href="#" class="dropdown-toggle btn btn-icon btn-trigger me-n1" data-bs-toggle="dropdown"><em class="icon ni ni-more-h"></em></a>
+                                                                <div class="dropdown-menu dropdown-menu-end">
+                                                                    <ul class="link-list-opt no-bdr">
+                                                                        <li><a href="#"><em class="icon ni ni-edit"></em><span>Edit Selected</span></a></li>
+                                                                        <li><a href="#"><em class="icon ni ni-trash"></em><span>Remove Seleted</span></a></li>
+                                                                    </ul>
+                                                                </div>
+                                                            </div>
+                                                        </li>
+                                                    </ul>
+                                                </div>
+                                            </div><!-- .nk-tb-item -->
+                                            {% for load in loads %}
+                                            <div class="nk-tb-item">
+                                                <div class="nk-tb-col nk-tb-col-check">
+                                                    <div class="custom-control custom-control-sm custom-checkbox notext">
+                                                        <input type="checkbox" class="custom-control-input" id="uid1">
+                                                        <label class="custom-control-label" for="uid1"></label>
+                                                    </div>
+                                                </div>
+                                                <div class="nk-tb-col">
+                                                    <a href="{% url 'view_load' load.id  %}"><span>{{ load.load_id }}</span></a>
+                                                </div>
+                                                <div class="nk-tb-col tb-col-md">
+                                                    <span>{{ load.estimate.customer.name}} </span>
+                                                </div>
+                                                <div class="nk-tb-col tb-col-lg">
+                                                    <span>{{ load.commodity }}</span>
+                                                </div>
+                                                <div class="nk-tb-col tb-col-mb">
+                                                    <span>{{ load.quantity }} {{ load.quantity_type}}</span>
+                                                </div>
+                                                <div class="nk-tb-col tb-col-md">
+                                                    <a href="{% url 'view_estimate' load.estimate.id  %}"><span>{{ load.estimate }}</span></a>
+                                                </div>                                                
+                                                <div class="nk-tb-col nk-tb-col-tools">
+                                                    <ul class="nk-tb-actions gx-1">
+                                                        <li>
+                                                            <div class="drodown">
+                                                                <a href="#" class="dropdown-toggle btn btn-icon btn-trigger" data-bs-toggle="dropdown"><em class="icon ni ni-more-h"></em></a>
+                                                                <div class="dropdown-menu dropdown-menu-end">
+                                                                    <ul class="link-list-opt no-bdr">
+                                                                        <li><a  href="{% url 'update_load' load.id %}"><em class="icon ni ni-edit"></em><span>Update</span></a></li>
+                                                                        <li><a  href="{% url 'view_load' load.id %}"><em class="icon ni ni-eye"></em><span>View Details</span></a></li>
+                                                                        <li><a data-bs-toggle="modal" class="delete-button" href="#deleteLoad" data-pk="{{ load.id }}"><em class="icon ni ni-trash"></em><span>Remove Load</span></a></li>
+                                                                    </ul>
+                                                                </div>
+                                                            </div>
+                                                        </li>
+                                                    </ul>
+                                                </div>
+                                            </div><!-- .nk-tb-item -->
+                                            {% endfor %}
+                                        </div><!-- .nk-tb-list -->
+                                    </div><!-- .card-inner -->
+                                    <div class="card-inner">
+                                        <div class="nk-block-between-md g-3">
+                                            <div class="g">
+                                                <ul class="pagination justify-content-center justify-content-md-start">
+                                                    <li class="page-item"><a class="page-link" href="#">Prev</a></li>
+                                                    <li class="page-item"><a class="page-link" href="#">1</a></li>
+                                                    <li class="page-item"><a class="page-link" href="#">2</a></li>
+                                                    <li class="page-item"><span class="page-link"><em class="icon ni ni-more-h"></em></span></li>
+                                                    <li class="page-item"><a class="page-link" href="#">6</a></li>
+                                                    <li class="page-item"><a class="page-link" href="#">7</a></li>
+                                                    <li class="page-item"><a class="page-link" href="#">Next</a></li>
+                                                </ul><!-- .pagination -->
+                                            </div>
+                                            <div class="g">
+                                                <div class="pagination-goto d-flex justify-content-center justify-content-md-start gx-3">
+                                                    <div>Page</div>
+                                                    <div>
+                                                        <select class="form-select js-select2" data-search="on" data-dropdown="xs center">
+                                                            <option value="page-1">1</option>
+                                                            <option value="page-2">2</option>
+                                                            <option value="page-4">4</option>
+                                                            <option value="page-5">5</option>
+                                                            <option value="page-6">6</option>
+                                                            <option value="page-7">7</option>
+                                                            <option value="page-8">8</option>
+                                                            <option value="page-9">9</option>
+                                                            <option value="page-10">10</option>
+                                                            <option value="page-11">11</option>
+                                                            <option value="page-12">12</option>
+                                                            <option value="page-13">13</option>
+                                                            <option value="page-14">14</option>
+                                                            <option value="page-15">15</option>
+                                                            <option value="page-16">16</option>
+                                                            <option value="page-17">17</option>
+                                                            <option value="page-18">18</option>
+                                                            <option value="page-19">19</option>
+                                                            <option value="page-20">20</option>
+                                                        </select>
+                                                    </div>
+                                                    <div>OF 102</div>
+                                                </div>
+                                            </div><!-- .pagination-goto -->
+                                        </div><!-- .nk-block-between -->
+                                    </div><!-- .card-inner -->
+                                </div><!-- .card-inner-group -->
+                            </div><!-- .card -->
+                        </div><!-- .col -->
+                    </div><!-- .row -->
+                </div><!-- .nk-block -->
+            </div>
+        </div>
+    </div>
+</div>
+<!-- content @e -->
+<div class="modal fade" id="deleteLoad">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <a href="#" class="close" data-bs-dismiss="modal"><em class="icon ni ni-cross"></em></a>
+            <div class="modal-body modal-body-sm text-center">
+                <div class="nk-modal py-4">
+                    <em class="nk-modal-icon icon icon-circle icon-circle-xxl ni ni-cross bg-danger"></em>
+                    <h4 class="nk-modal-title">Are You Sure ?</h4>
+                    <div class="nk-modal-text mt-n2">
+                        <p class="text-soft">This load will be removed permanently.</p>
+                    </div>
+                    <ul class="d-flex justify-content-center gx-4 mt-4">
+                        <form id="delete-form" method="POST">
+                            {% csrf_token %}
+                        <li>
+                            <button type="submit" data-bs-dismiss="modal" id="deleteObj" class="btn btn-primary">Yes, Delete.</button>
+                        </li>
+                        </form>
+                        <li>
+                            <button data-bs-dismiss="modal" data-toggle="modal" data-target="#editEventPopup" class="btn btn-danger btn-dim">Cancel</button>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div><!-- .Delete role  Modal-content -->
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+    //-- deleteRole modal script
+    function showDeleteModalForm() {
+    // Implementation of showModalForm() to display the modal
+    $('#deleteLoad').modal('show');
+}
+
+    $(document).ready(function() {
+    // Get all the delete buttons
+    var deleteButtons = document.getElementsByClassName('delete-button');
+
+    // Loop through each delete button
+    for (var i = 0; i < deleteButtons.length; i++) {
+        // Add click event listener
+        deleteButtons[i].addEventListener('click', function() {
+            // Get the pk from the data attribute
+            var pk = this.dataset.pk;
+
+            // Update the form's action with the correct URL
+            // Replace '0' with the actual value of pk from your Django template context
+            var form = document.getElementById('delete-form');
+            form.action = '{% url "remove_load" 0 %}'.replace('0', pk);
+
+            // Display the modal form
+            // Assuming you have code to display the modal form
+            showDeleteModalForm();
+
+            // You can add additional logic here if needed, e.g., pre-fill form fields, etc.
+
+            // Let the user manually click the submit button
+            // Assuming you have a submit button with id 'delete-submit-button'
+            document.getElementById('deleteObj').addEventListener('click', function() {
+                // Submit the form
+                form.submit();
+            });
+        });
+    }
+});
+//-- ends
+</script>
+{% endblock content %} 

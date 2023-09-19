@@ -1,0 +1,371 @@
+{% extends 'base.html' %}  
+
+{% block content %}
+
+<!-- displaying flash messages -->
+{% if messages %}
+{% for message in messages %}
+    <div class="alert {% if message.tags == 'error' %}alert-danger{% elif message.tags == 'success' %}alert-success{% else %}alert-primary{% endif %}">
+        {{ message }}
+    </div>
+{% endfor %}
+{% endif %}
+<!-- content @s -->
+<div class="nk-content ">
+    <div class="container-fluid">
+        <div class="nk-content-inner">
+            <div class="nk-content-body">
+                <div class="nk-block-head nk-block-head-sm">
+                    <div class="nk-block-between">
+                        <div class="nk-block-head-content">
+                            <h3 class="nk-block-title page-title">Create Quotation</h3>
+                        </div><!-- .nk-block-head-content -->
+                    </div><!-- .nk-block-between -->
+                </div><!-- .nk-block-head -->
+                <div class="nk-block">
+                    <div class="card card-bordered">
+                        <form action="{% url 'add_estimate' %}" method="POST" enctype="multipart/form-data" >
+                            {% csrf_token %}
+                            <div class="card-inner">
+                                <div class="nk-block">
+                                    <div class="row gy-4">
+                                        <div class="col-xxl-3 col-md-4">
+                                            <div class="form-group">
+                                                <label class="form-label"> Customer</label> <a data-bs-toggle="modal" href="#addCustomer" class="btn btn-sm btn-outline-primary"><span>Add Customer</span><em class="icon ni ni-plus-sm"></em></a>
+                                                <!--<input type="text" name="plate_number" class="form-control" id="name" placeholder="Registration Number" required> -->
+                                                {{ form.customer }}
+                                            </div>
+                                        </div><!--col-->
+                                        <div class="col-xxl-3 col-md-4">
+                                            <div class="form-group">
+                                                <label class="form-label">Valid Till</label>
+                                                <div class="form-control-wrap">
+                                                    <div class="form-icon form-icon-right">
+                                                        <em class="icon ni ni-calendar"></em>
+                                                    </div>
+                                                    <!--<input type="text" name="insurance_expiry" class="form-control date-picker" data-date-format="yyyy-mm-dd" placeholder="yyyy-mm-dd">-->
+                                                    {{ form.valid_till }}
+                                                </div>
+                                            </div>
+                                        </div><!--col-->
+                                    </div><!--row-->
+                                </div>
+                            </div>
+                            <div class="card-inner">
+                                <div class="nk-block">
+                                    <div class="row gy-4">
+                                        <div class="col-xxl-3 col-md-3">
+                                            <div class="form-group">
+                                                <label class="form-label" for="name">Item</label>
+                                                {{ form.item }}
+                                            </div>
+                                        </div><!--col-->
+                                        <div class="col-xxl-2 col-md-2">
+                                            <div class="form-group">
+                                                <label class="form-label" for="quantity">Km/Ml</label>
+                                                <input type="text" name="quantity" class="form-control" id="quantity" value="" >
+                                            </div>
+                                        </div><!--col-->
+                                        <div class="col-xxl-3 col-md-2">
+                                            <div class="form-group">
+                                                <label class="form-label" for="unitPrice">Unit Price</label>
+                                                <input type="text" name="unit_price" class="form-control" id="unitPrice" value="" >
+                                            </div>
+                                        </div><!--col-->
+                                        <div class="col-xxl-2 col-md-2">
+                                            <div class="form-group">
+                                                <label class="form-label" for="taxPc">Tax (%)</label>
+                                                <input type="number" name="tax" class="form-control" id="taxPc" value="" >
+                                            </div>
+                                        </div><!--col-->
+                                        <div class="col-xxl-3 col-md-2">
+                                            <div class="form-group">
+                                                <label class="form-label" for="amount">Amount</label>
+                                                <input type="number" name="amount" class="form-control" id="amount" placeholder="2000" >
+                                            </div>
+                                        </div><!--col-->
+                                        <div class="col-xxl-3 col-md-6">
+                                            <div class="form-group">
+                                                <label class="form-label" for="description">Description</label>
+                                                {{ form.description }}
+                                            </div>
+                                        </div><!--col-->
+                                    </div><!--row-->
+                                </div>
+                            </div>
+                            <div class="card-inner">
+                                <div class="nk-block ">
+                                    <div class="row gy-4 justify-content-end">
+                                        <div class="col-xxl-3 col-md-2">
+                                            <div class="form-group">
+                                                <label class="form-label fw-medium" for="subTotal">Sub Total</label>
+                                                <input type="number" name="sub_total" class="form-control fw-medium" id="subTotal" value="" readonly>
+                                            </div>
+                                        </div><!--col-->
+                                        <div class="col-xxl-3 col-md-2">
+                                            <div class="form-group">
+                                                <label class="form-label" for="discount">Discount</label>
+                                                <input type="number" name="discount" class="form-control" id="discount" value="" readonly>
+                                            </div>
+                                        </div><!--col-->
+                                        <div class="col-xxl-3 col-md-2">
+                                            <div class="form-group">
+                                                <label class="form-label" for="tax">Tax</label>
+                                                <input type="number" name="tax" class="form-control" id="tax" value="" readonly>
+                                            </div>
+                                        </div><!--col-->
+                                        <div class="col-xxl-3 col-md-2">
+                                            <div class="form-group">
+                                                <label class="form-label text-uppercase fw-bold" for="grandTotal">Total</label>
+                                                <input type="number" name="total" class="form-control text-uppercase fw-bold" id="grandTotal" value="" readonly>
+                                            </div>
+                                        </div><!--col-->
+                                    </div><!--row-->
+                                </div>
+                            </div>
+                            <div class="card-inner">
+                                <div class="nk-block">
+                                    <div class="row gy-4">
+                                        <div class="col-12">
+                                            <div class="form-group">
+                                                <label class="form-label" for="name">Note</label>
+                                                <!--<input type="text" name="plate_number" class="form-control" id="name" placeholder="Registration Number" required> -->
+                                                {{ form.note }}
+                                            </div>
+                                        </div><!--col-->
+                                        <div class="col-12">
+                                            <div class="form-group">
+                                                <button type="submit" class="btn btn-primary">Save Estimate</button>
+                                            </div>
+                                        </div><!--col-->
+                                    </div><!--row-->
+                                </div>
+                            </div>
+                        </form>
+                        </div><!-- .card-inner-group -->
+                    </div><!-- .card -->
+                </div><!-- .nk-block -->
+            </div>
+        </div>
+    </div>
+</div>
+<!-- content @e -->
+
+<!-- Add Customer modal-->
+<div class="modal fade" tabindex="-1" role="dialog" id="addCustomer">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <a href="#" class="close" data-bs-dismiss="modal"><em class="icon ni ni-cross-sm"></em></a>
+            <div class="modal-body modal-body-md">
+                <h5 class="modal-title">Add Customer</h5>
+                <form action="{% url 'add_customer_modal' %}" class="mt-4" method="POST" id="addCustomerForm">
+                    {% csrf_token %}
+                    <div class="row g-gs">
+                        <div class="col-xxl-3 col-md-4">
+                            <div class="form-group">
+                                <label class="form-label" for="name">Customer Name</label>
+                                <!--<input type="text" name="plate_number" class="form-control" id="name" placeholder="Registration Number" required> -->
+                                {{ customer_form.name }}
+                            </div>
+                        </div><!--col-->
+                        <div class="col-xxl-3 col-md-4">
+                            <div class="form-group">
+                                <label class="form-label" for="generic">Contact Person Name</label>
+                                <!--<input type="text" name="trailer_number" class="form-control" id="generic" placeholder="Trailer Number">-->
+                                {{ customer_form.contact_person }}
+                            </div>
+                        </div><!--col-->
+                        <div class="col-xxl-3 col-md-4">
+                            <div class="form-group">
+                                <label class="form-label" for="sKU">Contact Phone</label>
+                                <!--<input type="text" name="vin" class="form-control" id="sKU" placeholder="Vehicle Identification Number">-->
+                                {{ customer_form.phone }}
+                            </div>
+                        </div><!--col-->
+                        <div class="col-xxl-3 col-md-4">
+                            <div class="form-group">
+                                <label class="form-label">Contact Email</label>
+                                <div class="form-control-wrap">
+                                    {{ customer_form.email }}
+                                </div>
+                            </div>
+                        </div><!--col-->
+                        <div class="col-xxl-3 col-md-4">
+                            <div class="form-group">
+                                <label class="form-label">Address One</label>
+                                <div class="form-control-wrap">
+                                    {{ customer_form.address_one }}
+                                </div>
+                            </div>
+                        </div><!--col-->
+                        <div class="col-xxl-3 col-md-4">
+                            <div class="form-group">
+                                <label class="form-label">Address Two</label>
+                                <div class="form-control-wrap">
+                                    {{ customer_form.address_two }}
+                                </div>
+                            </div>
+                        </div><!--col-->
+                        <div class="col-xxl-3 col-md-4">
+                            <div class="form-group">
+                                <label class="form-label">Country</label>
+                                <div class="form-control-wrap">
+                                    {{ customer_form.country }}
+                                </div>
+                            </div>
+                        </div><!--col-->
+                        <div class="col-xxl-3 col-md-4">
+                            <div class="form-group">
+                                <label class="form-label">City</label>
+                                <div class="form-control-wrap">
+                                    {{ customer_form.city }}
+                                </div>
+                            </div>
+                        </div><!--col-->
+                        <div class="col-xxl-3 col-md-4">
+                            <div class="form-group">
+                                <label class="form-label">Website</label>
+                                <div class="form-control-wrap">
+                                    {{ customer_form.website }}
+                                </div>
+                            </div>
+                        </div><!--col-->
+                        <div class="col-xxl-3 col-md-4">
+                            <div class="form-group">
+                                <label class="form-label">Credit Limit</label>
+                                <div class="form-control-wrap">
+                                    {{ customer_form.credit_limit }}
+                                </div>
+                            </div>
+                        </div><!--col-->
+                        <div class="col-xxl-3 col-md-4">
+                            <div class="form-group">
+                                <label class="form-label">Payment Term</label>
+                                <div class="form-control-wrap">
+                                    {{ customer_form.payment_term }}
+                                </div>
+                            </div>
+                        </div><!--col-->
+                        <div class="col-xxl-3 col-md-4"> 
+                            <div class="form-group">
+                                <label class="form-label" for="customFileLabel">Company Logo</label>
+                                <div class="form-control-wrap">
+                                    <div class="form-file">
+                                        <!--<input type="file" class="form-file-input" id="customFile">-->
+                                        {{ customer_form.logo }}
+                                        <label class="form-file-label" for="customFile">Choose file</label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-12">
+                            <div class="form-group">
+                                <button type="submit" class="btn btn-primary">Add Customer</button>
+                            </div>
+                        </div><!--col-->
+                    </div>
+                </form>
+            </div><!-- .modal-body -->
+        </div><!-- .modal-content -->
+    </div><!-- .modal-dialog -->
+</div><!-- .modal -->
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+<!--autofilling created customer on the esrimate form-->
+<script>
+    $(document).ready(function() {
+        $('#addCustomerForm').submit(function(e) {
+            e.preventDefault(); // Prevent the default form submission
+
+            // Serialize the form data
+            var formData = $(this).serialize();
+
+            // Send an AJAX POST request to add the new vehicle make
+            $.ajax({
+                type: 'POST',
+                url: $(this).attr('action'),
+                data: formData,
+                success: function(response) {
+                    // Check if the response indicates success
+                    if (response.success) {
+                        var customerSelect = $('#customerSelect');
+                        var newOption = $('<option>', {
+                            value: response.customer.id,
+                            text: response.customer.name,
+                            selected: true // Set the option as selected
+                        });
+
+                        // Append the new option to the select and select it
+                        customerSelect.append(newOption).val(response.customer.id);
+
+                        // Close the modal
+                        $('#addCustomer').modal('hide');
+
+                        // Clear the form fields
+                        $('#addCustomerForm')[0].reset();
+                    }
+                },
+                error: function(xhr, textStatus, errorThrown) {
+                    // Handle any errors here
+                    console.error('Error:', errorThrown);
+                }
+            });
+        });
+    });
+</script>
+
+<!-- autofill inputs on tip form -->
+<script>
+    $(document).ready(function() {
+        // Function to calculate and update values
+        function updateInvoice() {
+            var quantity = parseFloat($('#quantity').val()) || 0;
+            var unitPrice = parseFloat($('#unitPrice').val()) || 0;
+            var taxPc = parseFloat($('#taxPc').val()) || 0;
+            
+            var amount = quantity * unitPrice;
+            var subTotal = amount;
+            var discount = 0; // You can calculate the discount here if needed.
+            var tax = (taxPc / 100) * subTotal;
+            var grandTotal = subTotal - discount + tax;
+    
+            // Update the fields
+            $('#amount').val(amount.toFixed(2));
+            $('#subTotal').val(subTotal.toFixed(2));
+            $('#discount').val(discount.toFixed(2));
+            $('#tax').val(tax.toFixed(2));
+            $('#grandTotal').val(grandTotal.toFixed(2));
+        }
+    
+        // Attach the function to input change events
+        $('#quantity, #unitPrice, #taxPc').on('input', updateInvoice);
+    });
+</script>
+<!-- ends -->   
+
+<!-- get trip details on choosing a trip -->
+<script>
+    $(document).ready(function () {
+        // Get references to the input fields and select field
+        var tripSelect = $("#trip");
+        var vehicleInput = $("#vehicle");
+        var customerInput = $("#customer");
+
+        // Add an event listener to the "Trip" select field
+        tripSelect.on("change", function () {
+            // Get the selected trip ID
+            var tripId = $(this).val();
+
+            // Send a GET request to fetch vehicle and customer information
+            $.get("/trip/get_trip_info/" + tripId, function (data) {
+                // Update the vehicle and customer input fields with the fetched data
+                vehicleInput.val(data.vehicle);
+                customerInput.val(data.customer);
+            });
+        });
+    });
+</script>
+<!-- end -->
+
+{% endblock content %}
