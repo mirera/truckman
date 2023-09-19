@@ -6,7 +6,7 @@ source /home/ubuntu/truckman_env/bin/activate
 # stop running services, if any
 #redis-cli shutdown
 
-sed -i 's/\[]/\["truckman.loginit.co.ke"]/' /home/ubuntu/truckman/truckman/settings.py 
+sed -i 's/\[]/\['truckman.loginit.co.ke','www.truckman.loginit.co.ke']/' /home/ubuntu/truckman/truckman/settings.py 
 
 sudo cp /home/ubuntu/truckman_secrets/.env  /home/ubuntu/truckman/.env 
 python manage.py migrate 

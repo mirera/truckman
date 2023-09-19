@@ -20,7 +20,7 @@
 #fi
 
 #if ! is_package_installed postgresql; then
-    sudo apt install -y postgresql
+#    sudo apt install -y postgresql
 #fi
 
 #if ! is_package_installed redis; then
