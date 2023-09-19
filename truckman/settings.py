@@ -139,12 +139,12 @@ AUTH_USER_MODEL = 'authentication.CustomUser'
 
 STATIC_URL = 'static/'
 
-#for production
+#for production aws/digital oceans etct
 
 STATIC_URL = '/static/' #changed this
 STATIC_ROOT = os.path.join(BASE_DIR, 'static') 
 '''
-#for development
+#for development - can serve files in cpanle
 STATIC_URL = '/static/'
 STATICFILES_DIRS = [
     BASE_DIR / 'static'
