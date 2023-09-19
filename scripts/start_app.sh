@@ -4,7 +4,7 @@
 source /home/ubuntu/truckman_env/bin/activate
 
 # stop running services, if any
-redis-cli shutdown
+#redis-cli shutdown
 
 sed -i 's/\[]/\["truckman.loginit.co.ke"]/' /home/ubuntu/truckman/truckman/settings.py 
 
