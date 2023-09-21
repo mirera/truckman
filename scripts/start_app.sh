@@ -8,9 +8,9 @@ source /home/ubuntu/truckman_env/bin/activate
 
 sed -i 's/\[]/\["truckman.loginit.co.ke"]/' /home/ubuntu/truckman/truckman/settings.py 
 sudo cp /home/ubuntu/truckman_secrets/.env  /home/ubuntu/truckman/.env 
-python manage.py makemigrations
-python manage.py migrate      
-python manage.py collectstatic
+cd /home/ubuntu/truckman && python manage.py makemigrations
+cd /home/ubuntu/truckman && python manage.py migrate      
+cd /home/ubuntu/truckman && python manage.py collectstatic
 sudo service gunicorn restart
 sudo service nginx restart
 
