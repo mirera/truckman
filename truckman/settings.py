@@ -140,7 +140,7 @@ AUTH_USER_MODEL = 'authentication.CustomUser'
 STATIC_URL = 'static/'
 
 #for production aws/digital oceans etct
-'''
+
 STATIC_URL = '/static/' #changed this
 STATIC_ROOT = os.path.join(BASE_DIR, 'static') 
 '''
@@ -149,7 +149,7 @@ STATIC_URL = '/static/'
 STATICFILES_DIRS = [
     BASE_DIR / 'static'
 ]
-
+'''
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.0/ref/settings/#default-auto-field
@@ -162,8 +162,8 @@ MEDIA_URL = '/media/'
 MEDIA_ROOT =  os.path.join(BASE_DIR, 'static/media')
 
 #Configure Celery to use Redis as the message broker
-CELERY_BROKER_URL = 'redis://localhost:6380/0' 
-CELERY_RESULT_BACKEND = 'redis://localhost:6380/0'
+CELERY_BROKER_URL = 'redis://localhost:6379/1' 
+CELERY_RESULT_BACKEND = 'redis://localhost:6379/1'
 
 #email configurations
 EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"

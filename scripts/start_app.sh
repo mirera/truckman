@@ -15,8 +15,8 @@ sudo service gunicorn restart
 sudo service nginx restart
 
 
-# Start Redis on port 6380 because many sites are runnning redis
-redis-server --port 6380 --daemonize yes --logfile /home/ubuntu/truckman/truckman/redis.log
+# Start Redis on port 
+redis-server --port 6379 --daemonize yes --logfile /home/ubuntu/truckman/truckman/redis.log
 cd /home/ubuntu/truckman && celery -A truckman beat &
 cd /home/ubuntu/truckman && celery -A truckman worker --logfile=/home/ubuntu/truckman/truckman/celery.log --detach
 
