@@ -22,8 +22,6 @@ from PIL import Image
 import io
 from django.conf import settings
 from django.urls import reverse
-
-
 from . models import (
     Vehicle, 
     Vehicle_Make, 
@@ -39,7 +37,8 @@ from . models import (
     Expense_Category,
     Reminder,
     Service,
-    Estimate
+    Estimate,
+    Vehicle_Owner
 )
 
 from .forms import (
@@ -60,7 +59,7 @@ from .forms import (
     EstimateForm
 )
 
-from truckman.utils import get_user_company, generate_invoice_pdf
+from truckman.utils import get_user_company, generate_invoice_pdf, export_model_data
 from truckman.tasks import send_email_task, send_email_with_attachment_task
 
 
@@ -123,16 +122,22 @@ def add_vehicle(request):
         model_id = request.POST.get('model')
         model= Vehicle_Model.objects.get(id=model_id)
 
+        owner_id = request.POST.get('owner')
+        owner= Vehicle_Owner.objects.get(id=owner_id)
+
         #create instance of vehicle
         vehicle = Vehicle.objects.create(
             company=company,
+            owner = owner,
             plate_number = request.POST.get('plate_number'),
             trailer_number = request.POST.get('trailer_number'),
-            vin = request.POST.get('vin'),
+            truck_vin = request.POST.get('truck_vin'),
+            trailer_vin = request.POST.get('trailer_vin'),
             make=make,
             model=model,
             milage=request.POST.get('milage'),
             color=request.POST.get('color'),
+            trailer_color=request.POST.get('trailer_color'),
             milage_unit = request.POST.get('milage_unit'),
             insurance_expiry = request.POST.get('insurance_expiry'),
             manufacture_year = request.POST.get('manufacture_year'),
@@ -169,16 +174,21 @@ def update_vehicle(request, pk):
         make = Vehicle_Make.objects.get(id=make_id)
         model_id = request.POST.get('model')
         model= Vehicle_Model.objects.get(id=model_id)
+        owner_id = request.POST.get('owner')
+        owner= Vehicle_Owner.objects.get(id=owner_id)
 
         #update instance 
         vehicle.company=company
+        vehicle.owner = owner
         vehicle.plate_number = request.POST.get('plate_number')
         vehicle.trailer_number = request.POST.get('trailer_number')
-        vehicle.vin = request.POST.get('vin')
+        vehicle.truck_vin = request.POST.get('truck_vin')
+        vehicle.trailer_vin = request.POST.get('trailer_vin')
         vehicle.make=make
         vehicle.model=model
         vehicle.milage=request.POST.get('milage')
         vehicle.color=request.POST.get('color')
+        vehicle.trailer_color=request.POST.get('trailer_color')
         vehicle.milage_unit = request.POST.get('milage_unit')
         vehicle.insurance_expiry = request.POST.get('insurance_expiry')
         vehicle.manufacture_year = request.POST.get('manufacture_year')
@@ -210,13 +220,16 @@ def update_vehicle(request, pk):
     else:
         # prepopulate the form with existing data
         form_data = {
+            'owner': vehicle.owner,
             'plate_number': vehicle.plate_number,
             'trailer_number': vehicle.trailer_number,
-            'vin': vehicle.vin,
+            'truck_vin': vehicle.truck_vin,
+            'trailer_vin': vehicle.trailer_vin,
             'make': vehicle.make,
             'model': vehicle.model,
             'milage': vehicle.milage,
             'color':vehicle.color,
+            'trailer_color':vehicle.trailer_color,
             'milage_unit': vehicle.milage_unit,
             'insurance_expiry': vehicle.insurance_expiry,
             'manufacture_year': vehicle.manufacture_year,
@@ -262,6 +275,18 @@ def remove_vehicle(request, pk):
         return redirect('list_vehicles')
 #--ends
 
+# export vehicle as csv
+@login_required(login_url='login')
+@permission_required('trip.view_vehicle')
+def vehicle_export_to_csv(request):
+    header = ['owner','plate_number', 'truck_vin', 'color',  
+              'make', 'model', 'milage_unit', 'milage', 
+              'trailer_number', 'trailer_vin', 'trailer_color', 
+              'insurance_expiry' ,'manufacture_year', 'purchase_year']
+    response = export_model_data(request, Vehicle, header)
+    return response 
+
+
 #---------------------------------- Driver views------------------------------------------
 
 # add driver
@@ -298,8 +323,17 @@ def add_driver(request):
             emergency_contact_person = request.POST.get('emergency_contact_person'),
             emergency_contact_person_rlshp = request.POST.get('emergency_contact_person_rlshp'),
             emergency_contact_no = request.POST.get('emergency_contact_no'),
-            emergency_contact_two = request.POST.get('emergency_contact_two'),
+
+            emergency_contact_person_two = request.POST.get('emergency_contact_person_two'),
+            emergency_contact_person_two_rlshp = request.POST.get('emergency_contact_person_two_rlshp'),
+            emergency_contact_no_two = request.POST.get('emergency_contact_no_two'),
+
+            emergency_contact_person_three = request.POST.get('emergency_contact_person_three'),
+            emergency_contact_person_three_rlshp = request.POST.get('emergency_contact_person_three_rlshp'),
+            emergency_contact_no_three = request.POST.get('emergency_contact_no_three'),
+
             assigned_vehicle = assigned_vehicle,
+            status = request.POST.get('status'),
         )
 
         messages.success(request, f'Driver was added successfully.')
@@ -331,12 +365,20 @@ def update_driver(request, pk):
         driver.passport_number = request.POST.get('passport_number')
         driver.dl_issuing_authority = request.POST.get('dl_issuing_authority')
         
-       
         driver.emergency_contact_person = request.POST.get('emergency_contact_person')
         driver.emergency_contact_person_rlshp = request.POST.get('emergency_contact_person_rlshp')
         driver.emergency_contact_no = request.POST.get('emergency_contact_no')
-        driver.emergency_contact_two = request.POST.get('emergency_contact_two')
+
+        driver.emergency_contact_person_two = request.POST.get('emergency_contact_person_two')
+        driver.emergency_contact_person_two_rlshp = request.POST.get('emergency_contact_person_two_rlshp')
+        driver.emergency_contact_no_two = request.POST.get('emergency_contact_no_two')
+
+        driver.emergency_contact_person_three = request.POST.get('emergency_contact_person_three')
+        driver.emergency_contact_person_three_rlshp = request.POST.get('emergency_contact_person_three_rlshp')
+        driver.emergency_contact_no_three = request.POST.get('emergency_contact_no_three')
+
         driver.assigned_vehicle = assigned_vehicle
+        driver.status = request.POST.get('status')
 
         # Check if new images/files are provided
         if request.FILES.get('driver_photo'):
@@ -370,11 +412,21 @@ def update_driver(request, pk):
             'dl_no': driver.dl_no,
             'passport_number': driver.passport_number,
             'dl_issuing_authority': driver.dl_issuing_authority,
+
             'emergency_contact_person': driver.emergency_contact_person,
             'emergency_contact_person_rlshp': driver.emergency_contact_person_rlshp,
             'emergency_contact_no': driver.emergency_contact_no,
-            'emergency_contact_two': driver.emergency_contact_two,
+
+            'emergency_contact_person_two': driver.emergency_contact_person_two,
+            'emergency_contact_person_two_rlshp': driver.emergency_contact_person_two_rlshp,
+            'emergency_contact_no_two': driver.emergency_contact_no_two,
+            
+            'emergency_contact_person_three': driver.emergency_contact_person_three,
+            'emergency_contact_person_three_rlshp': driver.emergency_contact_person_three_rlshp,
+            'emergency_contact_no_three': driver.emergency_contact_no_three,
+
             'assigned_vehicle': driver.assigned_vehicle,
+            'status':driver.status
         }
 
         form = DriverForm(initial=form_data, company=company )
@@ -423,6 +475,19 @@ def remove_driver(request, pk):
         messages.success(request, f'Driver {driver.first_name} {driver.last_name} removed')
         return redirect('list_drivers')
 #--ends
+
+# export driver as csv
+@login_required(login_url='login')
+@permission_required('trip.view_driver')
+def driver_export_to_csv(request):
+    header = ['first_name', 'last_name', 'tel_home', 'tel_roam', 'id_no', 'passport_number', 
+              'dl_no', 'dl_issuing_authority', 'status', 'date_hired', 'date_terminated', 
+              'emergency_contact_person' ,'emergency_contact_person_rlshp', 'emergency_contact_no',
+              'emergency_contact_person_two', 'emergency_contact_person_two_rlshp', 'emergency_contact_no_two',
+              'emergency_contact_person_three', 'emergency_contact_person_three_rlshp', 'emergency_contact_no_three',
+              'assigned_vehicle' ]
+    response = export_model_data(request, Driver, header)
+    return response 
 
 #---------------------------------- Customer views------------------------------------------
 
@@ -572,6 +637,17 @@ def remove_customer(request, pk):
         return redirect('list_customers')
 #--ends
 
+# export customer as csv
+@login_required(login_url='login')
+@permission_required('trip.view_customer')
+def customer_export_to_csv(request):
+    header = ['customer_id','name', 'contact_person', 'phone',  
+              'email', 'address_one', 'address_two', 'country', 
+              'city', 'payment_term', 
+              'credit_limit' ,'date_added', 'website']
+    response = export_model_data(request, Customer, header)
+    return response 
+
 #---------------------------------- Consignee views------------------------------------------
 # add consignee
 @login_required(login_url='login')
@@ -685,6 +761,18 @@ def remove_consignee(request, pk):
         return redirect('list_consignees')
 #--ends
 
+# export consignee as csv
+@login_required(login_url='login')
+@permission_required('trip.view_consignee')
+def consignee_export_to_csv(request):
+    header = ['consignee_id','name', 'contact_person', 'phone',  
+              'email', 'address_one', 'address_two', 'country', 
+              'city', 'date_added', 'website']
+    response = export_model_data(request, Consignee, header)
+    return response 
+
+#ends
+
 #---------------------------------- Shipper views------------------------------------------
 # add shipper
 @login_required(login_url='login')
@@ -797,6 +885,16 @@ def remove_shipper(request, pk):
         messages.success(request, f'Shipper {shipper.name} removed')
         return redirect('list_shippers')
 #--ends
+
+# export shipper as csv
+@login_required(login_url='login')
+@permission_required('trip.view_shipper')
+def shipper_export_to_csv(request):
+    header = ['shipper_id','name', 'contact_person', 'phone',  
+              'email', 'address_one', 'address_two', 'country', 
+              'city','date_added', 'website']
+    response = export_model_data(request, Shipper, header)
+    return response 
 
 #---------------------------------- Load views------------------------------------------
 # add load
@@ -959,6 +1057,17 @@ def remove_load(request, pk):
         messages.success(request, f'Load of ID: {load.load_id} removed')
         return redirect('list_loads')
 #--ends
+
+# export load as csv
+@login_required(login_url='login')
+@permission_required('trip.view_load')
+def load_export_to_csv(request):
+    header = ['load_id','shipper', 'consignee', 'quantity',  
+              'quantity_type', 'weight', 'commodity', 'pickup_date', 
+              'delivery_date', 'quote_amount', 
+              'date_added']
+    response = export_model_data(request, Load, header)
+    return response 
 
 #---------------------------------- Trip views------------------------------------------
 # add trip
@@ -1258,6 +1367,15 @@ def remove_trip(request, pk):
         return redirect('list_trips')
 #--ends
 
+# export trip as csv
+@login_required(login_url='login')
+@permission_required('trip.view_trip')
+def trip_export_to_csv(request):
+    header = ['trip_id','load', 'pick_up_location', 'drop_off_location',  
+              'distance', 'status', 'start_time', 'end_time', 'date_added']
+    response = export_model_data(request, Trip, header)
+    return response 
+
 #---------------------------------- Payment views------------------------------------------
 
 # add payment
@@ -1433,6 +1551,15 @@ def remove_payment(request, pk):
         messages.success(request, f'Trip of id : {trip.trip_id} removed')
         return redirect('list_trips')
 #--ends
+
+# export payment as csv
+@login_required(login_url='login')
+@permission_required('trip.view_trip')
+def payment_export_to_csv(request):
+    header = ['payment_id', 'transaction_id', 'invoice', 'amount',  
+              'paid_on', 'payment_method', 'remark']
+    response = export_model_data(request, Payment, header)
+    return response 
 
 #---------------------------------- Expense Category views------------------------------------------
 
@@ -1635,6 +1762,16 @@ def remove_expense(request, pk):
         messages.success(request, f'Trip of id : {trip.trip_id} removed')
         return redirect('list_trips')
 #--ends
+
+# export payment as csv
+@login_required(login_url='login')
+@permission_required('trip.view_expense')
+def expense_export_to_csv(request):
+    header = ['expense_id', 'expense_category', 'vehicle', 'trip', 'amount',  
+              'paid_to', 'date_paid']
+    response = export_model_data(request, Expense, header)
+    return response 
+
 
 #---------------------------------- Invoice views------------------------------------------
 # add invoice

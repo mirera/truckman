@@ -2,7 +2,7 @@
 {% load static %}
 <div class="nk-sidebar" data-content="sidebarMenu">
     <div class="nk-sidebar-bar">
-        <div class="nk-apps-brand">
+        <div class="nk-apps-brand"> 
             {% if company.logo %}
             <a href="{% url 'home' %}" class="logo-link">
                 <img class="logo-light logo-img" src="{{ company.logo.url }}" srcset="{{ company.logo.url }}" alt="logo">
@@ -112,15 +112,15 @@
                         </a>
                     </li><!-- .nk-menu-item -->
                     <li class="nk-menu-item has-sub">
-                        <a href="{% url 'list_drivers' %}" class="nk-menu-link ">
-                            <span class="nk-menu-icon"><em class="icon ni ni-speed"></em></span>
-                            <span class="nk-menu-text">Driver</span>
-                        </a>
-                    </li><!-- .nk-menu-item -->
-                    <li class="nk-menu-item has-sub">
                         <a href="{% url 'list_vehicles' %}" class="nk-menu-link">
                             <span class="nk-menu-icon"><em class="icon ni ni-truck"></em></span>
                             <span class="nk-menu-text">Vehicle</span>
+                        </a>
+                    </li><!-- .nk-menu-item -->
+                    <li class="nk-menu-item has-sub">
+                        <a href="{% url 'list_drivers' %}" class="nk-menu-link ">
+                            <span class="nk-menu-icon"><em class="icon ni ni-speed"></em></span>
+                            <span class="nk-menu-text">Driver</span>
                         </a>
                     </li><!-- .nk-menu-item -->
                     <li class="nk-menu-item has-sub">
@@ -182,17 +182,16 @@
                 <h5 class="title">Operations</h5>
                 <ul class="nk-menu">
                     <li class="nk-menu-item has-sub">
-                        <a href="{% url 'list_drivers' %}" class="nk-menu-link">
-                            <span class="nk-menu-icon"><em class="icon ni ni-capsule-fill"></em></span>
-                            <span class="nk-menu-text">Driver</span>
-                        </a>
-                    </li><!-- .nk-menu-item -->
-                    <li class="nk-menu-item has-sub">
                         <a href="{% url 'list_vehicles' %}" class="nk-menu-link">
                             <span class="nk-menu-icon"><em class="icon ni ni-truck"></em></span>
                             <span class="nk-menu-text">Vehicle</span>
                         </a>
-
+                    </li><!-- .nk-menu-item -->
+                    <li class="nk-menu-item has-sub">
+                        <a href="{% url 'list_drivers' %}" class="nk-menu-link">
+                            <span class="nk-menu-icon"><em class="icon ni ni-capsule-fill"></em></span>
+                            <span class="nk-menu-text">Driver</span>
+                        </a>
                     </li><!-- .nk-menu-item -->
                     <li class="nk-menu-item has-sub">
                         <a href="{% url 'list_customers' %}" class="nk-menu-link">

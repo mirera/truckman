@@ -5,6 +5,15 @@ from authentication.forms import Client, CustomUser
 
 #---------------------------------- Vehicle models ------------------------------------------
 #vehicle make/brand
+class Vehicle_Owner(models.Model):
+    company = models.ForeignKey(Client, on_delete=models.CASCADE)
+    name = models.CharField(max_length=50)
+
+    def __str__(self):
+        return self.name
+#--
+
+#vehicle make/brand
 class Vehicle_Make(models.Model):
     company = models.ForeignKey(Client, on_delete=models.CASCADE)
     name = models.CharField(max_length=50)
@@ -36,9 +45,12 @@ CONDITION_CHOICES = (
 
 class Vehicle(models.Model):
     company = models.ForeignKey(Client, on_delete=models.CASCADE)
+    owner = models.ForeignKey(Vehicle_Owner, on_delete=models.CASCADE, null=True)
     plate_number = models.CharField(max_length=10, unique=True)
     trailer_number = models.CharField(max_length=10, unique=True)
-    vin = models.CharField(max_length=20, unique=True)
+    truck_vin = models.CharField(max_length=20, unique=True)
+    trailer_vin = models.CharField(max_length=20, null=True)
+    trailer_color = models.CharField(max_length=20, null=True)
     make = models.ForeignKey(Vehicle_Make, on_delete=models.SET_NULL, null=True)
     model = models.ForeignKey(Vehicle_Model, on_delete=models.SET_NULL, null=True)
     color = models.CharField(max_length=50, null=True)
@@ -55,6 +67,7 @@ class Vehicle(models.Model):
     trailer_logbook = models.FileField(upload_to='vehicle_images/', null=True, blank=True)
     good_transit_licence  = models.FileField(upload_to='vehicle_images/', null=True, blank=True)
     is_assigned_driver = models.BooleanField(default=False)
+    is_available = models.BooleanField(default=True)
      
 
     def __str__(self):
@@ -77,6 +90,11 @@ KIN_RLSHP = (
     ('Mother','MOTHER'),
     ('Father','FATHER'),
     ('Other','OTHER'),
+)
+DRIVER_STATUS = (
+    ('On Probation','On Probation'),
+    ('Permanent','Permanent'),
+    ('On Contract','On Contract'),
 )
 class Driver(models.Model): 
     #personal data
@@ -101,9 +119,18 @@ class Driver(models.Model):
     emergency_contact_person = models.CharField(max_length=50, null=True, blank=True)
     emergency_contact_person_rlshp = models.CharField(max_length=30, choices=KIN_RLSHP, default='Spouse')
     emergency_contact_no = models.CharField(max_length=14, null=True, blank=True)
-    emergency_contact_two = models.CharField(max_length=14, null=True, blank=True)
+
+    emergency_contact_person_two = models.CharField(max_length=50, null=True, blank=True)
+    emergency_contact_person_two_rlshp = models.CharField(max_length=30, choices=KIN_RLSHP, default='Spouse')
+    emergency_contact_no_two = models.CharField(max_length=14, null=True, blank=True)
+
+    emergency_contact_person_three = models.CharField(max_length=50, null=True, blank=True)
+    emergency_contact_person_three_rlshp = models.CharField(max_length=30, choices=KIN_RLSHP, default='Spouse')
+    emergency_contact_no_three = models.CharField(max_length=14, null=True, blank=True)
+
     #vehicle data
     assigned_vehicle = models.ForeignKey(Vehicle, on_delete=models.SET_NULL, null=True, blank=True)
+    status = models.CharField(max_length=20, choices=DRIVER_STATUS, default='On Probation')
     
 
     def __str__(self):
@@ -374,6 +401,8 @@ class Trip(models.Model):
     driver_advance = models.IntegerField(null=True)
     driver_milage = models.FloatField(null=True)
     date_added = models.DateTimeField(auto_now_add=True)
+    start_time = models.DateTimeField(null=True)
+    end_time = models.DateTimeField(null=True)
     status = models.CharField(max_length=30, default='Not Started', choices=TRIP_STATUS)
 
     #generate customer_id 
@@ -494,6 +523,7 @@ class Expense_Category(models.Model):
 # expense model
 class Expense(models.Model):
     company = models.ForeignKey(Client, on_delete=models.CASCADE)
+    vehicle = models.ForeignKey(Vehicle, on_delete=models.SET_NULL , null=True)
     expense_id = models.CharField(max_length=7, unique=True, editable=False)
     expense_category = models.ForeignKey(Expense_Category, on_delete=models.SET_NULL, null=True)
     trip = models.ForeignKey(Trip, on_delete=models.SET_NULL , null=True)

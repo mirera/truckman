@@ -15,7 +15,8 @@ from .models import (
     Expense_Category,
     Expense,
     Reminder,
-    Load
+    Load, 
+    Vehicle_Owner
 )
 
 # Register your models here.
@@ -35,3 +36,4 @@ admin.site.register(Expense_Category)
 admin.site.register(Expense)
 admin.site.register(Reminder)
 admin.site.register(Load)
+admin.site.register(Vehicle_Owner)

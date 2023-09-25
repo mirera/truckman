@@ -6,6 +6,8 @@ import io
 from reportlab.lib.pagesizes import letter
 from reportlab.pdfgen import canvas
 from django.utils.timezone import localtime
+import csv
+from django.http import HttpResponse
 
 #utilies functions
  
@@ -125,6 +127,30 @@ def to_utc(user_timezone, datetime_value):
     datetime_local = user_timezone.localize(datetime_value)
     datetime_utc = datetime_local.astimezone(pytz.utc)
     return datetime_utc
+
+#download model data as .csvs
+def export_model_data(request, MyModel, header):
+    # Get all objects from the model
+    queryset = MyModel.objects.filter(company=get_user_company(request))
+
+    model_name = MyModel.__name__  # Get the model name
+
+    # Create a response with CSV headers 
+    response = HttpResponse(content_type='text/csv')
+    response['Content-Disposition'] = f'attachment; filename="{model_name}_data.csv"'
+
+    # Create a CSV writer and write the header row
+    csv_writer = csv.writer(response)
+    csv_writer.writerow(header)
+
+    # Write the data rows
+    for obj in queryset:
+        data_row = [str(getattr(obj, field_name, '')) for field_name in header]
+        csv_writer.writerow(data_row)
+
+    return response
+
+
 
 phone_codes = [
     ('+93', 'AF +93'),

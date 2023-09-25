@@ -32,34 +32,35 @@
                                 <div class="row gy-4">
                                     <div class="nk-block-head">
                                         <div class="nk-block-head-content">
-                                            <h5 class="title nk-block-title">Basic Details:</h5>
-                                            <p>Add truck head and trailer basic detials. </p>
+                                            <h5 class="title nk-block-title">Truck Details:</h5>
+                                            <p>Truck head and trailer basic detials. </p>
                                         </div>
                                     </div>
                                     <div class="col-xxl-3 col-md-4">
                                         <div class="form-group">
-                                            <label class="form-label" for="name">Plate Number</label>
+                                            <label class="form-label">Truck Owner</label>
+                                            <div class="form-control-wrap">
+                                                {{ form.owner }}
+                                            </div>
+                                        </div>
+                                    </div><!--col-->
+                                    <div class="col-xxl-3 col-md-4">
+                                        <div class="form-group">
+                                            <label class="form-label" for="name">Truck Plate Number</label>
                                             <!--<input type="text" name="plate_number" class="form-control" id="name" placeholder="Registration Number" required> -->
                                             {{ form.plate_number }}
                                         </div>
                                     </div><!--col-->
                                     <div class="col-xxl-3 col-md-4">
                                         <div class="form-group">
-                                            <label class="form-label" for="generic">Trailer Number</label>
-                                            <!--<input type="text" name="trailer_number" class="form-control" id="generic" placeholder="Trailer Number">-->
-                                            {{ form.trailer_number }}
-                                        </div>
-                                    </div><!--col-->
-                                    <div class="col-xxl-3 col-md-4">
-                                        <div class="form-group">
-                                            <label class="form-label" for="sKU">VIN</label>
+                                            <label class="form-label" for="sKU">Truck VIN</label>
                                             <!--<input type="text" name="vin" class="form-control" id="sKU" placeholder="Vehicle Identification Number">-->
-                                            {{ form.vin }}
+                                            {{ form.truck_vin }}
                                         </div>
                                     </div><!--col-->
                                     <div class="col-xxl-3 col-md-4">
                                         <div class="form-group">
-                                            <label class="form-label"> Vehicle Make</label> <a data-bs-toggle="modal" href="#addVehicleMake" class="btn btn-sm btn-outline-primary"><span>Add Make</span><em class="icon ni ni-plus-sm"></em></a>
+                                            <label class="form-label"> Truck Make</label> <a data-bs-toggle="modal" href="#addVehicleMake" class="btn btn-sm btn-outline-primary"><span>Add Make</span><em class="icon ni ni-plus-sm"></em></a>
                                             <div class="form-control-wrap">
                                                 {{ form.make }} 
                                             </div>
@@ -75,7 +76,7 @@
                                     </div><!--col-->
                                     <div class="col-xxl-3 col-md-4">
                                         <div class="form-group">
-                                            <label class="form-label">Color</label>
+                                            <label class="form-label">Truck Color</label>
                                             <div class="form-control-wrap">
                                                 {{ form.color }}
                                             </div>
@@ -92,11 +93,8 @@
                                     <div class="col-xxl-3 col-md-4">
                                         <div class="form-group">
                                             <label class="form-label">Milage</label>
-                                            <div class="form-control-wrap number-spinner-wrap">
-                                                <button class="btn btn-icon btn-outline-light number-spinner-btn number-minus" data-number="minus"><em class="icon ni ni-minus"></em></button>
-                                                <!--<input type="number" name="milage" class="form-control number-spinner" value="0">-->
+                                            <div class="form-control-wrap">
                                                 {{ form.milage }}
-                                                <button class="btn btn-icon btn-outline-light number-spinner-btn number-plus" data-number="plus"><em class="icon ni ni-plus"></em></button>
                                             </div>
                                         </div>
                                     </div><!--col-->
@@ -146,7 +144,7 @@
                                     </div><!--col-->
                                     <div class="col-xxl-3 col-md-4">
                                         <div class="form-group">
-                                            <label class="form-label" for="default-02">Vehicle Details</label>
+                                            <label class="form-label" for="default-02">Truck Details</label>
                                             <div class="form-control-wrap">
                                                 <!--<textarea name="notes" class="form-control" id="default-textarea">Add more details</textarea>-->
                                                 {{ form.notes }}
@@ -155,8 +153,8 @@
                                     </div><!--col--> <br>
                                     <div class="nk-block-head">
                                         <div class="nk-block-head-content">
-                                            <h5 class="title nk-block-title"> Vehicle Images & Documents:</h5>
-                                            <p>Add truck head and trailer images and other required documents. </p>
+                                            <h5 class="title nk-block-title"> Truck Images & Documents:</h5>
+                                            <p>Truck head images and other required documents. </p>
                                         </div>
                                     </div>
                                     <div class="col-xxl-3 col-md-4"> 
@@ -166,18 +164,6 @@
                                                 <div class="form-file">
                                                     <!--<input type="file" class="form-file-input" id="customFile">-->
                                                     {{ form.truck_image }}
-                                                    <label class="form-file-label" for="customFile">Choose file</label>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="col-xxl-3 col-md-4"> 
-                                        <div class="form-group">
-                                            <label class="form-label" for="customFileLabel">Trailer Image</label>
-                                            <div class="form-control-wrap">
-                                                <div class="form-file">
-                                                    <!--<input type="file" class="form-file-input" id="customFile">-->
-                                                    {{ form.trailer_image }}
                                                     <label class="form-file-label" for="customFile">Choose file</label>
                                                 </div>
                                             </div>
@@ -197,11 +183,57 @@
                                     </div>
                                     <div class="col-xxl-3 col-md-4"> 
                                         <div class="form-group">
-                                            <label class="form-label" for="customFileLabel">Trailer Logbook</label>
+                                            <label class="form-label" for="customFileLabel">Good Transit Licence</label>
                                             <div class="form-control-wrap">
                                                 <div class="form-file">
                                                     <!--<input type="file" class="form-file-input" id="customFile">-->
-                                                    {{ form.trailer_logbook }}
+                                                    {{ form.good_transit_licence }}
+                                                    <label class="form-file-label" for="customFile">Choose file</label>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <br>
+                                    <div class="nk-block-head">
+                                        <div class="nk-block-head-content">
+                                            <h5 class="title nk-block-title"> Trailer Details:</h5>
+                                            <p>Trailer Details. </p>
+                                        </div>
+                                    </div>
+                                    <div class="col-xxl-3 col-md-4">
+                                        <div class="form-group">
+                                            <label class="form-label" for="generic">Trailer Number</label>
+                                            {{ form.trailer_number }}
+                                        </div>
+                                    </div><!--col-->
+                                    <div class="col-xxl-3 col-md-4">
+                                        <div class="form-group">
+                                            <label class="form-label" for="sKU">Trailer VIN</label>
+                                            {{ form.trailer_vin }}
+                                        </div>
+                                    </div><!--col-->
+                                    <div class="col-xxl-3 col-md-4">
+                                        <div class="form-group">
+                                            <label class="form-label">Trailer Color</label>
+                                            <div class="form-control-wrap">
+                                                {{ form.trailer_color }}
+                                            </div>
+                                        </div>
+                                    </div><!--col-->
+                                    <br>
+                                    <div class="nk-block-head">
+                                        <div class="nk-block-head-content">
+                                            <h5 class="title nk-block-title"> Trailer Images & Documents:</h5>
+                                            <p>Trailer head images and other required documents. </p>
+                                        </div>
+                                    </div>
+                                    <div class="col-xxl-3 col-md-4"> 
+                                        <div class="form-group">
+                                            <label class="form-label" for="customFileLabel">Trailer Image</label>
+                                            <div class="form-control-wrap">
+                                                <div class="form-file">
+                                                    <!--<input type="file" class="form-file-input" id="customFile">-->
+                                                    {{ form.trailer_image }}
                                                     <label class="form-file-label" for="customFile">Choose file</label>
                                                 </div>
                                             </div>
@@ -209,11 +241,11 @@
                                     </div>
                                     <div class="col-xxl-3 col-md-4"> 
                                         <div class="form-group">
-                                            <label class="form-label" for="customFileLabel">Good Transit Licence</label>
+                                            <label class="form-label" for="customFileLabel">Trailer Logbook</label>
                                             <div class="form-control-wrap">
                                                 <div class="form-file">
                                                     <!--<input type="file" class="form-file-input" id="customFile">-->
-                                                    {{ form.good_transit_licence }}
+                                                    {{ form.trailer_logbook }}
                                                     <label class="form-file-label" for="customFile">Choose file</label>
                                                 </div>
                                             </div>

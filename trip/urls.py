@@ -20,6 +20,7 @@ urlpatterns = [
     path('remove_vehicle/<str:pk>', views.remove_vehicle, name='remove_vehicle'),
     path('view_vehicle/<str:pk>', views.view_vehicle, name='view_vehicle'),
     path('list_vehicles', views.list_vehicles, name='list_vehicles'),
+    path('vehicle_export_to_csv', views.vehicle_export_to_csv, name='vehicle_export_to_csv'),
     #--ends
 
     #driver urls
@@ -28,6 +29,7 @@ urlpatterns = [
     path('remove_driver/<str:pk>', views.remove_driver, name='remove_driver'),
     path('view_driver/<str:pk>', views.view_driver, name='view_driver'),
     path('list_drivers', views.list_drivers, name='list_drivers'),
+    path('driver_export_to_csv', views.driver_export_to_csv, name='driver_export_to_csv'),
     #--ends
 
     #Customer urls
@@ -38,6 +40,7 @@ urlpatterns = [
     path('list_customers', views.list_customers, name='list_customers'),
 
     path('add_customer_modal', views.add_customer_modal, name='add_customer_modal'),
+    path('customer_export_to_csv', views.customer_export_to_csv, name='customer_export_to_csv'),
     #--ends
 
     #shipper urls
@@ -46,6 +49,7 @@ urlpatterns = [
     path('remove_shipper/<str:pk>', views.remove_shipper, name='remove_shipper'),
     path('view_shipper/<str:pk>', views.view_shipper, name='view_shipper'),
     path('list_shippers', views.list_shippers, name='list_shippers'),
+    path('shipper_export_to_csv', views.shipper_export_to_csv, name='shipper_export_to_csv'),
     #--ends
 
     #Consignee urls
@@ -54,6 +58,8 @@ urlpatterns = [
     path('remove_consignee/<str:pk>', views.remove_consignee, name='remove_consignee'),
     path('view_consignee/<str:pk>', views.view_consignee, name='view_consignee'),
     path('list_consignees', views.list_consignees, name='list_consignees'),
+
+    path('consignee_export_to_csv', views.consignee_export_to_csv, name='consignee_export_to_csv'),
     #--ends
 
     #load urls
@@ -62,6 +68,7 @@ urlpatterns = [
     path('remove_load/<str:pk>', views.remove_load, name='remove_load'),
     path('view_load/<str:pk>', views.view_load, name='view_load'),
     path('list_loads', views.list_loads, name='list_loads'),
+    path('load_export_to_csv', views.load_export_to_csv, name='load_export_to_csv'),
     #--ends
 
     #trip urls
@@ -76,6 +83,7 @@ urlpatterns = [
     #send trip doc to shipper url
     path('view_trip/<str:pk>/send_to_shipper', views.send_to_shipper, name='send_to_shipper'),
     path('docs_bulky_action/<str:pk>', views.docs_bulky_action, name='docs_bulky_action'),
+    path('trip_export_to_csv', views.trip_export_to_csv, name='trip_export_to_csv'),
 
     #--ends
 
@@ -85,6 +93,7 @@ urlpatterns = [
     path('remove_payment/<str:pk>', views.remove_payment, name='remove_payment'),
     path('view_payment/<str:pk>', views.view_payment, name='view_payment'),
     path('list_payments', views.list_payments, name='list_payments'),
+    path('payment_export_to_csv', views.payment_export_to_csv, name='payment_export_to_csv'),
     #--ends
 
     #expense category urls
@@ -99,6 +108,7 @@ urlpatterns = [
     path('remove_expense/<str:pk>', views.remove_expense, name='remove_expense'),
     path('view_expense/<str:pk>', views.view_expense, name='view_expense'),
     path('list_expenses', views.list_expenses, name='list_expenses'),
+    path('expense_export_to_csv', views.expense_export_to_csv, name='expense_export_to_csv'),
     #--ends
 
     #invoice urls

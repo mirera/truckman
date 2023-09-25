@@ -612,7 +612,7 @@ def global_settings(request):
         company.phone_no = formatted_phone
         company.country = request.POST.get('country')
         company.city = request.POST.get('city')
-        company.logo = request.FILES.get('logo')
+        #company.logo = request.FILES.get('logo')
         company.address = request.POST.get('address')
         company.invoice_payment_details = request.POST.get('invoice_payment_details')
         company.currency = request.POST.get('currency')

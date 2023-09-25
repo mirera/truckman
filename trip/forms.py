@@ -66,13 +66,16 @@ class VehicleForm(forms.ModelForm):
         exclude =['company']
 
         widgets = {
+                'owner': forms.Select(attrs={'class': 'form-select js-select2'}),
                 'plate_number': forms.TextInput(attrs={'class': 'form-control', 'placeholder':'Registration number'}),
                 'trailer_number': forms.TextInput(attrs={'class': 'form-control', 'placeholder':'Trailer number'}),
-                'vin': forms.TextInput(attrs={'class': 'form-control', 'placeholder':'1KZ-345678'}),
+                'truck_vin': forms.TextInput(attrs={'class': 'form-control', 'placeholder':'1KZ-345678'}),
+                'trailer_vin': forms.TextInput(attrs={'class': 'form-control', 'placeholder':'1KZ-345678'}),
                 'milage': forms.NumberInput(attrs={'class': 'form-control number-spinner','value': '0', 'placeholder':'345678'}),
                 'make': forms.Select(attrs={'class': 'form-select js-select2', 'id':'vehicleMakeSelect'}),
                 'model': forms.Select(attrs={'class': 'form-select js-select2', 'id':'vehicleModelSelect'}),
                 'color': forms.TextInput(attrs={'class': 'form-control', 'placeholder':'White'}),
+                'trailer_color': forms.TextInput(attrs={'class': 'form-control', 'placeholder':'White'}),
                 'milage_unit': forms.Select(attrs={'class': 'form-select js-select2'}),
                 'condition': forms.Select(attrs={'class': 'form-select js-select2'}),
                 'insurance_expiry': forms.DateInput(attrs={'class': 'form-control  date-picker', 'data-date-format':'yyyy-mm-dd', 'placeholder':'yyyy-mm-dd'}),
@@ -121,9 +124,17 @@ class DriverForm(forms.ModelForm):
                 'emergency_contact_person': forms.TextInput(attrs={'class': 'form-control', 'placeholder':'Moriasi Ndoyo'}),
                 'emergency_contact_person_rlshp': forms.Select(attrs={'class': 'form-select js-select2'}),
                 'emergency_contact_no': forms.TextInput(attrs={'class': 'form-control', 'placeholder':'0700000000'}),
-                'emergency_contact_two': forms.TextInput(attrs={'class': 'form-control', 'placeholder':'0700000000'}),
+
+                'emergency_contact_person_two': forms.TextInput(attrs={'class': 'form-control', 'placeholder':'Moriasi Ndoyo'}),
+                'emergency_contact_person_two_rlshp': forms.Select(attrs={'class': 'form-select js-select2'}),
+                'emergency_contact_no_two': forms.TextInput(attrs={'class': 'form-control', 'placeholder':'0700000000'}),
+
+                'emergency_contact_person_three': forms.TextInput(attrs={'class': 'form-control', 'placeholder':'Moriasi Ndoyo'}),
+                'emergency_contact_person_three_rlshp': forms.Select(attrs={'class': 'form-select js-select2'}),
+                'emergency_contact_no_three': forms.TextInput(attrs={'class': 'form-control', 'placeholder':'0700000000'}),
                 #vehicle data
                 'assigned_vehicle': forms.Select(attrs={'class': 'form-select js-select2'}),
+                'status': forms.Select(attrs={'class': 'form-select js-select2'}),
             } 
         
 #---------------------------------- Customer forms ------------------------------------------   
@@ -383,7 +394,8 @@ class ExpenseForm(forms.ModelForm):
         exclude =['company', 'expense_id' ]
 
         widgets = {
-                'expense_category': forms.Select(attrs={'class': 'form-select js-select2', 'id':'expenseCategorySelect'}),
+                'expense_category': forms.Select(attrs={'class': 'form-select js-select2', 'id':'expenseCategorySelect'}), 
+                'vehicle': forms.Select(attrs={'class': 'form-select js-select2'}),
                 'trip': forms.Select(attrs={'class': 'form-select js-select2'}),
                 'amount': forms.NumberInput(attrs={'class': 'form-control', 'placeholder':'7800'}),
                 'date_paid': forms.DateInput(attrs={'class': 'form-control  date-picker', 'data-date-format':'yyyy-mm-dd', 'placeholder':'yyyy-mm-dd'}),

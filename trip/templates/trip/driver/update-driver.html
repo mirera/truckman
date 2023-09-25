@@ -33,7 +33,7 @@
                                     <div class="nk-block-head">
                                         <div class="nk-block-head-content">
                                             <h5 class="title nk-block-title">Basic Details:</h5>
-                                            <p>Add driver basic detials. </p>
+                                            <p>Driver basic detials. </p>
                                         </div>
                                     </div>
                                     <div class="nk-block">
@@ -54,7 +54,7 @@
                                             </div><!--col-->
                                             <div class="col-xxl-3 col-md-4">
                                                 <div class="form-group">
-                                                    <label class="form-label" for="sKU">ID No</label>
+                                                    <label class="form-label" for="sKU">National ID No</label>
                                                     <!--<input type="text" name="vin" class="form-control" id="sKU" placeholder="Vehicle Identification Number">-->
                                                     {{ form.id_no }}
                                                 </div>
@@ -84,6 +84,14 @@
                                                         </div>
                                                         <!--<input type="text" name="insurance_expiry" class="form-control date-picker" data-date-format="yyyy-mm-dd" placeholder="yyyy-mm-dd">-->
                                                         {{ form.date_hired }}
+                                                    </div>
+                                                </div>
+                                            </div><!--col-->
+                                            <div class="col-xxl-3 col-md-4">
+                                                <div class="form-group">
+                                                    <label class="form-label">Status</label>
+                                                    <div class="form-control-wrap">
+                                                        {{ form.status }}
                                                     </div>
                                                 </div>
                                             </div><!--col-->
@@ -122,7 +130,7 @@
                                     <div class="nk-block-head">
                                         <div class="nk-block-head-content">
                                             <h5 class="title nk-block-title">Driving Licence & Passport Details:</h5>
-                                            <p>Add driver driving licence and passport detials. </p>
+                                            <p>Driver driving licence and passport detials. </p>
                                         </div>
                                     </div>
                                     <div class="nk-block">
@@ -200,14 +208,14 @@
                                     <div class="nk-block-head">
                                         <div class="nk-block-head-content">
                                             <h5 class="title nk-block-title">Next of Kin Details:</h5>
-                                            <p>Add driver Emergency Contact Person detials. </p>
+                                            <p>Driver Emergency Contact Person detials. </p>
                                         </div>
                                     </div>
                                     <div class="nk-block">
                                         <div class="row gy-4">
                                             <div class="col-xxl-3 col-md-4">
                                                 <div class="form-group">
-                                                    <label class="form-label">Emergency Contact Person</label>
+                                                    <label class="form-label">Emergency Contact Person I</label>
                                                     <div class="form-control-wrap">
                                                         {{ form.emergency_contact_person }}
                                                     </div>
@@ -223,22 +231,67 @@
                                             </div><!--col-->
                                             <div class="col-xxl-3 col-md-4">
                                                 <div class="form-group">
-                                                    <label class="form-label">Emergency Contact Number</label>
+                                                    <label class="form-label">Emergency Contact I Number</label>
                                                     <div class="form-control-wrap">
                                                         {{ form.emergency_contact_no }}
                                                     </div>
                                                 </div>
                                             </div><!--col-->
+                                        </div><!--row-->
+                                        <div class="row gy-4">
                                             <div class="col-xxl-3 col-md-4">
                                                 <div class="form-group">
-                                                    <label class="form-label">Emergency Contact Number II</label>
+                                                    <label class="form-label">Emergency Contact Person II</label>
                                                     <div class="form-control-wrap">
-                                                        {{ form.emergency_contact_two }}
+                                                        {{ form.emergency_contact_person_two }}
+                                                    </div>
+                                                </div>
+                                            </div><!--col-->
+                                            <div class="col-xxl-3 col-md-4">
+                                                <div class="form-group">
+                                                    <label class="form-label">Relationship</label>
+                                                    <div class="form-control-wrap">
+                                                        {{ form.emergency_contact_person_two_rlshp }}
+                                                    </div>
+                                                </div>
+                                            </div><!--col-->
+                                            <div class="col-xxl-3 col-md-4">
+                                                <div class="form-group">
+                                                    <label class="form-label">Emergency Contact II Number</label>
+                                                    <div class="form-control-wrap">
+                                                        {{ form.emergency_contact_no_two }}
+                                                    </div>
+                                                </div>
+                                            </div><!--col-->
+                                        </div><!--row-->
+                                        <div class="row gy-4">
+                                            <div class="col-xxl-3 col-md-4">
+                                                <div class="form-group">
+                                                    <label class="form-label">Emergency Contact Person III</label>
+                                                    <div class="form-control-wrap">
+                                                        {{ form.emergency_contact_person_three }}
+                                                    </div>
+                                                </div>
+                                            </div><!--col-->
+                                            <div class="col-xxl-3 col-md-4">
+                                                <div class="form-group">
+                                                    <label class="form-label">Relationship</label>
+                                                    <div class="form-control-wrap">
+                                                        {{ form.emergency_contact_person_three_rlshp }}
+                                                    </div>
+                                                </div>
+                                            </div><!--col-->
+                                            <div class="col-xxl-3 col-md-4">
+                                                <div class="form-group">
+                                                    <label class="form-label">Emergency Contact III Number</label>
+                                                    <div class="form-control-wrap">
+                                                        {{ form.emergency_contact_no_three }}
                                                     </div>
                                                 </div>
                                             </div><!--col-->
                                         </div><!--row-->
                                     </div>
+                                </div><!-- .card-inner-group -->
                                 </div><!-- .card-inner-group -->
                                 <div class="card-inner">
                                     <div class="nk-block-head">
