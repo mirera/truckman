@@ -140,7 +140,7 @@ AUTH_USER_MODEL = 'authentication.CustomUser'
 STATIC_URL = 'static/'
 
 #for production aws/digital oceans etct
-'''
+
 STATIC_URL = '/static/' #changed this
 STATIC_ROOT = os.path.join(BASE_DIR, 'static') 
 '''
@@ -149,7 +149,7 @@ STATIC_URL = '/static/'
 STATICFILES_DIRS = [
     BASE_DIR / 'static'
 ]
-
+'''
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.0/ref/settings/#default-auto-field
 
