@@ -9,7 +9,7 @@
         {{ message }}
     </div>
 {% endfor %}
-{% endif %}
+{% endif %} 
 <!-- content @s -->
 <div class="nk-content ">
     <div class="container-fluid">
@@ -31,7 +31,7 @@
                                     <div class="row gy-4">
                                         <div class="col-xxl-3 col-md-4">
                                             <div class="form-group">
-                                                <label class="form-label"> Customer</label> <a data-bs-toggle="modal" href="#addCustomer" class="btn btn-sm btn-outline-primary"><span>Add Customer</span><em class="icon ni ni-plus-sm"></em></a>
+                                                <label class="form-label"> Customer</label> <a data-bs-toggle="modal" href="#addCustomer" class="btn btn-sm btn-outline-primary"><span>Add Customer</span></a>
                                                 <!--<input type="text" name="plate_number" class="form-control" id="name" placeholder="Registration Number" required> -->
                                                 {{ form.customer }}
                                             </div>
@@ -48,10 +48,31 @@
                                                 </div>
                                             </div>
                                         </div><!--col-->
+                                        <div class="col-xxl-2 col-md-2">
+                                            <div class="form-group">
+                                                <label class="form-label" for="taxPc">Discount (%)</label>
+                                                <input type="number" name="discountpc" class="form-control" id="discountPc" value="" >
+                                            </div>
+                                        </div><!--col-->
+                                        <div class="col-xxl-2 col-md-2">
+                                            <div class="form-group">
+                                                <label class="form-label" for="taxPc">Tax (%)</label>
+                                                <input type="number" name="taxpc" class="form-control" id="taxPc" value="" >
+                                            </div>
+                                        </div><!--col-->
                                     </div><!--row-->
                                 </div>
                             </div>
                             <div class="card-inner">
+                                <div class="nk-block">
+                                    <div class="row gy-4">
+                                        <div class="col-xxl-3 col-md-4">
+                                            <a href="#" id="addItem" class="btn btn-sm btn-outline-primary addItem"><span>Add Item</span></a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="card-inner third-card-inner">
                                 <div class="nk-block">
                                     <div class="row gy-4">
                                         <div class="col-xxl-3 col-md-3">
@@ -62,32 +83,33 @@
                                         </div><!--col-->
                                         <div class="col-xxl-2 col-md-2">
                                             <div class="form-group">
-                                                <label class="form-label" for="quantity">Km/Ml</label>
-                                                <input type="text" name="quantity" class="form-control" id="quantity" value="" >
+                                                <label class="form-label" for="quantity">Route</label>
+                                                <!--<input type="text" name="quantity" class="form-control" id="quantity" value="" > -->
+                                                {{ form.route }}
                                             </div>
                                         </div><!--col-->
                                         <div class="col-xxl-3 col-md-2">
                                             <div class="form-group">
-                                                <label class="form-label" for="unitPrice">Unit Price</label>
-                                                <input type="text" name="unit_price" class="form-control" id="unitPrice" value="" >
+                                                <label class="form-label" for="unitPrice">Rate</label>
+                                                <input type="text" name="rate" class="form-control" id="routeRate" value="" >
                                             </div>
                                         </div><!--col-->
                                         <div class="col-xxl-2 col-md-2">
                                             <div class="form-group">
-                                                <label class="form-label" for="taxPc">Tax (%)</label>
-                                                <input type="number" name="tax" class="form-control" id="taxPc" value="" >
+                                                <label class="form-label" for="numberTrucks">Truck(s)</label>
+                                                <input type="number" name="trucks" class="form-control" id="numberTrucks" value="" >
                                             </div>
                                         </div><!--col-->
                                         <div class="col-xxl-3 col-md-2">
                                             <div class="form-group">
                                                 <label class="form-label" for="amount">Amount</label>
-                                                <input type="number" name="amount" class="form-control" id="amount" placeholder="2000" >
+                                                <input type="number" name="amount" class="form-control" id="amount" placeholder="2000" readonly>
                                             </div>
                                         </div><!--col-->
-                                        <div class="col-xxl-3 col-md-6">
+                                        <div class="col-xxl-3 col-md-1">
                                             <div class="form-group">
-                                                <label class="form-label" for="description">Description</label>
-                                                {{ form.description }}
+                                                <label class="form-label" for="amount">Remove</label>
+                                                <a href="#" class="btn btn-danger" id="removeItem"><em class="icon ni ni-cross-round"></em></a>
                                             </div>
                                         </div><!--col-->
                                     </div><!--row-->
@@ -123,6 +145,19 @@
                                     </div><!--row-->
                                 </div>
                             </div>
+                            <!--
+                            <div class="card-inner">
+                                <div class="nk-block">
+                                    <div class="row gy-4">
+                                        <div class="col-xxl-3 col-md-6">
+                                            <div class="form-group">
+                                                <label class="form-label" for="description">Description</label>
+                                                {{ form.description }}
+                                            </div>
+                                        </div><!--col--
+                                    </div>
+                                </div>
+                            </div> -->
                             <div class="card-inner">
                                 <div class="nk-block">
                                     <div class="row gy-4">
@@ -272,6 +307,41 @@
 
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
+<!-- click on add item to clone item section-->
+<script>
+    $(document).ready(function() {
+        // Counter for unique IDs
+        let itemCount = 1;
+
+        // Function to add a new item block
+        function addNewItem() {
+            const newItem = $('.third-card-inner:first').clone();
+            
+            // Increment IDs within the cloned div
+            newItem.find('[id]').each(function() {
+                const oldId = $(this).attr('id');
+                $(this).attr('id', oldId + itemCount);
+            });
+
+            // Increment the global item count
+            itemCount++;
+
+            // Append the cloned div below the last card-inner
+            $('.third-card-inner:last').after(newItem);
+            
+            // Add functionality to remove the new item
+            newItem.find('#removeItem').click(function() {
+                newItem.remove();
+            });
+        }
+
+        // Add functionality to the "Add Item" button
+        $('#addItem').click(function() {
+            addNewItem();
+        });
+    });
+</script>
+
 <!--autofilling created customer on the esrimate form-->
 <script>
     $(document).ready(function() {
@@ -315,18 +385,19 @@
     });
 </script>
 
-<!-- autofill inputs on tip form -->
+<!-- autofill inputs on estimate form -->
 <script>
     $(document).ready(function() {
         // Function to calculate and update values
         function updateInvoice() {
-            var quantity = parseFloat($('#quantity').val()) || 0;
-            var unitPrice = parseFloat($('#unitPrice').val()) || 0;
+            var quantity = parseFloat($('#numberTrucks').val()) || 0;
+            var unitPrice = parseFloat($('#routeRate').val()) || 0;
             var taxPc = parseFloat($('#taxPc').val()) || 0;
+            var discountPc = parseFloat($('#discountPc').val()) || 0;
             
             var amount = quantity * unitPrice;
             var subTotal = amount;
-            var discount = 0; // You can calculate the discount here if needed.
+            var discount = (discountPc / 100) * subTotal;
             var tax = (taxPc / 100) * subTotal;
             var grandTotal = subTotal - discount + tax;
     
@@ -339,7 +410,7 @@
         }
     
         // Attach the function to input change events
-        $('#quantity, #unitPrice, #taxPc').on('input', updateInvoice);
+        $('#numberTrucks, #routeRate, #taxPc, #discountPc').on('input', updateInvoice);
     });
 </script>
 <!-- ends -->   

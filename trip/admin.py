@@ -16,7 +16,8 @@ from .models import (
     Expense,
     Reminder,
     Load, 
-    Vehicle_Owner
+    Vehicle_Owner,
+    Route
 )
 
 # Register your models here.
@@ -37,3 +38,4 @@ admin.site.register(Expense)
 admin.site.register(Reminder)
 admin.site.register(Load)
 admin.site.register(Vehicle_Owner)
+admin.site.register(Route)

@@ -12,11 +12,6 @@ from authentication.models import Preference
 from django.http import HttpResponse
 from xhtml2pdf import pisa
 from django.template.loader import get_template
-from premailer import transform
-from premailer import Premailer
-from reportlab.lib.pagesizes import letter
-from reportlab.lib import pdfencrypt
-from reportlab.pdfgen import canvas
 from PyPDF2 import PdfMerger, PdfReader
 from PIL import Image
 import io
@@ -38,7 +33,8 @@ from . models import (
     Reminder,
     Service,
     Estimate,
-    Vehicle_Owner
+    Vehicle_Owner,
+    Route
 )
 
 from .forms import (
@@ -1983,15 +1979,19 @@ def add_estimate(request):
         customer_id = request.POST.get('customer')
         customer = Customer.objects.get(company=company, id=customer_id)
 
+        route_id = request.POST.get('route')
+        route = Route.objects.get(company=company, id=route_id)
+
         #create instance of a invoice
         estimate = Estimate.objects.create(
             company=company,
             customer = customer,
+            route = route,
             valid_till = request.POST.get('valid_till'),
-            description = request.POST.get('description'),
+            description = route.description,
             item = request.POST.get('item'),
-            quantity = request.POST.get('quantity'), #km/ml
-            unit_price = request.POST.get('unit_price'),
+            trucks = request.POST.get('trucks'),
+            rate = request.POST.get('rate'),
             sub_total = request.POST.get('sub_total'),
             discount = request.POST.get('discount'),
             tax = request.POST.get('tax'),
@@ -2022,14 +2022,18 @@ def update_estimate(request, pk):
             customer_id = request.POST.get('customer')
             customer = Customer.objects.get(company=company, id=customer_id)
 
+            route_id = request.POST.get('route')
+            route = Route.objects.get(company=company, id=route_id)
+
             #update instance 
             estimate.company = company
             estimate.customer = customer
+            estimate.route = route
             estimate.valid_till = request.POST.get('valid_till')
-            estimate.description = request.POST.get('description')
+            estimate.description = route.description
             estimate.item = request.POST.get('item')
-            estimate.quantity = request.POST.get('quantity')
-            estimate.unit_price = request.POST.get('unit_price')
+            estimate.trucks = request.POST.get('trucks')
+            estimate.rate = request.POST.get('rate')
             estimate.sub_total = request.POST.get('sub_total')
             estimate.discount = request.POST.get('discount')
             estimate.tax = request.POST.get('tax')
@@ -2047,10 +2051,11 @@ def update_estimate(request, pk):
         # prepopulate the form with existing data
         form_data = {
             'customer': estimate.customer,
+            'route': estimate.route,
             'valid_till': estimate.valid_till,
             'item': estimate.item,
-            'quantity': estimate.quantity,
-            'unit_price': estimate.unit_price,
+            'trucks': estimate.trucks,
+            'rate': estimate.rate,
             'sub_total': estimate.sub_total,
             'tax': estimate.tax,
             'total': estimate.total,

@@ -1,4 +1,5 @@
 from django import forms
+#from django.contrib.gis import forms as geoforms
 from .models import (
     Vehicle,
     Vehicle_Make,
@@ -298,12 +299,15 @@ class EstimateForm(forms.ModelForm):
     
     class Meta:
         model = Estimate
-        fields = '__all__'
+        fields = '__all__' 
         exclude =['company', 'estimate_id', 'date_added']
 
         widgets = {
                 'customer': forms.Select(attrs={'class': 'form-select js-select2', 'id':'customerSelect'}),
-                'item': forms.TextInput(attrs={'class': 'form-control', 'placeholder':'Steel Coils'}),
+                'item': forms.Select(attrs={'class': 'form-select js-select2', 'id':'itemSelect'}),
+                'route': forms.Select(attrs={'class': 'form-select js-select2', 'id':'routeSelect'}),
+                'rate': forms.NumberInput(attrs={'class': 'form-control', 'placeholder':'7800', 'id':'rate'}),
+                'trucks': forms.NumberInput(attrs={'class': 'form-control', 'placeholder':'7800', 'id':'trucks'}),
                 'description': forms.TextInput(attrs={'class': 'form-control', 'placeholder':'Some descriptions.'}),
                 #'sub_total': forms.NumberInput(attrs={'class': 'form-control', 'placeholder':'7800'}),
                 #'tax': forms.NumberInput(attrs={'class': 'form-control', 'placeholder':'7800'}),

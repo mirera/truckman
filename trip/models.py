@@ -1,6 +1,7 @@
 from django.db import models
 from django.db import transaction
 import uuid
+from django.utils import timezone
 from authentication.forms import Client, CustomUser
 
 #---------------------------------- Vehicle models ------------------------------------------
@@ -254,6 +255,23 @@ class Consignee(models.Model):
     def __str__(self):
         return self.name
 
+#------------------------------------ Route Model -----------------------------------------------   
+     
+class Route(models.Model):
+    company = models.ForeignKey(Client, on_delete=models.CASCADE)
+    name = models.CharField(max_length=150)
+    start_point = models.CharField(max_length=255)
+    end_point = models.CharField(max_length=255)
+    distance = models.DecimalField(max_digits=10, decimal_places=2)
+    estimated_duration = models.DurationField()
+    stop_points = models.TextField()  # You can store stop points as text, one per line, for example.
+    #map = models.TextField()  # A representation of the route on a map, e.g., JSON data.
+    description = models.TextField(null=True)
+    date_added = models.DateTimeField(default=timezone.now)
+
+    def __str__(self):
+        return self.name
+    
 #---------------------------------- Estimate  & Service Modules -----------------------------------------------
 # service model
 UNIT_TYPE = (
@@ -282,13 +300,19 @@ ESTIMATE_STATUS = (
     ('Waiting','Waiting'),
     ('Declined','Declined'),
 )
+
+ESTIMATE_ITEM_TYPE = (
+    ('Container','Container'),
+    ('Loose Cargo','Loose Cargo'),
+)
 class Estimate(models.Model):
     company = models.ForeignKey(Client, on_delete=models.CASCADE)
     customer = models.ForeignKey(Customer, on_delete=models.SET_NULL, null=True)
+    route = models.ForeignKey(Route, on_delete=models.SET_NULL, null=True)
     estimate_id = models.CharField(max_length=7, unique=True, editable=False)
-    item = models.CharField(max_length=20, null=True)
-    quantity = models.IntegerField(default=0.00)
-    unit_price = models.IntegerField(default=0.00)
+    item = models.CharField(max_length=20, default='Container', choices=ESTIMATE_ITEM_TYPE)
+    trucks = models.IntegerField(default=0.00) #initially quantity
+    rate = models.IntegerField(default=0.00) #initially unit_price
     description = models.CharField(max_length=100, null=True)
     sub_total = models.FloatField(default=0.00)
     tax = models.FloatField(default=0.00)
@@ -600,3 +624,4 @@ class Notification(models.Model):
 
     def __str__(self):
         return self.recipient.first_name
+    
