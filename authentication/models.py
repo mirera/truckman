@@ -1,10 +1,12 @@
 from django.contrib.auth.models import AbstractUser, Group, Permission
 from django.db import models
 from django.utils import timezone
+import uuid
 
 #--------------------------Client model-----------------------------------------
 #client model
 class Client(models.Model): 
+    id = models.UUIDField(default=uuid.uuid4, unique=True, primary_key=True) 
     name = models.CharField(max_length=100, unique=True)
     email = models.EmailField(unique=True)
     phone_no = models.CharField(max_length=12, null=True, blank=True)
@@ -30,6 +32,7 @@ class Client(models.Model):
 #--------------------------Preference model-----------------------------------------
 #client prefereces model
 class Preference(models.Model):
+    id = models.UUIDField(default=uuid.uuid4, unique=True, primary_key=True) 
     company = models.ForeignKey(Client, on_delete=models.CASCADE)
     email_from_name = models.CharField(max_length=12, null=True) 
     from_email = models.EmailField(null=True)
@@ -42,6 +45,7 @@ class Preference(models.Model):
 #Role model
 
 class Role(models.Model):
+    id = models.UUIDField(default=uuid.uuid4, unique=True, primary_key=True) 
     company = models.ForeignKey(Client, on_delete=models.CASCADE)
     name = models.CharField(max_length=50)
     permissions = models.ManyToManyField(Permission, blank=True)
@@ -52,7 +56,7 @@ class Role(models.Model):
         if '-admin' in self.name:
             return
         super().delete(*args, **kwargs) 
-
+    '''
     def save(self, *args, **kwargs):
         # Check if the instance is being edited and the name contains '-admin'
         if self.id is not None and '-admin' in self.name:
@@ -61,7 +65,7 @@ class Role(models.Model):
             # Update the name with the original name
             self.name = original_instance.name
         super().save(*args, **kwargs)
-
+    '''
     def __str__(self):
         return self.name
     
@@ -84,7 +88,8 @@ class CustomUser(AbstractUser):
         related_name='custom_user_set',
         related_query_name='custom_user',
     )
-    company = models.ForeignKey(Client, on_delete=models.CASCADE)
+    id = models.UUIDField(default=uuid.uuid4, unique=True, primary_key=True) 
+    company = models.ForeignKey(Client, on_delete=models.CASCADE, null=True)
     profile_photo = models.ImageField(upload_to='profile_photos/', null=True, blank=True)
     role = models.ForeignKey(Role, on_delete=models.SET_NULL, null=True, blank=True)
     phone = models.CharField(max_length=12, null=True)

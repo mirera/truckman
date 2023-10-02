@@ -112,7 +112,7 @@ urlpatterns = [
     #--ends
 
     #invoice urls
-    path('add_invoice', views.add_invoice, name='add_invoice'),
+    #path('add_invoice', views.add_invoice, name='add_invoice'),
     path('update_invoice/<str:pk>', views.update_invoice, name='update_invoice'),
     path('remove_invoice/<str:pk>', views.remove_invoice, name='remove_invoice'),
     path('view_invoice/<str:pk>', views.view_invoice, name='view_invoice'),
@@ -131,9 +131,11 @@ urlpatterns = [
     path('list_estimates', views.list_estimates, name='list_estimates'),
 
     path('send_estimate/<str:pk>', views.send_estimate, name='send_estimate'),
-    path('estimate_negotiate/<str:estimate_id>', views.view_estimate_negotiate_mode, name='view_estimate_negotiate_mode'),
+    path('estimate_negotiate/<str:pk>', views.view_estimate_negotiate_mode, name='view_estimate_negotiate_mode'),
     path('accept_estimate/<str:pk>', views.accept_estimate, name='accept_estimate'),
     path('decline_estimate/<str:pk>', views.decline_estimate, name='decline_estimate'),
+    path('generate_associated_invoice/<str:pk>', views.generate_associated_invoice, name='generate_associated_invoice'),
+    #path('generate_associated_invoice/<str:pk>', views.generate_associated_invoice, name='generate_associated_invoice'),
     #--ends
 
     #reminder urls

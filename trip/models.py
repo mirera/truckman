@@ -3,10 +3,12 @@ from django.db import transaction
 import uuid
 from django.utils import timezone
 from authentication.forms import Client, CustomUser
+import uuid
 
 #---------------------------------- Vehicle models ------------------------------------------
 #vehicle make/brand
 class Vehicle_Owner(models.Model):
+    id = models.UUIDField(default=uuid.uuid4, unique=True, primary_key=True) 
     company = models.ForeignKey(Client, on_delete=models.CASCADE)
     name = models.CharField(max_length=50)
 
@@ -16,6 +18,7 @@ class Vehicle_Owner(models.Model):
 
 #vehicle make/brand
 class Vehicle_Make(models.Model):
+    id = models.UUIDField(default=uuid.uuid4, unique=True, primary_key=True) 
     company = models.ForeignKey(Client, on_delete=models.CASCADE)
     name = models.CharField(max_length=50)
 
@@ -25,6 +28,7 @@ class Vehicle_Make(models.Model):
 
 ## Vehicle model model
 class Vehicle_Model(models.Model):
+    id = models.UUIDField(default=uuid.uuid4, unique=True, primary_key=True) 
     company = models.ForeignKey(Client, on_delete=models.CASCADE)
     make = models.ForeignKey(Vehicle_Make, on_delete=models.SET_NULL, null=True)
     name = models.CharField(max_length=50)
@@ -45,6 +49,7 @@ CONDITION_CHOICES = (
 )
 
 class Vehicle(models.Model):
+    id = models.UUIDField(default=uuid.uuid4, unique=True, primary_key=True) 
     company = models.ForeignKey(Client, on_delete=models.CASCADE)
     owner = models.ForeignKey(Vehicle_Owner, on_delete=models.CASCADE, null=True)
     plate_number = models.CharField(max_length=10, unique=True)
@@ -99,6 +104,7 @@ DRIVER_STATUS = (
 )
 class Driver(models.Model): 
     #personal data
+    id = models.UUIDField(default=uuid.uuid4, unique=True, primary_key=True) 
     company = models.ForeignKey(Client, on_delete=models.CASCADE)
     first_name = models.CharField(max_length=12)
     last_name = models.CharField(max_length=12)
@@ -149,6 +155,7 @@ PAYMENT_TERM = (
 ) 
 
 class Customer(models.Model):
+    id = models.UUIDField(default=uuid.uuid4, unique=True, primary_key=True) 
     company = models.ForeignKey(Client, on_delete=models.CASCADE)
     customer_id = models.CharField(max_length=7, unique=True, editable=False)
     name = models.CharField(max_length=50)
@@ -188,6 +195,7 @@ class Customer(models.Model):
 
 #shipper model
 class Shipper(models.Model):
+    id = models.UUIDField(default=uuid.uuid4, unique=True, primary_key=True) 
     company = models.ForeignKey(Client, on_delete=models.CASCADE)
     shipper_id = models.CharField(max_length=7, unique=True, editable=False) 
     name = models.CharField(max_length=50)
@@ -223,6 +231,7 @@ class Shipper(models.Model):
 
 # consignee model
 class Consignee(models.Model):
+    id = models.UUIDField(default=uuid.uuid4, unique=True, primary_key=True) 
     company = models.ForeignKey(Client, on_delete=models.CASCADE)
     consignee_id = models.CharField(max_length=7, unique=True, editable=False)
     name = models.CharField(max_length=50)
@@ -258,6 +267,7 @@ class Consignee(models.Model):
 #------------------------------------ Route Model -----------------------------------------------   
      
 class Route(models.Model):
+    id = models.UUIDField(default=uuid.uuid4, unique=True, primary_key=True) 
     company = models.ForeignKey(Client, on_delete=models.CASCADE)
     name = models.CharField(max_length=150)
     start_point = models.CharField(max_length=255)
@@ -306,6 +316,7 @@ ESTIMATE_ITEM_TYPE = (
     ('Loose Cargo','Loose Cargo'),
 )
 class Estimate(models.Model):
+    id = models.UUIDField(default=uuid.uuid4, unique=True, primary_key=True) 
     company = models.ForeignKey(Client, on_delete=models.CASCADE)
     customer = models.ForeignKey(Customer, on_delete=models.SET_NULL, null=True)
     route = models.ForeignKey(Route, on_delete=models.SET_NULL, null=True)
@@ -339,6 +350,9 @@ class Estimate(models.Model):
                     self.estimate_id = prefix + '0001'
         super().save(*args, **kwargs)
 
+    class Meta:
+        ordering = ['-date_added']
+
     def __str__(self):
         return self.estimate_id
     
@@ -367,6 +381,7 @@ QUANTITY_TYPE = (
 
 
 class Load(models.Model):
+    id = models.UUIDField(default=uuid.uuid4, unique=True, primary_key=True) 
     company = models.ForeignKey(Client, on_delete=models.CASCADE)
     load_id = models.CharField(max_length=7, unique=True, editable=False)
     shipper = models.ForeignKey(Shipper, on_delete=models.SET_NULL, null=True)
@@ -412,6 +427,7 @@ TRIP_STATUS = (
     ('COMPLETED','Completed')
 ) 
 class Trip(models.Model):
+    id = models.UUIDField(default=uuid.uuid4, unique=True, primary_key=True) 
     company = models.ForeignKey(Client, on_delete=models.CASCADE)
     trip_id = models.CharField(max_length=7, unique=True, editable=False)
     load = models.ForeignKey(Load, on_delete=models.SET_NULL , null=True)
@@ -455,13 +471,19 @@ INVOICE_STATUS = (
     ('Unpaid','Unpaid'),
     ('Partially Paid','Partially Paid'),
 )
+INVOICE_ITEM_TYPE = (
+    ('Container','Container'),
+    ('Loose Cargo','Loose Cargo'),
+)
 class Invoice(models.Model):
+    id = models.UUIDField(default=uuid.uuid4, unique=True, primary_key=True) 
     company = models.ForeignKey(Client, on_delete=models.CASCADE)
+    estimate = models.ForeignKey(Estimate, on_delete=models.SET_NULL, null=True)
     invoice_id = models.CharField(max_length=7, unique=True, editable=False)
-    trip = models.ForeignKey(Trip, on_delete=models.SET_NULL, null=True, blank=True)
-    item = models.CharField(max_length=20, null=True)
-    quantity = models.IntegerField(default=0.00)
-    unit_price = models.IntegerField(default=0.00)
+    route = models.ForeignKey(Route, on_delete=models.SET_NULL, null=True)
+    item = models.CharField(max_length=20, default='Container', choices=INVOICE_ITEM_TYPE)
+    trucks = models.IntegerField(default=0.00)
+    rate = models.IntegerField(default=0.00)
     description = models.CharField(max_length=100, null=True)
     sub_total = models.FloatField(default=0.00)
     tax = models.FloatField(default=0.00)
@@ -470,9 +492,12 @@ class Invoice(models.Model):
     balance = models.FloatField(default=0.00)
     invoice_date = models.DateField()
     due_date = models.DateField()
+    note = models.TextField(null=True)
     status = models.CharField(max_length=30, choices=INVOICE_STATUS, default='Unpaid')
     is_sent = models.BooleanField(default=False)
-    note = models.TextField(null=True)
+
+    class Meta:
+        ordering = ['-invoice_date']
 
     #generate customer_id 
     def save(self, *args, **kwargs):
@@ -507,6 +532,7 @@ class Invoice(models.Model):
 #---------------------------------- Payment Modules -----------------------------------------------
 # payment model
 class Payment(models.Model):
+    id = models.UUIDField(default=uuid.uuid4, unique=True, primary_key=True) 
     company = models.ForeignKey(Client, on_delete=models.CASCADE)
     payment_id = models.CharField(max_length=7, unique=True, editable=False)
     transaction_id = models.CharField(max_length=20, null=True, blank=True)
@@ -538,6 +564,7 @@ class Payment(models.Model):
 #---------------------------------- Expense & ExpenseCategory Modules ------------------------------
 #expense_category model
 class Expense_Category(models.Model):
+    id = models.UUIDField(default=uuid.uuid4, unique=True, primary_key=True) 
     company = models.ForeignKey(Client, on_delete=models.CASCADE)
     name = models.CharField(max_length=20)
 
@@ -546,6 +573,7 @@ class Expense_Category(models.Model):
 
 # expense model
 class Expense(models.Model):
+    id = models.UUIDField(default=uuid.uuid4, unique=True, primary_key=True) 
     company = models.ForeignKey(Client, on_delete=models.CASCADE)
     vehicle = models.ForeignKey(Vehicle, on_delete=models.SET_NULL , null=True)
     expense_id = models.CharField(max_length=7, unique=True, editable=False)
@@ -589,6 +617,7 @@ REMINDER_STATUS = (
     ('Due','Due'),
 )
 class Reminder(models.Model):
+    id = models.UUIDField(default=uuid.uuid4, unique=True, primary_key=True) 
     company = models.ForeignKey(Client, on_delete=models.CASCADE)
     name = models.CharField(max_length=20)
     vehicle = models.ForeignKey(Vehicle, on_delete=models.SET_NULL, null=True)
@@ -614,6 +643,7 @@ STATES = (
         ('stateless', 'stateless'),
     )
 class Notification(models.Model):
+    id = models.UUIDField(default=uuid.uuid4, unique=True, primary_key=True) 
     company = models.ForeignKey(Client, on_delete=models.CASCADE)
     recipient = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
     message = models.TextField()
@@ -625,3 +655,48 @@ class Notification(models.Model):
     def __str__(self):
         return self.recipient.first_name
     
+#---------------------------------- Loading list & item Model -----------------------------------------------  
+
+class LoadingList(models.Model):
+    id = models.UUIDField(default=uuid.uuid4, unique=True, primary_key=True) 
+    company = models.ForeignKey(Client, on_delete=models.CASCADE)
+    estimate = models.ForeignKey(Estimate, on_delete=models.CASCADE)
+    loading_list_id = models.CharField(max_length=7, unique=True, editable=False)
+    date_created = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ['-date_created']
+
+    #generate loading list id 
+    def save(self, *args, **kwargs):
+        if not self.loading_list_id:
+            prefix = 'LL'
+            # Averting race condition using 'select_for_update()'
+            with transaction.atomic():
+                last_loading_list = LoadingList.objects.select_for_update().filter(loading_list_id__startswith=prefix).order_by('-loading_list_id').first()
+                if last_loading_list:
+                    last_id = last_loading_list.loading_list_id[2:]  # Remove prefix
+                    next_id = str(int(last_id) + 1).zfill(4)
+                    self.loading_list_id = prefix + next_id
+                else:
+                    self.loading_list_id = prefix + '0001'
+        super().save(*args, **kwargs)
+
+    def __str__(self):
+        return self.loading_list_id
+
+class LoadingListItem(models.Model):
+    id = models.UUIDField(default=uuid.uuid4, unique=True, primary_key=True) 
+    company = models.ForeignKey(Client, on_delete=models.CASCADE)
+    loading_list = models.ForeignKey(LoadingList, on_delete=models.CASCADE)
+    vehicle = models.ForeignKey(Vehicle, on_delete=models.SET_NULL, null=True)
+    #truck = models.CharField(max_length=20)
+    #trailer = models.CharField(max_length=20)
+    #driver_name = models.CharField(max_length=100)
+    #mobile = models.CharField(max_length=20)
+    #passport = models.CharField(max_length=20, blank=True, null=True)
+    #driver_license = models.CharField(max_length=20, blank=True, null=True)
+    tonnage = models.IntegerField(null=True)
+
+    def __str__(self):
+        return f"Loading List Item {self.id}"

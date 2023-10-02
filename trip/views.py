@@ -17,6 +17,7 @@ from PIL import Image
 import io
 from django.conf import settings
 from django.urls import reverse
+
 from . models import (
     Vehicle, 
     Vehicle_Make, 
@@ -57,7 +58,7 @@ from .forms import (
 
 from truckman.utils import get_user_company, generate_invoice_pdf, export_model_data
 from truckman.tasks import send_email_task, send_email_with_attachment_task
-
+from truckman.processes import generate_invoice
 
 
 
@@ -1771,54 +1772,20 @@ def expense_export_to_csv(request):
 
 #---------------------------------- Invoice views------------------------------------------
 # add invoice
+'''
 @login_required(login_url='login')
 @permission_required('trip.add_invoice')
-def add_invoice(request):
-    company = get_user_company(request) 
-    #instantiate the two kwargs to be able to access them on the forms.py
-    form = InvoiceForm(request.POST, company=company)  
+def add_invoice(request, pk):
+    company = get_user_company(request)
+    estimate = Estimate.objects.get(id=pk) 
     if request.method == 'POST':
-
-        trip_id = request.POST.get('trip')
-        trip = Trip.objects.get(company=company, id=trip_id)
-
-        description = f"Transport of {trip.load.commodity} from {trip.pick_up_location} to {trip.drop_off_location}, ({trip.distance}kms)"
-
-        service = Service.objects.create(
-            company=company,
-            name = request.POST.get('name'),
-            description = description,
-            unit = request.POST.get('unit'),
-            unit_price = request.POST.get('unit_price'),
-            amount = request.POST.get('sub_total'),
-            tax = request.POST.get('tax')
-
-        )
-
-        #create instance of a invoice
-        invoice = Invoice.objects.create(
-            company=company,
-            trip = trip,
-            service = service,
-            sub_total = request.POST.get('sub_total'),
-            discount = request.POST.get('discount'),
-            tax = request.POST.get('tax'),
-            total = request.POST.get('total'),
-            balance = request.POST.get('total'),
-            invoice_date = request.POST.get('invoice_date'),
-            due_date = request.POST.get('due_date'),
-            note = request.POST.get('note'),
-        )
-
+        #invoice = generate_invoice(estimate)
         messages.success(request, f'Invoice was added successfully.')
         return redirect('view_invoice', invoice.id)
 
-    context= {
-        'form':form,
-    }
     return render(request, 'trip/invoice/add-invoice.html', context)
 #--ends
-
+'''
 # update trip
 @login_required(login_url='login')
 @permission_required('trip.change_invoice')
@@ -2091,9 +2058,18 @@ def list_estimates(request):
 def view_estimate(request, pk):
     company=get_user_company(request)
     estimate = Estimate.objects.get(id=pk, company=company)
+
+    # check if invoice associated with the estimate exists
+    #it will only exist is the estimate has been accepted.
+    try:
+        invoice = Invoice.objects.get(estimate=estimate)
+    except:
+        invoice = None
+
     context={
         'estimate':estimate,
-        'company':company
+        'company':company, 
+        'invoice':invoice,
         }
     return render(request, 'trip/estimate/view-estimate.html', context)
 #--ends
@@ -2140,15 +2116,25 @@ def send_estimate(request, pk):
 
 #accept estimate
 def accept_estimate(request, pk):
+    print(f'This is the PK:{pk}')
     estimate = Estimate.objects.get(id=pk)
     estimate.status = 'Accepted'
     estimate.save()
+
+    #generate associated loading list
+    #generate_loading_list(estimate) 
+
+    #generate asscoaited invoice 
+    invoice = generate_invoice(estimate)
+
     #send email to admin notify them about the acceptance
     estimate_url = request.build_absolute_uri(reverse('view_estimate', args=[pk]))
     context = {
-        'estimate':estimate.estimate_id,
-        'estimate_url' : estimate_url
+        'estimate':estimate.id,
+        'estimate_url' : estimate_url,
+        'invoice':invoice
     }
+    
     send_email_task(
         context=context, 
         template_path='trip/estimate/estimate-accepted.html', 
@@ -2158,6 +2144,7 @@ def accept_estimate(request, pk):
         recipient_email=estimate.company.email, 
         replyto_email=settings.EMAIL_HOST_USER
     )
+    messages.success(request, 'Quotation accepted successfully.')
     return redirect('view_estimate_negotiate_mode', estimate.id )
 
 #decline estimate
@@ -2169,7 +2156,7 @@ def decline_estimate(request, pk):
     #send email to admin notify them about the rejection
     estimate_url = request.build_absolute_uri(reverse('view_estimate', args=[pk]))
     context = {
-        'estimate':estimate.estimate_id,
+        'estimate':estimate.id, 
         'estimate_url' : estimate_url
     }
     send_email_task(
@@ -2181,11 +2168,12 @@ def decline_estimate(request, pk):
         recipient_email=estimate.company.email, 
         replyto_email=settings.EMAIL_HOST_USER
     )
+    messages.info(request, 'Quotation declined successfully.')
     return redirect('view_estimate_negotiate_mode', estimate.id )
 
 #share estimate uri with customer
-def view_estimate_negotiate_mode(request, estimate_id):
-    estimate = Estimate.objects.get(estimate_id=estimate_id)
+def view_estimate_negotiate_mode(request, pk):
+    estimate = Estimate.objects.get(id=pk)
     company = estimate.company
     context={
         'estimate':estimate,
@@ -2198,6 +2186,13 @@ def negotiate_estimate(request):
     if request.method == 'POST':
         pass
         #get response from post
+
+#This view generates an invoice of an associated estimate
+def generate_associated_invoice(request, pk):
+    estimate = Estimate.objects.get(id=pk)
+    invoice = generate_invoice(estimate)
+    messages.success(request, 'Invoice has been generated sucessfully.')
+    return render('view_invoice', invoice.id)
     
 #---------------------------------- Reminder views------------------------------------------
 

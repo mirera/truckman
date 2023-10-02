@@ -8,6 +8,7 @@ from django.urls import reverse
 from django.contrib import messages
 from django.shortcuts import render, redirect
 from django.contrib.auth.models import Permission
+from django.shortcuts import get_object_or_404
 from .forms import CustomUserCreationForm, StaffForm, RoleForm, ClientForm
 from .models import Client, CustomUser, Role, Preference
 from truckman.utils import get_user_company, format_phone_number, deformat_phone_no
@@ -428,8 +429,7 @@ def list_staffs(request):
 @login_required(login_url='login')
 @permission_required('authentication.view_customuser')
 def view_staff(request, pk):
-    company = get_user_company(request)
-    staff = CustomUser.objects.get(id=pk, company=company)
+    staff = get_object_or_404(CustomUser, id=pk)
     context = {
         'staff':staff,
     }
