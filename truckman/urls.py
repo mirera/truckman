@@ -17,6 +17,7 @@ from django.contrib import admin
 from django.urls import path, include
 from django.conf.urls.static import static
 from django.conf import settings 
+from django.conf.urls import handler404
 from . import views
 
 urlpatterns = [
@@ -25,6 +26,9 @@ urlpatterns = [
     path('authentication/', include('authentication.urls')),
     path('trip/', include('trip.urls')),
 ]
+
+# Add a custom 404 handler
+handler404 = views.custom_404
 
 #extend the url pattern to cater for media urls
 urlpatterns += static(settings.MEDIA_URL, document_root= settings.MEDIA_ROOT)
