@@ -11,6 +11,9 @@ class Vehicle_Owner(models.Model):
     id = models.UUIDField(default=uuid.uuid4, unique=True, primary_key=True) 
     company = models.ForeignKey(Client, on_delete=models.CASCADE)
     name = models.CharField(max_length=50)
+    email = models.EmailField(null=True)
+    phone = models.CharField(max_length=50, null=True)
+    address = models.CharField(max_length=200, null=True)
 
     def __str__(self):
         return self.name

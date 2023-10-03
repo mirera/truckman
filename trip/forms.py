@@ -67,7 +67,7 @@ class VehicleForm(forms.ModelForm):
         exclude =['company']
 
         widgets = {
-                'owner': forms.Select(attrs={'class': 'form-select js-select2'}),
+                'owner': forms.Select(attrs={'class': 'form-select js-select2', 'id':'vehicleOwnerSelect'}),
                 'plate_number': forms.TextInput(attrs={'class': 'form-control', 'placeholder':'Registration number'}),
                 'trailer_number': forms.TextInput(attrs={'class': 'form-control', 'placeholder':'Trailer number'}),
                 'truck_vin': forms.TextInput(attrs={'class': 'form-control', 'placeholder':'1KZ-345678'}),

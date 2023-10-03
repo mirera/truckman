@@ -38,7 +38,7 @@
                                     </div>
                                     <div class="col-xxl-3 col-md-4">
                                         <div class="form-group">
-                                            <label class="form-label">Truck Owner</label>
+                                            <label class="form-label"> Truck Owner</label> <a data-bs-toggle="modal" href="#addVehicleOwner" class="btn btn-sm btn-outline-primary"><span>Add Owner</span><em class="icon ni ni-plus-sm"></em></a>
                                             <div class="form-control-wrap">
                                                 {{ form.owner }}
                                             </div>
@@ -268,6 +268,61 @@
 <!-- content @e -->
 
 <!-- Add Vehicle Make modal-->
+<div class="modal fade" tabindex="-1" role="dialog" id="addVehicleOwner">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <a href="#" class="close" data-bs-dismiss="modal"><em class="icon ni ni-cross-sm"></em></a>
+            <div class="modal-body modal-body-md">
+                <h5 class="modal-title">Add Vehicle Owner</h5>
+                <form action="{% url 'add_partner' %}" class="mt-4" method="POST" id="addVehicleOwnerForm">
+                    {% csrf_token %}
+                    <div class="row g-gs">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label class="form-label" for="vehicleMake">Name</label> 
+                                <div class="form-control-wrap">
+                                    <input type="text" name="name" class="form-control" id="name" placeholder="John Doe" required>
+                                </div>
+                            </div>
+                        </div><!-- .col -->
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label class="form-label" for="vehicleMake">Email</label> 
+                                <div class="form-control-wrap">
+                                    <input type="email" name="email" class="form-control" id="email">
+                                </div>
+                            </div>
+                        </div><!-- .col -->
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label class="form-label" for="vehicleMake">Phone</label> 
+                                <div class="form-control-wrap">
+                                    <input type="number" name="phone" class="form-control" id="phone">
+                                </div>
+                            </div>
+                        </div><!-- .col -->
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label class="form-label" for="vehicleMake">Address</label> 
+                                <div class="form-control-wrap">
+                                    <input type="text" name="address" class="form-control" id="address">
+                                </div>
+                            </div>
+                        </div><!-- .col -->
+                        <div class="col-12">
+                            <ul class="align-center flex-wrap flex-sm-nowrap gx-4 gy-2">
+                                <button type="submit" class="btn btn-primary">Add Vehicle Owner</button>
+                            </ul>
+                        </div>
+                    </div>
+                </form>
+            </div><!-- .modal-body -->
+        </div><!-- .modal-content -->
+    </div><!-- .modal-dialog -->
+</div><!-- .modal --> 
+
+
+<!-- Add Vehicle Make modal-->
 <div class="modal fade" tabindex="-1" role="dialog" id="addVehicleMake">
     <div class="modal-dialog modal-lg" role="document">
         <div class="modal-content">
@@ -424,6 +479,60 @@
 
                         // Clear the form fields
                         $('#addVehicleModelForm')[0].reset();
+                    }
+                },
+                error: function(xhr, textStatus, errorThrown) {
+                    // Handle any errors here
+                    console.error('Error:', errorThrown);
+                }
+            });
+        });
+    });
+</script>
+
+<!--autofilling vehicle owner-->
+<script>
+    $(document).ready(function() {
+        $('#addVehicleOwnerForm').submit(function(e) {
+            e.preventDefault(); // Prevent the default form submission
+
+            // Serialize the form data
+            var formData = $(this).serialize();
+
+            // Send an AJAX POST request to add the new vehicle make
+            $.ajax({
+                type: 'POST',
+                url: $(this).attr('action'),
+                data: formData,
+                success: function(response) {
+                    // Check if the response indicates success
+                    if (response.success) {
+                        var ownerSelect = $('#vehicleOwnerSelect');
+                        var newOption = $('<option>', {
+                            value: response.partner.id,
+                            text: response.partner.name,
+                            selected: true // Set the option as selected
+                        });
+
+                        // Append the new option to the select and select it
+                        ownerSelect.append(newOption).val(response.partner.id);
+
+                        // Close the modal
+                        $('#addVehicleOwner').modal('hide');
+
+                        // Clear the form fields
+                        $('#addVehicleOwnerForm')[0].reset();
+
+                        // Update the "owner" dropdown in the "Add Vehicle Owner" modal
+                        var ownerSelect = $('#vehicleOwnerSelect2');
+                        var newOption = $('<option>', {
+                            value: response.partner.id,
+                            text: response.partner.name,
+                            selected: true // Set the option as selected
+                        });
+
+                    // Append the new option to the select and select it
+                    ownerSelect.append(newOption).val(response.partner.id);
                     }
                 },
                 error: function(xhr, textStatus, errorThrown) {

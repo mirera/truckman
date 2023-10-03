@@ -61,6 +61,63 @@ from truckman.tasks import send_email_task, send_email_with_attachment_task
 from truckman.processes import generate_invoice
 
 
+#---------------------------------- Partner Views------------------------------------------
+# add partner 
+@login_required(login_url='login')
+def add_partner(request):
+    company = get_user_company(request) #get request user company
+    
+    if request.method == 'POST':
+        #create instance of vehicle make
+        partner = Vehicle_Owner.objects.create(
+            company=company,
+            name = request.POST.get('name'),
+            email = request.POST.get('email'),
+            phone = request.POST.get('phone'),
+            address = request.POST.get('address')
+        )
+        return JsonResponse({'success': True, 'partner': {'id': partner.id, 'name': partner.name}})
+    else:
+        return JsonResponse({'success': False})
+#--ends
+
+# add partner 
+@login_required(login_url='login')
+def update_partner(request, pk):
+    partner = get_object_or_404(Vehicle_Owner, id=pk)
+    if request.method == 'POST':
+        partner.name = request.POST.get('name')
+        partner.email = request.POST.get('email')
+        partner.phone = request.POST.get('phone')
+        partner.address = request.POST.get('address')
+        partner.save()
+
+        context = {
+            'partner':partner
+        }
+        messages.success(request, 'Partner details updated')
+        return render(request, 'trip/partner/update-partner.html', context)
+
+    context = {
+        'partner':partner
+    }
+    return render(request, 'trip/partner/update-partner.html', context)
+
+# list partners 
+@login_required(login_url='login')
+def list_partners(request):
+    partners = Vehicle_Owner.objects.filter(company=get_user_company(request))
+    context = {'partners':partners}
+    return render(request, 'trip/partner/partners-list.html', context)
+#--ends
+
+# remove partners 
+@login_required(login_url='login')
+def remove_partner(request, pk):
+    partner = get_object_or_404(Vehicle_Owner, id=pk)
+    context = {'partner':partner}
+    return render(request, 'trip/partner/partners-list.html', context)
+#--ends
 
 #---------------------------------- Vehicle Make Views------------------------------------------
 # add vehicle make

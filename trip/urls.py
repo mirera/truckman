@@ -4,6 +4,12 @@ from . import views
 
 urlpatterns = [
 
+    #partner/vehicle owner urls
+    path('add_partner', views.add_partner, name='add_partner'),
+    path('list_partners', views.list_partners, name='list_partners'),
+    path('update_partner/<str:pk>', views.update_partner, name='update_partner'),
+    path('remove_partner/<str:pk>', views.remove_partner, name='remove_partner'),
+
     #vehicle make urls
     path('add_vehicle_make', views.add_vehicle_make, name='add_vehicle_make'),
     
