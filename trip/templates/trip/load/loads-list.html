@@ -275,6 +275,7 @@
                                                                     <ul class="link-list-opt no-bdr">
                                                                         <li><a  href="{% url 'update_load' load.id %}"><em class="icon ni ni-edit"></em><span>Update</span></a></li>
                                                                         <li><a  href="{% url 'view_load' load.id %}"><em class="icon ni ni-eye"></em><span>View Details</span></a></li>
+                                                                        <li><a  data-bs-toggle="modal" class="assigntruck-button" href="#assignLoadTrucks" data-pk="{{ load.id }}">  <em class="icon ni ni-eye"></em><span>Assign Trucks</span></a></li>
                                                                         <li><a data-bs-toggle="modal" class="delete-button" href="#deleteLoad" data-pk="{{ load.id }}"><em class="icon ni ni-trash"></em><span>Remove Load</span></a></li>
                                                                     </ul>
                                                                 </div>
@@ -340,6 +341,55 @@
     </div>
 </div>
 <!-- content @e -->
+
+<!-- Assign Load Trucks/Vehicles -->
+<div class="modal fade" tabindex="-1" role="dialog" id="assignLoadTrucks">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <a href="#" class="close" data-bs-dismiss="modal"><em class="icon ni ni-cross-sm"></em></a>
+            <div class="modal-body modal-body-md">
+                <h5 class="modal-title">Assign Load Trucks</h5>
+                <form action="" class="mt-4" method="POST" id="assignLoadTrucksForm">
+                    {% csrf_token %}
+                    <div class="row g-gs">
+                        <div class="col-md-6">
+                                <ul class="preview-list">
+                                    <li class="preview-item">
+                                        <span class="preview-title overline-title">Trucks/Vehicles</span>
+                                        <ul class="d-flex g-3">
+                                            <li>
+                                                <div class="dropdown">
+                                                    <a href="#" class="dropdown-toggle btn btn-light" data-bs-toggle="dropdown">Select Vehicles<em class="icon ni ni-chevron-down"></em></a>
+                                                    <div class="dropdown-menu">
+                                                        {% for vehicle in vehicles %} <!-- form.permissions.field.queryset -->
+                                                        <ul class="link-tidy">
+                                                            <li>
+                                                                <div class="custom-control custom-control-sm custom-checkbox">
+                                                                    <input type="checkbox" class="custom-control-input" id="{{ vehicle.plate_number }}" name="vehicles" value="{{ vehicle.id }}" {% if vehicle in load.assigned_trucks.all %}checked{% endif %}>
+                                                                    <label class="custom-control-label" for="{{ vehicle.plate_number }}">{{ vehicle.plate_number }}</label>
+                                                                </div>
+                                                            </li>
+                                                        </ul>
+                                                        {% endfor%}
+                                                    </div>
+                                                </div>
+                                            </li><!-- li -->
+                                        </ul>
+                                    </li><!-- li -->
+                                </ul>
+                        </div><!-- .col -->
+                        <div class="col-12">
+                            <ul class="align-center flex-wrap flex-sm-nowrap gx-4 gy-2">
+                                <button type="submit" class="btn btn-primary">Assign</button>
+                            </ul>
+                        </div>
+                    </div>
+                </form>
+            </div><!-- .modal-body -->
+        </div><!-- .modal-content -->
+    </div><!-- .modal-dialog -->
+</div><!-- .modal -->
+
 <div class="modal fade" id="deleteLoad">
     <div class="modal-dialog" role="document">
         <div class="modal-content">
@@ -369,6 +419,7 @@
 </div><!-- .Delete role  Modal-content -->
 
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<!--delete script-->
 <script>
     //-- deleteRole modal script
     function showDeleteModalForm() {
@@ -409,4 +460,26 @@
 });
 //-- ends
 </script>
+<!--Assign truckks script-->
+
+<script>
+$(document).ready(function() {
+    // Listen for the click event on the "Assign Trucks" button
+    $(".assigntruck-button").on("click", function(e) {
+        e.preventDefault();
+
+        // Get the load ID from the data-pk attribute of the clicked button
+        var loadId = $(this).data("pk");
+
+        // Set the form action to the appropriate URL with the load ID
+        var form = $("#assignLoadTrucksForm");
+        var url = "{% url 'assign_load_trucks' 0 %}".replace("0", loadId);
+        form.attr("action", url);
+
+        // Show the modal
+        $("#assignLoadTrucks").modal("show");
+    });
+});
+</script>
+
 {% endblock content %} 

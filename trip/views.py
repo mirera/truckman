@@ -35,7 +35,9 @@ from . models import (
     Service,
     Estimate,
     Vehicle_Owner,
-    Route
+    Route, 
+    BorderStop,
+    StopPoint,
 )
 
 from .forms import (
@@ -1083,11 +1085,15 @@ def update_load(request, pk):
 @login_required(login_url='login')
 @permission_required('trip.view_load')
 def list_loads(request):
-    loads = Load.objects.filter(company=get_user_company(request))
+    company = get_user_company(request)
+    loads = Load.objects.filter(company=company)
     number_of_loads = loads.count()
+    vehicles = Vehicle.objects.filter(company=company, is_available=True)
+
     context = {
         'loads':loads,
-        'number_of_loads':number_of_loads
+        'number_of_loads':number_of_loads, 
+        'vehicles':vehicles
     }
     return render(request, 'trip/load/loads-list.html', context)
 #--ends
@@ -1122,6 +1128,138 @@ def load_export_to_csv(request):
               'date_added']
     response = export_model_data(request, Load, header)
     return response 
+#--ends
+
+#assign trucks to a load
+def assign_load_trucks(request, pk):
+    load = get_object_or_404(Load, id=pk)
+    if request.method == 'POST':
+         # Get a list of selected vehicle IDs from the form
+        vehicle_ids = request.POST.getlist('vehicles') 
+
+        # Convert the selected vehicle IDs to actual Vehicle objects
+        selected_vehicles = Vehicle.objects.filter(pk__in=vehicle_ids) 
+
+        # Assign the selected vehicles to the load
+        for vehicle in selected_vehicles:
+            load.assigned_trucks.add(vehicle)
+
+        # Retrieve vehicles associated with a load
+        loaded_vehicles = load.assigned_trucks.all()
+
+        #set loaded vehicles' available status to 'False'
+        for vehicle in loaded_vehicles:
+            vehicle.is_available = False
+            vehicle.save()
+            print(f'State of the vehicle : {vehicle.is_available}')
+
+        messages.success(request, 'Load assigned vehicles successfully ')
+        return redirect('view_load', load.id)
+
+    context = {
+        'load':load
+       }
+    
+    return render(request, 'trip/load/loads-list.html' , context)
+
+
+
+
+#---------------------------------- Route views------------------------------------------
+# add route
+@login_required(login_url='login')
+def add_route(request):
+    company = get_user_company(request) #get request user company
+    
+    if request.method == 'POST':
+        distance = int(request.POST.get('distance'))
+        estimated_duration = distance // 65 #65 is the average speed of a truck
+        #create instance of route
+        route = Route.objects.create(
+            company=company,
+            name = request.POST.get('name'),
+            start_point = request.POST.get('start_point'),
+            end_point = request.POST.get('end_point'),
+            distance = distance,
+            duration = estimated_duration,
+            description = request.POST.get('description'),
+            
+        )
+        # Add selected border stops and stop points to the route
+        selected_border_stops = request.POST.getlist('border_stops')
+        selected_stop_points = request.POST.getlist('stop_points')
+        
+        for stop_id in selected_border_stops:
+            border_stop = BorderStop.objects.get(id=stop_id)
+            route.border_stops.add(border_stop)
+        
+        for point_id in selected_stop_points:
+            stop_point = StopPoint.objects.get(id=point_id)
+            route.stop_points.add(stop_point)
+
+        return JsonResponse({'success': True, 'route': {'id': route.id, 'name': route.name}})
+    else:
+        return JsonResponse({'success': False})
+#--ends
+
+# update route
+@login_required(login_url='login')
+def update_route(request, pk):
+    route = get_object_or_404(Route, id=pk)
+    company = get_user_company(request)
+    stop_points = StopPoint.objects.filter(company=company)
+    border_points = BorderStop.objects.filter(company=company)
+
+    if request.method == 'POST':
+        route.name = request.POST.get('name')
+        route.start_point = request.POST.get('start_point')
+        route.end_point = request.POST.get('end_point')
+        route.distance = request.POST.get('distance')
+        route.description = request.POST.get('description')
+        route.save()
+
+        # Add selected border stops and stop points to the route
+        selected_border_stops = request.POST.getlist('border_stops')
+        selected_stop_points = request.POST.getlist('stop_points')
+        
+        for stop_id in selected_border_stops:
+            border_stop = BorderStop.objects.get(id=stop_id)
+            route.border_stops.add(border_stop)
+        
+        for point_id in selected_stop_points:
+            stop_point = StopPoint.objects.get(id=point_id)
+            route.stop_points.add(stop_point)
+
+        context = {
+            'route':route,
+            
+        }
+        messages.success(request, 'Route details updated successfully.')
+        return render(request, 'trip/route/update-route.html', context)
+    
+    context = {
+        'route':route,
+        'border_points':border_points,
+        'stop_points':stop_points
+    }
+    return render(request, 'trip/route/update-route.html', context)
+
+# list routes
+@login_required(login_url='login')
+def list_routes(request):
+    routes = Route.objects.filter(company=get_user_company(request))
+    context = {
+        'routes':routes
+    }
+    return render(request,'trip/route/route-list.html', context)
+
+# delete route
+@login_required(login_url='login')
+def remove_route(request, pk):
+    route = get_object_or_404(Route, id=pk)
+    route.delete()
+    messages.success(request, 'Route deleted successfully')
+    return redirect('list_routes')
 
 #---------------------------------- Trip views------------------------------------------
 # add trip
@@ -1996,6 +2134,8 @@ def generate_invoice_pdf(request, pk):
 def add_estimate(request):
     company = get_user_company(request) 
     #instantiate the two kwargs to be able to access them on the forms.py
+    stop_points = StopPoint.objects.filter(company=company)
+    border_points = BorderStop.objects.filter(company=company)
     form = EstimateForm(request.POST, company=company)  
     customer_form = CustomerForm(request.POST) 
     if request.method == 'POST':
@@ -2028,7 +2168,10 @@ def add_estimate(request):
 
     context= {
         'form':form,
-        'customer_form':customer_form
+        'customer_form':customer_form,
+        'stop_points':stop_points,
+        'border_points':border_points
+
     }
     return render(request, 'trip/estimate/add-estimate.html', context)
 #--ends
@@ -2147,8 +2290,8 @@ def remove_estimate(request, pk):
 @permission_required('trip.view_estimate') 
 def send_estimate(request, pk):
     company = get_user_company(request)
-    estimate = Estimate.objects.get(id=pk, company=company)
-    preference = Preference.objects.get(company=company)
+    estimate = get_object_or_404(Estimate, id=pk)
+    preference = get_object_or_404(Preference, company=company)
 
     estimate_url = request.build_absolute_uri(reverse('view_estimate', args=[estimate.estimate_id]))
     #having this context because delay() need model serialzation
@@ -2173,23 +2316,28 @@ def send_estimate(request, pk):
 
 #accept estimate
 def accept_estimate(request, pk):
-    print(f'This is the PK:{pk}')
-    estimate = Estimate.objects.get(id=pk)
+    estimate = get_object_or_404(Estimate, id=pk)
     estimate.status = 'Accepted'
     estimate.save()
+
+    # instatiate a load
+    load = Load.objects.create(
+        company = estimate.company,
+        estimate = estimate
+     )
 
     #generate associated loading list
     #generate_loading_list(estimate) 
 
     #generate asscoaited invoice 
-    invoice = generate_invoice(estimate)
+    #invoice = generate_invoice(estimate)
 
     #send email to admin notify them about the acceptance
     estimate_url = request.build_absolute_uri(reverse('view_estimate', args=[pk]))
     context = {
         'estimate':estimate.id,
         'estimate_url' : estimate_url,
-        'invoice':invoice
+        'load':load
     }
     
     send_email_task(

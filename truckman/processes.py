@@ -1,13 +1,14 @@
 from django.utils import timezone
 from datetime import timedelta
 from trip.models import Estimate, Invoice, LoadingList, LoadingListItem
+from django.shortcuts import get_object_or_404
 
 '''
 This function is called when an estimate has been accepted
 by the customer. You can also use it to re-generate an 
 invoice for a given estimate.
 '''
-def generate_invoice(estimate):
+def generate_invoice(estimate): 
         #estimate = Estimate.objects.get(id=estimate.id)
         due_date = timezone.now().date() + timedelta(days=30)
         #create instance of a invoice
@@ -36,7 +37,7 @@ This function is called when an estimate has been accepted
 by the customer. It creates a loading list 
 '''
 def generate_loading_list(estimate):
-        estimate = Estimate.objects.get(id=estimate.id)
+        estimate = get_object_or_404(Estimate, id=estimate.id)
 
         #create instance of a loading list
         loading_list = LoadingList.objects.create(

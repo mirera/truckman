@@ -75,6 +75,16 @@ urlpatterns = [
     path('view_load/<str:pk>', views.view_load, name='view_load'),
     path('list_loads', views.list_loads, name='list_loads'),
     path('load_export_to_csv', views.load_export_to_csv, name='load_export_to_csv'),
+    path('assign_load_trucks/<str:pk>', views.assign_load_trucks, name='assign_load_trucks'),
+    #--ends
+
+    #load urls
+    path('add_route', views.add_route, name='add_route'),
+    path('update_route/<str:pk>', views.update_route, name='update_route'),
+    path('remove_route/<str:pk>', views.remove_route, name='remove_route'),
+    #path('view_load/<str:pk>', views.view_load, name='view_load'),
+    path('list_routes', views.list_routes, name='list_routes'),
+    #path('load_export_to_csv', views.load_export_to_csv, name='load_export_to_csv'),
     #--ends
 
     #trip urls

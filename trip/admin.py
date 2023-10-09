@@ -19,7 +19,9 @@ from .models import (
     Vehicle_Owner,
     Route,
     LoadingList,
-    LoadingListItem
+    LoadingListItem,
+    BorderStop,
+    StopPoint
 )
 
 # Register your models here.
@@ -43,3 +45,5 @@ admin.site.register(Vehicle_Owner)
 admin.site.register(Route)
 admin.site.register(LoadingList)
 admin.site.register(LoadingListItem)
+admin.site.register(BorderStop)
+admin.site.register(StopPoint)

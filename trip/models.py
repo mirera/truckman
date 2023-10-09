@@ -267,7 +267,23 @@ class Consignee(models.Model):
     def __str__(self):
         return self.name
 
-#------------------------------------ Route Model -----------------------------------------------   
+#------------------------------------ Route Model -----------------------------------------------  
+class BorderStop(models.Model):
+    company = models.ForeignKey(Client, on_delete=models.CASCADE, null=True)
+    name = models.CharField(max_length=100)
+    location = models.CharField(max_length=100) 
+
+    def __str__(self):
+        return self.name
+    
+class StopPoint(models.Model):
+    company = models.ForeignKey(Client, on_delete=models.CASCADE, null=True)
+    name = models.CharField(max_length=100)
+    location = models.CharField(max_length=100)
+    # Other fields for stop point information
+
+    def __str__(self):
+        return self.name
      
 class Route(models.Model):
     id = models.UUIDField(default=uuid.uuid4, unique=True, primary_key=True) 
@@ -275,10 +291,11 @@ class Route(models.Model):
     name = models.CharField(max_length=150)
     start_point = models.CharField(max_length=255)
     end_point = models.CharField(max_length=255)
-    distance = models.DecimalField(max_digits=10, decimal_places=2)
-    estimated_duration = models.DurationField()
-    stop_points = models.TextField()  # You can store stop points as text, one per line, for example.
-    #map = models.TextField()  # A representation of the route on a map, e.g., JSON data.
+    distance = models.IntegerField(null=True)
+    #estimated_duration = models.IntegerField(null=True)
+    duration = models.IntegerField(null=True)
+    border_stops = models.ManyToManyField(BorderStop, blank=True)
+    stop_points = models.ManyToManyField(StopPoint, blank=True)
     description = models.TextField(null=True)
     date_added = models.DateTimeField(default=timezone.now)
 
@@ -393,17 +410,18 @@ class Load(models.Model):
     quantity = models.CharField(max_length=20, choices=QUANTITY_TYPE, default='Barrel')
     quantity_type = models.CharField(max_length=20, choices=QUANTITY_TYPE, default='Barrel')
     weight =  models.IntegerField(null=True, blank=True)
-    commodity = models.CharField(max_length=155)
-    pickup_date = models.DateField()
-    delivery_date = models.DateField()
+    commodity = models.CharField(max_length=155, null=True)
+    pickup_date = models.DateField(null=True)
+    delivery_date = models.DateField(null=True)
     driver_instructions = models.TextField(null=True, blank=True)
     #--primary fee--
     estimate = models.ForeignKey(Estimate, on_delete=models.SET_NULL, null=True)
-    quote_amount = models.FloatField()
+    quote_amount = models.FloatField(null=True)
     #others
     legal_disclaimer = models.TextField(null=True, blank=True)
     notes = models.TextField(null=True, blank=True)
     date_added = models.DateTimeField(auto_now_add=True)
+    assigned_trucks = models.ManyToManyField(Vehicle)
 
     #generate customer_id 
     def save(self, *args, **kwargs):
@@ -434,8 +452,6 @@ class Trip(models.Model):
     company = models.ForeignKey(Client, on_delete=models.CASCADE)
     trip_id = models.CharField(max_length=7, unique=True, editable=False)
     load = models.ForeignKey(Load, on_delete=models.SET_NULL , null=True)
-    vehicle = models.ForeignKey(Vehicle, on_delete=models.SET_NULL , null=True)
-    vehicle_odemeter = models.BigIntegerField()
     #consider using google maps later
     pick_up_location = models.CharField(null=True, max_length=150)
     drop_off_location = models.CharField(null=True, max_length=150)
