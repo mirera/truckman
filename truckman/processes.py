@@ -29,7 +29,7 @@ def generate_invoice(estimate):
             due_date = due_date,
             note = estimate.company.invoice_payment_details,
         )
-        return invoice
+        return invoice  #should return a path to the pdf of the invoice
 #--ends
 
 '''

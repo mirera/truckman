@@ -60,7 +60,7 @@ from .forms import (
 
 from truckman.utils import get_user_company, generate_invoice_pdf, export_model_data
 from truckman.tasks import send_email_task, send_email_with_attachment_task
-from truckman.processes import generate_invoice
+from truckman.processes import generate_invoice, generate_loading_list
 
 
 #---------------------------------- Partner Views------------------------------------------
@@ -1151,7 +1151,41 @@ def assign_load_trucks(request, pk):
         for vehicle in loaded_vehicles:
             vehicle.is_available = False
             vehicle.save()
-            print(f'State of the vehicle : {vehicle.is_available}')
+            # send sms notifications to drivers to load load data
+
+        #generate and send associated loading list to client
+        loading_list = generate_loading_list(load.estimate) 
+        loading_list_pdf_path = '' #set it later
+
+        #generate asscoaited invoice & send to client
+        invoice = generate_invoice(load.estimate)
+
+        context = {
+            'company':load.company.name,
+            'customer':load.estimate.customer.name
+        }
+
+        send_email_with_attachment_task.delay(
+                context=context, 
+                template_path='trip/load/loading-list-email.html', 
+                from_name=load.company.name, 
+                from_email=settings.EMAIL_HOST_USER, 
+                subject=f'{load.load_id}:Loading List', 
+                recipient_email=load.estimate.company.email, 
+                replyto_email=settings.EMAIL_HOST_USER,
+                attachment_path=''
+            ) 
+        send_email_with_attachment_task.delay(
+                context=context, 
+                template_path='trip/load/loading-list-email.html', 
+                from_name=load.company.name, 
+                from_email=settings.EMAIL_HOST_USER, 
+                subject=f'{load.load_id}:Invoice', 
+                recipient_email=load.estimate.company.email, 
+                replyto_email=settings.EMAIL_HOST_USER,
+                attachment_path=''
+            ) 
+
 
         messages.success(request, 'Load assigned vehicles successfully ')
         return redirect('view_load', load.id)
@@ -2326,12 +2360,6 @@ def accept_estimate(request, pk):
         estimate = estimate
      )
 
-    #generate associated loading list
-    #generate_loading_list(estimate) 
-
-    #generate asscoaited invoice 
-    #invoice = generate_invoice(estimate)
-
     #send email to admin notify them about the acceptance
     estimate_url = request.build_absolute_uri(reverse('view_estimate', args=[pk]))
     context = {
@@ -2340,7 +2368,7 @@ def accept_estimate(request, pk):
         'load':load
     }
     
-    send_email_task(
+    send_email_task.delay(
         context=context, 
         template_path='trip/estimate/estimate-accepted.html', 
         from_name='Loginit Truckman', 
@@ -2364,7 +2392,7 @@ def decline_estimate(request, pk):
         'estimate':estimate.id, 
         'estimate_url' : estimate_url
     }
-    send_email_task(
+    send_email_task.delay(
         context=context, 
         template_path='trip/estimate/estimate-declined.html', 
         from_name='Loginit Truckman', 
