@@ -59,3 +59,6 @@ def generate_loading_list(estimate):
             LoadingListItem.objects.create(loading_list=loading_list, **item_data)
 #--ends
 
+
+
+

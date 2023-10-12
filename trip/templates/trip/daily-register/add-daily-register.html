@@ -1,0 +1,226 @@
+{% extends 'base.html' %}  
+
+{% block content %}
+<!-- content @s -->
+{% if messages %}
+{% for message in messages %}
+    <div class="alert {% if message.tags == 'error' %}alert-danger{% elif message.tags == 'success' %}alert-success{% else %}alert-primary{% endif %}">
+        {{ message }}
+    </div>
+{% endfor %}
+{% endif %}
+<div class="nk-content ">
+    <div class="container-fluid">
+        <div class="nk-content-inner">
+            <div class="nk-content-body">
+                <div class="nk-block-head nk-block-head-sm">
+                    <div class="nk-block-between">
+                        <div class="nk-block-head-content">
+                            <h3 class="nk-block-title page-title">Daily Register</h3>
+                            <div class="nk-block-des text-soft">
+                                <p>Mark daily register.</p>
+                            </div>
+                        </div><!-- .nk-block-head-content -->
+                    </div><!-- .nk-block-between -->
+                </div><!-- .nk-block-head -->
+                <div class="nk-block">
+                    <div class="card card-bordered">
+                        <div class="card-inner-group">
+                            <form action="{% url 'add_register_entry' trip.id %}" method="POST" enctype="multipart/form-data" >
+                                {% csrf_token %}
+                                <div class="card-inner">
+                                    <div class="nk-block-head">
+                                        <div class="nk-block-head-content">
+                                            <h5 class="title nk-block-title">Daily Rigister Details:</h5>
+                                        </div>
+                                    </div>
+                                    <div class="nk-block">
+                                        <div class="row gy-4">
+                                            <div class="col-xxl-3 col-md-4" id="start-point">
+                                                <div class="form-group">
+                                                    <label class="form-label" for="name">Start Point</label>
+                                                    <input type="text" name="start_point" class="form-control" id="start_point">
+                                                </div>
+                                            </div><!--col-->
+                                            <div class="col-xxl-3 col-md-4" id="midday-point">
+                                                <div class="form-group">
+                                                    <label class="form-label" for="name">Mid-day Location</label>
+                                                    <input type="text" name="midday_location" class="form-control" id="midday_location">
+                                                </div>
+                                            </div><!--col-->
+                                            <div class="col-xxl-3 col-md-4" id="evening-point">
+                                                <div class="form-group">
+                                                    <label class="form-label" for="name">Evening Stop Point</label>
+                                                    <input type="text" name="stop_point" class="form-control" id="stop_point" >
+                                                </div>
+                                            </div><!--col-->
+                                            <div class="col-xxl-3 col-md-4" id="morning">
+                                                <div class="form-group">
+                                                    <label class="form-label" for="name">Morning Odemeter Reading</label>
+                                                    <input type="number" name="morning_odemeter_reading" class="form-control" id="morning_odemeter_reading" placeholder="300000" required>
+                                                </div>
+                                            </div><!--col-->
+                                            <div class="col-xxl-3 col-md-4" id="midday">
+                                                <div class="form-group">
+                                                    <label class="form-label" for="generic">Midday Odemeter Reading</label>
+                                                    <input type="number" name="midday_odemeter_reading" class="form-control" id="midday_odemeter_reading" placeholder="30000" required>
+                                                </div>
+                                            </div><!--col-->
+                                            <div class="col-xxl-3 col-md-4" id="evening">
+                                                <div class="form-group">
+                                                    <label class="form-label" for="sKU">Evening Odemeter Reading</label>
+                                                    <input type="number" name="evening_odemeter_reading" class="form-control" id="evening_odemeter_reading" placeholder="30000" required>
+                                                </div>
+                                            </div><!--col-->
+                                            <div class="col-xxl-3 col-md-4">
+                                                <div class="form-group">
+                                                    <label class="form-label">Truck & Trip Status</label>
+                                                    <div class="form-control-wrap">
+                                                        {{ form.vehicle_status }}
+                                                    </div>
+                                                </div>
+                                            </div><!--col-->
+                                            <!--This should only appear if above trips service is 'parked'-->
+                                            <div class="col-xxl-3 col-md-4" id="reasonDiv">
+                                                <div class="form-group">
+                                                    <label class="form-label">Reason</label>
+                                                    <div class="form-control-wrap">
+                                                        {{ form.reason_parked }}
+                                                    </div>
+                                                </div>
+                                            </div><!--col-->
+                                            <div class="col-12">
+                                                <div class="form-group">
+                                                    <button type="submit" class="btn btn-primary">Submit</button>
+                                                </div>
+                                            </div><!--col-->
+                                        </div><!--row-->
+                                    </div>
+                                </div><!-- .card-inner-group -->
+                            </form>
+                        </div>
+                    </div><!-- .card -->
+                </div><!-- .nk-block -->
+            </div>
+        </div>
+    </div>
+</div>
+<!-- content @e -->
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+<!-- Script to display inputs based on the time: morning, midday or evening -->
+<script>
+    // Function to show/hide input fields based on the current time
+    function updateInputVisibility() {
+        var currentTime = new Date().getHours();
+
+        if (currentTime >= 6 && currentTime < 12) {
+            //odemeter reading
+            $("#morning").show();
+            $("#midday").hide();
+            $("#evening").hide();
+            //location
+            $("#start-point").show();
+            $("#midday-point").hide();
+            $("#evening-point").hide();
+        } else if (currentTime >= 12 && currentTime < 17) {
+            //odemeter reading
+            $("#morning").hide();
+            $("#midday").show();
+            $("#evening").hide();
+            //location
+            $("#start-point").hide();
+            $("#midday-point").show();
+            $("#evening-point").hide();
+        } else if (currentTime >= 17 && currentTime < 21) {
+            //odemeter reading
+            $("#morning").hide();
+            $("#midday").hide();
+            $("#evening").show();
+            //location
+            $("#start-point").hide();
+            $("#midday-point").hide();
+            $("#evening-point").show();
+        } else {
+            //odemeter reading
+            $("#morning").hide();
+            $("#midday").hide();
+            $("#evening").hide();
+            //location
+            $("#start-point").hide();
+            $("#midday-point").hide();
+            $("#evening-point").hide();
+        }
+    }
+
+    // Initial visibility update
+    updateInputVisibility();
+</script>
+
+<!-- script to get users co-ordinates-->
+<script>
+    // Function to get the user's location
+    function getLocation() {
+        if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition(function (position) {
+                var latitude = position.coords.latitude;
+                var longitude = position.coords.longitude;
+
+                // You can use the latitude and longitude to find the nearest town and country, for example using reverse geocoding APIs.
+
+                // Update the input fields
+                document.getElementById('start_point').value = `Lat: ${latitude}, Lng: ${longitude}`;
+                document.getElementById('midday_location').value = `Lat: ${latitude}, Lng: ${longitude}`;
+                document.getElementById('stop_point').value = `Lat: ${latitude}, Lng: ${longitude}`;
+            });
+        } else {
+            alert("Geolocation is not supported by this browser.");
+        }
+    }
+
+    // Call the getLocation function when the page loads
+    getLocation();
+</script>
+
+<!-- script to hide location inputs -->
+<script>
+    // Function to hide the element
+    function hideElement() {
+        var middayLocationElement = document.getElementById('midday-point');
+        var startLocationElement = document.getElementById('start_point'); 
+        var stopLocationElement = document.getElementById('stop_point');
+
+        middayLocationElement.style.display = 'none';
+        startLocationElement.style.display = 'none';
+        stopLocationElement.style.display = 'none';
+    }
+    hideElement()
+</script>
+
+<!--script to conditionally show reason div and input if selection is parked-->
+<script>
+    $(document).ready(function() {
+        // Add an event listener to the vehicle_status select input
+        $('#vehicleStatusSelect').change(function() {
+            var selectedOption = $(this).val();
+
+            // Check if the selected option is "Parked"
+            if (selectedOption === 'Parked') {
+                $('#reasonDiv').show();
+            } else {
+                $('#reasonDiv').hide();
+            }
+        });
+
+        // Initial check when the page loads
+        if ($('#vehicleStatusSelect').val() === 'Parked') {
+            $('#reasonDiv').show();
+        } else {
+            $('#reasonDiv').hide();
+        }
+    });
+</script>
+
+
+{% endblock content %} 

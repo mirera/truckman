@@ -38,6 +38,7 @@ from . models import (
     Route, 
     BorderStop,
     StopPoint,
+    DailyRegister
 )
 
 from .forms import (
@@ -55,10 +56,11 @@ from .forms import (
     ExpenseCategoryForm,
     ReminderForm,
     InvoiceForm,
-    EstimateForm
+    EstimateForm,
+    DailyRegisterForm
 )
 
-from truckman.utils import get_user_company, generate_invoice_pdf, export_model_data
+from truckman.utils import get_user_company, generate_invoice_pdf, export_model_data, geocode_address, reverse_geocode
 from truckman.tasks import send_email_task, send_email_with_attachment_task
 from truckman.processes import generate_invoice, generate_loading_list
 
@@ -1308,16 +1310,12 @@ def add_trip(request):
         load_id = request.POST.get('load')
         load = Load.objects.get(company=company, id=load_id)
 
-        vehicle_id = request.POST.get('vehicle')
-        vehicle = Vehicle.objects.get(company=company, id=vehicle_id)
-
         distance = int(request.POST.get('distance')) + 50 #use this to estimate the trip cost.
 
         #create instance of a trip
         trip = Trip.objects.create(
             company=company,
             load = load,
-            vehicle = vehicle,
             driver_accesory_pay = request.POST.get('driver_accesory_pay'),
             vehicle_odemeter = request.POST.get('vehicle_odemeter'),
             driver_advance = request.POST.get('driver_advance'),
@@ -1384,12 +1382,9 @@ def update_trip(request, pk):
         load_id = request.POST.get('load')
         load = Load.objects.get(company=company, id=load_id)
 
-        vehicle_id = request.POST.get('vehicle')
-        vehicle = Vehicle.objects.get(company=company, id=vehicle_id)
         #update instance 
         trip.company = company
         trip.load = load
-        trip.vehicle = vehicle
         trip.driver_accesory_pay = request.POST.get('driver_accesory_pay')
         trip.vehicle_odemeter = request.POST.get('vehicle_odemeter')
         trip.driver_advance = request.POST.get('driver_advance')
@@ -1402,7 +1397,6 @@ def update_trip(request, pk):
         # prepopulate the form with existing data
         form_data = {
             'load': trip.load,
-            'vehicle': trip.vehicle,
             'driver_accesory_pay': trip.driver_accesory_pay,
             'vehicle_odemeter': trip.vehicle_odemeter,
             'driver_advance': trip.driver_advance,
@@ -2574,4 +2568,125 @@ def get_estimate_info(request, estimate_id):
         return JsonResponse(estimate_info)
     except Estimate.DoesNotExist:
         return JsonResponse({'error': 'Estimate not found'}, status=404)
+    
+#--------------------------- daily register views _________________________________________________
+
+#driver add to a daily register
+#@login_required(login_url='login')
+def add_register_entry(request, pk):
+    company = get_user_company(request)
+    form = DailyRegisterForm(request.POST)
+    trip = Trip.objects.get(pk=id) # from this we get driver and vehicle
+    vehicles = trip.load.assigned_trucks.all()
+    drivers = Driver.objects.filter(assigned_vehicle__in=vehicles)
+
+    if request.method == 'POST':
+        current_time = timezone.now().time()
+        #if morning between 6-11am
+        if current_time >= timezone.time(6, 0) and current_time < timezone.time(11, 0):
+            for driver, vehicle in zip(drivers, vehicles):
+                coordinates = request.POST.get('start_point')
+                print(f'These are the corodinates from html form:{coordinates}')
+                # Split the coordinates to extract latitude and longitude
+                latitude, longitude = map(float, coordinates.split(','))
+
+                # Use the reverse_geocode function to get the address
+                location_data = reverse_geocode((latitude, longitude))
+                print(f'This is the location object :{location_data}')
+                if location_data:
+                    # Split the location into town and country
+                    #nearest_town, country = location_info.split(', ')
+                    nearest_town = location_data.get('town')
+                    country = location_data.get('country')
+                    print(f'This is the town and country :{nearest_town}, {country}')
+                else:
+                    nearest_town, country = None, None
+
+                
+                register_instant = DailyRegister.objects.create(
+                    company = company,
+                    trip = trip,
+                    vehicle = vehicle,
+                    driver = driver,
+                    start_point = nearest_town,
+                    country = country,
+                    morning_odemeter_reading = request.POST.get('morning_odemeter_reading'),
+                    vehicle_status = request.POST.get('vehicle_status'),
+                    reason_parked = request.POST.get('reason_parked'),
+                )
+    
+        #if midday between 12 - 4pm
+        elif current_time >= timezone.time(12, 0) and current_time < timezone.time(16, 0):
+            for driver, vehicle in zip(drivers, vehicles):
+                coordinates = request.POST.get('start_point')
+                print(f'These are the corodinates from html form:{coordinates}')
+                # Split the coordinates to extract latitude and longitude
+                latitude, longitude = map(float, coordinates.split(','))
+
+                # Use the reverse_geocode function to get the address
+                location_data = reverse_geocode((latitude, longitude))
+                print(f'This is the location object :{location_data}')
+                if location_data:
+                    # Split the location into town and country
+                    #nearest_town, country = location_info.split(', ')
+                    nearest_town = location_data.get('town')
+                    country = location_data.get('country')
+                    print(f'This is the town and country :{nearest_town}, {country}')
+                else:
+                    nearest_town, country = None, None
+                register_instant = DailyRegister.objects.create(
+                    company = company,
+                    trip = trip,
+                    vehicle = vehicle,
+                    driver = driver,
+                    midday_location = nearest_town, 
+                    country = country,
+                    midday_odemeter_reading = request.POST.get('midday_odemeter_reading'),
+                    vehicle_status = request.POST.get('vehicle_status'),
+                    reason_parked = request.POST.get('reason_parked'),
+                )
+
+        #if evening after 5-9pm
+        elif current_time >= timezone.time(17, 0) and current_time < timezone.time(21, 0):
+            for driver, vehicle in zip(drivers, vehicles):
+                coordinates = request.POST.get('start_point')
+                print(f'These are the corodinates from html form:{coordinates}')
+                # Split the coordinates to extract latitude and longitude
+                latitude, longitude = map(float, coordinates.split(','))
+
+                # Use the reverse_geocode function to get the address
+                location_data = reverse_geocode((latitude, longitude))
+                print(f'This is the location object :{location_data}')
+                if location_data:
+                    # Split the location into town and country
+                    #nearest_town, country = location_info.split(', ')
+                    nearest_town = location_data.get('town')
+                    country = location_data.get('country')
+                    print(f'This is the town and country :{nearest_town}, {country}')
+                else:
+                    nearest_town, country = None, None
+
+                register_instant = DailyRegister.objects.create(
+                    company = company,
+                    trip = trip,
+                    vehicle = vehicle,
+                    driver = driver,
+                    stop_point = nearest_town,
+                    country = country,
+                    evening_odemeter_reading = request.POST.get('evening_odemeter_reading'),
+                    vehicle_status = request.POST.get('vehicle_status'),
+                    reason_parked = request.POST.get('reason_parked')
+                )
+
+        messages.success(request, 'Entry recorded successfully')
+        return redirect()
+
+    context = {
+       'trip':trip,
+       'form':form
+    }
+    return render(request, 'trip/daily-register/add-daily-register.html', context)
+
+
+    
 

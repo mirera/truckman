@@ -166,4 +166,7 @@ urlpatterns = [
     path('get_load_info/<str:load_id>/', views.get_load_info, name='get_load_info'),
     path('get_estimate_info/<str:estimate_id>/', views.get_estimate_info, name='get_estimate_info'),
 
+    #-- register entry urls
+    path('add_register_entry/<str:pk>/', views.add_register_entry, name='add_register_entry'),
+
 ]

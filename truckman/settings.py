@@ -173,3 +173,6 @@ EMAIL_HOST_PASSWORD = 'ehwvqcdfvydltqka'
 EMAIL_USE_TLS = True
 
 
+SMS_SENDER_ID = os.environ['SMS_SENDER_ID'] 
+SMS_API_TOKEN = os.environ['SMS_API_TOKEN'] 
+

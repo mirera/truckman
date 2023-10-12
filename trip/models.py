@@ -719,3 +719,31 @@ class LoadingListItem(models.Model):
 
     def __str__(self):
         return f"Loading List Item {self.id}"
+
+#---------------------------------- Truck Daily Register Model ----------------------------------------------- 
+VEHICLE_CHOICES = (
+    ('Parked','Parked'),
+    ('Moving','Moving'),
+)
+
+PARKING_REASONS = (
+    ('Traffic','Traffic'),
+    ('Fuel','Fuel'),
+    ('Arrested','Arrested'),
+    ('Missing Documentation ','Missing Documentation'),
+    ('Missing Documentation Client Side','Missing Documentation Client Side'),
+)
+class DailyRegister(models.Model):
+    trip = models.ForeignKey(Trip, on_delete=models.SET_NULL, null=True)
+    submission_time = models.DateTimeField(auto_now_add=True)
+    start_point = models.CharField(max_length=255, null=True) #start point in the moring
+    midday_location = models.CharField(max_length=255, null=True)
+    stop_point = models.CharField(max_length=255, null=True) #start point in the moring
+    country = models.CharField(max_length=255) 
+    vehicle = models.ForeignKey(Vehicle, on_delete=models.SET_NULL, null=True)
+    morning_odemeter_reading = models.IntegerField(null=True)
+    midday_odemeter_reading = models.IntegerField(null=True)
+    evening_odemeter_reading = models.IntegerField(null=True)
+    vehicle_status = models.CharField(choices=VEHICLE_CHOICES)
+    reason_parked = models.CharField(choices=PARKING_REASONS, null=True)
+    
