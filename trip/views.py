@@ -2,7 +2,8 @@ from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required 
 from truckman.decorators import permission_required
 from django.utils import timezone
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, time
+import pytz
 import os
 from django.shortcuts import get_object_or_404
 from django.conf import settings
@@ -60,9 +61,9 @@ from .forms import (
     DailyRegisterForm
 )
 
-from truckman.utils import get_user_company, generate_invoice_pdf, export_model_data, geocode_address, reverse_geocode
+from truckman.utils import get_user_company, generate_invoice_pdf, export_model_data, reverse_geocode, format_coordinates, get_location_data
 from truckman.tasks import send_email_task, send_email_with_attachment_task
-from truckman.processes import generate_invoice, generate_loading_list
+from truckman.processes import generate_invoice, generate_loading_list, create_daily_register
 
 
 #---------------------------------- Partner Views------------------------------------------
@@ -963,10 +964,7 @@ def add_load(request):
     #instantiate the two kwargs to be able to access them on the forms.py
     form = LoadForm(request.POST, company=company) 
     if request.method == 'POST':
-        '''
-        customer_id = request.POST.get('customer')
-        customer = Customer.objects.get(company=company, id=customer_id)
-        '''
+        
         shipper_id = request.POST.get('shipper')
         shipper = Shipper.objects.get(company=company, id=shipper_id)
 
@@ -979,7 +977,6 @@ def add_load(request):
         #create instance of a load
         load = Load.objects.create(
             company=company,
-            #customer = customer,
             shipper = shipper,
             consignee = consignee,
             estimate = estimate,
@@ -1010,9 +1007,6 @@ def update_load(request, pk):
     load = Load.objects.get(id=pk, company=company)
     if request.method == 'POST':
 
-        customer_id = request.POST.get('customer')
-        customer = Customer.objects.get(company=company, id=customer_id)
-
         shipper_id = request.POST.get('shipper')
         shipper = Shipper.objects.get(company=company, id=shipper_id)
 
@@ -1021,7 +1015,6 @@ def update_load(request, pk):
 
         #update instance 
         load.company = company
-        load.customer = customer
         load.shipper = shipper
         load.consignee = consignee
         load.pickup_date = request.POST.get('pickup_date')
@@ -1051,7 +1044,6 @@ def update_load(request, pk):
     else:
         # prepopulate the form with existing data
         form_data = {
-            'customer': load.customer,
             'shipper': load.shipper,
             'consignee': load.consignee,
             'pickup_date': load.pickup_date,
@@ -1197,9 +1189,7 @@ def assign_load_trucks(request, pk):
        }
     
     return render(request, 'trip/load/loads-list.html' , context)
-
-
-
+#--ends
 
 #---------------------------------- Route views------------------------------------------
 # add route
@@ -1317,13 +1307,14 @@ def add_trip(request):
             company=company,
             load = load,
             driver_accesory_pay = request.POST.get('driver_accesory_pay'),
-            vehicle_odemeter = request.POST.get('vehicle_odemeter'),
+            #vehicle_odemeter = request.POST.get('vehicle_odemeter'),
             driver_advance = request.POST.get('driver_advance'),
             driver_milage = request.POST.get('driver_advance'),
             pick_up_location = request.POST.get('pick_up_location'),
             drop_off_location = request.POST.get('drop_off_location'),
             distance = distance,
         )
+        '''
         description = f"Transport of {trip.load.commodity} from {trip.pick_up_location} to {trip.drop_off_location}, ({trip.distance}kms)"
         invoice_date = timezone.now().date()
         payment_term_days = load.estimate.customer.payment_term
@@ -1361,7 +1352,7 @@ def add_trip(request):
             note = note,
 
         )
-
+        '''
         messages.success(request, f'Trip was added successfully.')
         return redirect('view_trip', trip.id)
 
@@ -1431,7 +1422,7 @@ def view_trip(request, pk):
     company=get_user_company(request)
     trip = Trip.objects.get(id=pk, company=company)
     expenses = Expense.objects.filter(company=company, trip=trip)
-    invoice = Invoice.objects.get(company=company, trip=trip)
+    invoice = Invoice.objects.get(estimate=trip.load.estimate)
     payments = Payment.objects.filter(company=company, invoice=invoice) #invoice in invoices associated with the trip 
     form = ExpenseForm(request.POST, company=company) # for expense modal
     category_form = ExpenseCategoryForm(request.POST) # for expense category modal
@@ -2571,122 +2562,85 @@ def get_estimate_info(request, estimate_id):
     
 #--------------------------- daily register views _________________________________________________
 
-#driver add to a daily register
-#@login_required(login_url='login')
 def add_register_entry(request, pk):
     company = get_user_company(request)
     form = DailyRegisterForm(request.POST)
-    trip = Trip.objects.get(pk=id) # from this we get driver and vehicle
+    trip = Trip.objects.get(id=pk)
     vehicles = trip.load.assigned_trucks.all()
     drivers = Driver.objects.filter(assigned_vehicle__in=vehicles)
 
     if request.method == 'POST':
-        current_time = timezone.now().time()
-        #if morning between 6-11am
-        if current_time >= timezone.time(6, 0) and current_time < timezone.time(11, 0):
-            for driver, vehicle in zip(drivers, vehicles):
-                coordinates = request.POST.get('start_point')
-                print(f'These are the corodinates from html form:{coordinates}')
-                # Split the coordinates to extract latitude and longitude
-                latitude, longitude = map(float, coordinates.split(','))
+        general_coordinates = format_coordinates(request.POST.get('general_coordinates'))
 
-                # Use the reverse_geocode function to get the address
-                location_data = reverse_geocode((latitude, longitude))
-                print(f'This is the location object :{location_data}')
-                if location_data:
-                    # Split the location into town and country
-                    #nearest_town, country = location_info.split(', ')
-                    nearest_town = location_data.get('town')
-                    country = location_data.get('country')
-                    print(f'This is the town and country :{nearest_town}, {country}')
-                else:
-                    nearest_town, country = None, None
+        location_data = reverse_geocode(general_coordinates)
+        user_timezone = location_data.get('timezone')
 
-                
-                register_instant = DailyRegister.objects.create(
-                    company = company,
-                    trip = trip,
-                    vehicle = vehicle,
-                    driver = driver,
-                    start_point = nearest_town,
-                    country = country,
-                    morning_odemeter_reading = request.POST.get('morning_odemeter_reading'),
-                    vehicle_status = request.POST.get('vehicle_status'),
-                    reason_parked = request.POST.get('reason_parked'),
-                )
-    
-        #if midday between 12 - 4pm
-        elif current_time >= timezone.time(12, 0) and current_time < timezone.time(16, 0):
-            for driver, vehicle in zip(drivers, vehicles):
-                coordinates = request.POST.get('start_point')
-                print(f'These are the corodinates from html form:{coordinates}')
-                # Split the coordinates to extract latitude and longitude
-                latitude, longitude = map(float, coordinates.split(','))
+        user_tz = pytz.timezone(user_timezone)
+        current_datetime = timezone.now()
+        current_time = current_datetime.astimezone(user_tz).time()
 
-                # Use the reverse_geocode function to get the address
-                location_data = reverse_geocode((latitude, longitude))
-                print(f'This is the location object :{location_data}')
-                if location_data:
-                    # Split the location into town and country
-                    #nearest_town, country = location_info.split(', ')
-                    nearest_town = location_data.get('town')
-                    country = location_data.get('country')
-                    print(f'This is the town and country :{nearest_town}, {country}')
-                else:
-                    nearest_town, country = None, None
-                register_instant = DailyRegister.objects.create(
-                    company = company,
-                    trip = trip,
-                    vehicle = vehicle,
-                    driver = driver,
-                    midday_location = nearest_town, 
-                    country = country,
-                    midday_odemeter_reading = request.POST.get('midday_odemeter_reading'),
-                    vehicle_status = request.POST.get('vehicle_status'),
-                    reason_parked = request.POST.get('reason_parked'),
-                )
+        # Determine the datetime field based on the current time
+        if 5 <= current_time.hour < 11:
+            datetime_field = 'morning'
+        elif 12 <= current_time.hour < 16:
+            datetime_field = 'midday'
+        elif 17 <= current_time.hour < 21:
+            datetime_field = 'evening'
+        else:
+            context = {
+                'trip': trip,
+                'form': form
+            }
+            messages.error(request, 'Wrong entry time!')
+            return render(request, 'trip/daily-register/add-daily-register.html', context)
 
-        #if evening after 5-9pm
-        elif current_time >= timezone.time(17, 0) and current_time < timezone.time(21, 0):
-            for driver, vehicle in zip(drivers, vehicles):
-                coordinates = request.POST.get('start_point')
-                print(f'These are the corodinates from html form:{coordinates}')
-                # Split the coordinates to extract latitude and longitude
-                latitude, longitude = map(float, coordinates.split(','))
-
-                # Use the reverse_geocode function to get the address
-                location_data = reverse_geocode((latitude, longitude))
-                print(f'This is the location object :{location_data}')
-                if location_data:
-                    # Split the location into town and country
-                    #nearest_town, country = location_info.split(', ')
-                    nearest_town = location_data.get('town')
-                    country = location_data.get('country')
-                    print(f'This is the town and country :{nearest_town}, {country}')
-                else:
-                    nearest_town, country = None, None
-
-                register_instant = DailyRegister.objects.create(
-                    company = company,
-                    trip = trip,
-                    vehicle = vehicle,
-                    driver = driver,
-                    stop_point = nearest_town,
-                    country = country,
-                    evening_odemeter_reading = request.POST.get('evening_odemeter_reading'),
-                    vehicle_status = request.POST.get('vehicle_status'),
-                    reason_parked = request.POST.get('reason_parked')
-                )
+        for driver, vehicle in zip(drivers, vehicles):
+            coordinates = request.POST.get(f'{datetime_field}_location')
+            
+            create_daily_register(request, company, trip, vehicle, driver, coordinates, user_timezone, datetime_field)
 
         messages.success(request, 'Entry recorded successfully')
-        return redirect()
+        return render(request,'trip/daily-register/success.html')
 
     context = {
-       'trip':trip,
-       'form':form
+       'trip': trip,
+       'form': form
     }
     return render(request, 'trip/daily-register/add-daily-register.html', context)
 
+#---ends
 
+#--------------------------- daily register report views _________________________________________________
+
+#view to render daily trip register report
+@login_required(login_url='login')
+def trip_daily_register_report(request):
+    form = DailyRegisterForm()
     
+    if request.method == 'POST':
+        #get the trip id 
+        trip_id = request.POST.get('trip')
+        trip = Trip.objects.get(id=trip_id)
+
+        # Calculate the number of days elapsed since the trip started
+        start_date = trip.date_added.date() #change later to start_time  
+        current_date = datetime.now().date()
+        elapsed_days = (current_date - start_date).days + 1  # +1 to include the current day
+
+        # Create a list of day numbers
+        day_numbers = list(range(1, elapsed_days + 1))
+
+        context = {
+            'trip': trip,
+            'day_numbers': day_numbers, 
+        }
+        return render(request, 'trip/reports/daily-register-report.html', context )
+    
+    context = {
+        'form':form
+    }
+    return render(request, 'trip/reports/daily-register-select-trip.html', context)
+
+
+
 

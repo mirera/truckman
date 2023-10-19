@@ -262,7 +262,7 @@ class TripForm(forms.ModelForm):
 
         widgets = {
                 'load': forms.Select(attrs={'class': 'form-select js-select2', 'id':'load'}),
-                'vehicle_odemeter': forms.NumberInput(attrs={'class': 'form-control', 'placeholder':'67800'}),
+                #'vehicle_odemeter': forms.NumberInput(attrs={'class': 'form-control', 'placeholder':'67800'}),
                 'driver_milage': forms.NumberInput(attrs={'class': 'form-control', 'placeholder':'67800'}),
                 'driver_accesory_pay': forms.NumberInput(attrs={'class': 'form-control', 'placeholder':'67800'}),
                 'driver_advance': forms.NumberInput(attrs={'class': 'form-control', 'placeholder':'600'}), 
@@ -435,12 +435,13 @@ class DailyRegisterForm(forms.ModelForm):
      
     class Meta:
         model = DailyRegister
-        fields = ['vehicle_status', 'reason_parked']
+        fields = ['vehicle_status', 'reason_parked', 'trip']
         exclude =['company']
 
         widgets = {
-                'vehicle_status': forms.Select(attrs={'class': 'form-select js-select2', 'id':'vehicleStatusSelect', 'required':True}),
+                'vehicle_status': forms.Select(attrs={'class': 'form-select js-select2', 'id':'vehicleStatusSelect'}),
                 'reason_parked': forms.Select(attrs={'class': 'form-select js-select2', 'id':'reasonParkedSelect'}),
+                'trip': forms.Select(attrs={'class': 'form-select js-select2', 'id':'selectedTrip'}),
                 
             }    
 

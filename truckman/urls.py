@@ -23,8 +23,10 @@ from . import views
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('',views.index_page, name='home'),
+    path('set_timezone',views.set_timezone, name='set_timezone'),
     path('authentication/', include('authentication.urls')),
     path('trip/', include('trip.urls')),
+    path('api/', include('api.urls')),
 ]
 
 # Add a custom 404 handler

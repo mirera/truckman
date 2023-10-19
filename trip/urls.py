@@ -169,4 +169,6 @@ urlpatterns = [
     #-- register entry urls
     path('add_register_entry/<str:pk>/', views.add_register_entry, name='add_register_entry'),
 
+    #-- reports 
+    path('trip_daily_register_report', views.trip_daily_register_report, name='trip_daily_register_report'),
 ]

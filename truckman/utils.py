@@ -20,6 +20,9 @@ from datetime import timedelta
 import uuid
 from pyshorteners import Shortener
 from geopy.geocoders import GoogleV3
+from pprint import pprint
+import timezonefinder
+
 
 #utilies functions
  # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -246,9 +249,7 @@ def shorten_url(url, expiration_hours=24):
        # Create a short URL
        s = Shortener()
        shortened_url = s.tinyurl.short(url)
-       print(f'This is the shortened url:{shortened_url}')
        shortened_url = s.tinyurl.short(f"{url}?token={token}&expires={expiration_time}")
-       print(f'This is the shortened url with token:{shortened_url}')
 
 
        return shortened_url
@@ -280,11 +281,65 @@ def reverse_geocode(coordinates):
     location = geolocator.reverse((latitude, longitude), exactly_one=True)
 
     location_data = {
-        'country': location.raw.get('address', {}).get('country'),
-        'town': location.raw.get('address', {}).get('town') or location.raw.get('address', {}).get('city'),
+        'sublocality': None,
+        'city': None,
+        'country': None,
+        'timezone': None
     }
 
+    for component in location.raw.get('address_components', []):
+        if 'sublocality' in component.get('types', []):
+            location_data['sublocality'] = component['long_name']
+        if 'locality' in component.get('types', []):
+            location_data['city'] = component['long_name']
+        if 'country' in component.get('types', []):
+            location_data['country'] = component['long_name']
+    
+    # Determine the timezone based on coordinates
+    tf = timezonefinder.TimezoneFinder()
+    location_data['timezone'] = tf.timezone_at(lng=longitude, lat=latitude)
+    
     return location_data
+
+
+'''
+function to format JS generated coordinates
+'''
+def format_coordinates(raw_coordinates):
+    # Extract latitude and longitude
+    try:
+        parts = raw_coordinates.split(',')
+        if len(parts) >= 2:
+            latitude = float(parts[0].replace('Lat: ', '').strip())
+            longitude = float(parts[1].replace('Lng: ', '').strip())
+        else:
+            raise ValueError("Invalid coordinates format")
+    except ValueError as e:
+        print(f'Error parsing coordinates: {e}')
+        nearest_town, country = None, None
+        return None  # Handle the error by returning None
+
+    return (latitude, longitude)
+
+
+'''
+Function to generate user's current location:
+ town,city and country
+'''
+def get_location_data(coordinates):
+    clean_coordinates = format_coordinates(coordinates)
+    location_data = reverse_geocode(clean_coordinates)
+    if location_data:
+        sublocality = location_data.get('sublocality')
+        city = location_data.get('city')
+
+        nearest_town = f"{sublocality}, {city}" if sublocality and city else city
+
+        country = location_data.get('country')
+    else:
+        nearest_town, country = None, None
+
+    return nearest_town, country
 
 
 
