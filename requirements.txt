@@ -28,7 +28,7 @@ idna==3.4
 iso4217==1.11.20220401
 kombu==5.3.2
 lxml==4.9.3
-numpy==1.26.1
+numpy==1.24.4
 oscrypto==1.3.0
 packaging==23.1
 Pillow==10.0.0
