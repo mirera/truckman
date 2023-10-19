@@ -16,7 +16,8 @@ from .models import (
     Payment,
     Expense_Category,
     Expense,
-    Reminder
+    Reminder,
+    DailyRegister
 )
 
 
@@ -67,7 +68,7 @@ class VehicleForm(forms.ModelForm):
         exclude =['company']
 
         widgets = {
-                'owner': forms.Select(attrs={'class': 'form-select js-select2'}),
+                'owner': forms.Select(attrs={'class': 'form-select js-select2', 'id':'vehicleOwnerSelect'}),
                 'plate_number': forms.TextInput(attrs={'class': 'form-control', 'placeholder':'Registration number'}),
                 'trailer_number': forms.TextInput(attrs={'class': 'form-control', 'placeholder':'Trailer number'}),
                 'truck_vin': forms.TextInput(attrs={'class': 'form-control', 'placeholder':'1KZ-345678'}),
@@ -253,7 +254,6 @@ class TripForm(forms.ModelForm):
         company = kwargs.pop('company')# Get the company from kwargs
         super(TripForm, self).__init__(*args, **kwargs)
         self.fields['load'].queryset = Load.objects.filter(company=company) 
-        self.fields['vehicle'].queryset = Vehicle.objects.filter(company=company, is_assigned_driver=True)
     
     class Meta:
         model = Trip
@@ -262,8 +262,7 @@ class TripForm(forms.ModelForm):
 
         widgets = {
                 'load': forms.Select(attrs={'class': 'form-select js-select2', 'id':'load'}),
-                'vehicle': forms.Select(attrs={'class': 'form-select js-select2','id':'vehicle'}),
-                'vehicle_odemeter': forms.NumberInput(attrs={'class': 'form-control', 'placeholder':'67800'}),
+                #'vehicle_odemeter': forms.NumberInput(attrs={'class': 'form-control', 'placeholder':'67800'}),
                 'driver_milage': forms.NumberInput(attrs={'class': 'form-control', 'placeholder':'67800'}),
                 'driver_accesory_pay': forms.NumberInput(attrs={'class': 'form-control', 'placeholder':'67800'}),
                 'driver_advance': forms.NumberInput(attrs={'class': 'form-control', 'placeholder':'600'}), 
@@ -430,7 +429,21 @@ class ReminderForm(forms.ModelForm):
                 
             }    
 
+#---------------------------------- Daily Register forms --------------------------------------
+
+class DailyRegisterForm(forms.ModelForm):
+     
+    class Meta:
+        model = DailyRegister
+        fields = ['vehicle_status', 'reason_parked', 'trip']
+        exclude =['company']
+
+        widgets = {
+                'vehicle_status': forms.Select(attrs={'class': 'form-select js-select2', 'id':'vehicleStatusSelect'}),
+                'reason_parked': forms.Select(attrs={'class': 'form-select js-select2', 'id':'reasonParkedSelect'}),
+                'trip': forms.Select(attrs={'class': 'form-select js-select2', 'id':'selectedTrip'}),
+                
+            }    
+
 #---------------------------------- Reminder forms --------------------------------------
-
-
 

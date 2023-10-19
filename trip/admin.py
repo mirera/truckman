@@ -17,7 +17,12 @@ from .models import (
     Reminder,
     Load, 
     Vehicle_Owner,
-    Route
+    Route,
+    LoadingList,
+    LoadingListItem,
+    BorderStop,
+    StopPoint,
+    DailyRegister
 )
 
 # Register your models here.
@@ -39,3 +44,8 @@ admin.site.register(Reminder)
 admin.site.register(Load)
 admin.site.register(Vehicle_Owner)
 admin.site.register(Route)
+admin.site.register(LoadingList)
+admin.site.register(LoadingListItem)
+admin.site.register(BorderStop)
+admin.site.register(StopPoint)
+admin.site.register(DailyRegister)

@@ -114,6 +114,17 @@
                                                     </div>
                                                     
                                                 </div><!-- .profile-ud-list -->
+                                                <div class="profile-ud-list">
+                                                    <div class="profile-ud-item">
+                                                        <div class="profile-ud wider">
+                                                            <span class="profile-ud-label">Assigned Vehicles</span>
+                                                            {% for vehicle in load.assigned_trucks.all %}
+                                                            <span class="profile-ud-value"><a href="{% url 'view_vehicle' vehicle.id %}">{{ vehicle.plate_number }}</a></span>
+                                                            {% endfor %}
+                                                        </div>
+                                                    </div>
+                                                    
+                                                </div><!-- .profile-ud-list -->
                                             </div><!-- .nk-block -->
                                             
                                         </div><!-- tab pane -->

@@ -4,6 +4,12 @@ from . import views
 
 urlpatterns = [
 
+    #partner/vehicle owner urls
+    path('add_partner', views.add_partner, name='add_partner'),
+    path('list_partners', views.list_partners, name='list_partners'),
+    path('update_partner/<str:pk>', views.update_partner, name='update_partner'),
+    path('remove_partner/<str:pk>', views.remove_partner, name='remove_partner'),
+
     #vehicle make urls
     path('add_vehicle_make', views.add_vehicle_make, name='add_vehicle_make'),
     
@@ -69,6 +75,16 @@ urlpatterns = [
     path('view_load/<str:pk>', views.view_load, name='view_load'),
     path('list_loads', views.list_loads, name='list_loads'),
     path('load_export_to_csv', views.load_export_to_csv, name='load_export_to_csv'),
+    path('assign_load_trucks/<str:pk>', views.assign_load_trucks, name='assign_load_trucks'),
+    #--ends
+
+    #load urls
+    path('add_route', views.add_route, name='add_route'),
+    path('update_route/<str:pk>', views.update_route, name='update_route'),
+    path('remove_route/<str:pk>', views.remove_route, name='remove_route'),
+    #path('view_load/<str:pk>', views.view_load, name='view_load'),
+    path('list_routes', views.list_routes, name='list_routes'),
+    #path('load_export_to_csv', views.load_export_to_csv, name='load_export_to_csv'),
     #--ends
 
     #trip urls
@@ -112,7 +128,7 @@ urlpatterns = [
     #--ends
 
     #invoice urls
-    path('add_invoice', views.add_invoice, name='add_invoice'),
+    #path('add_invoice', views.add_invoice, name='add_invoice'),
     path('update_invoice/<str:pk>', views.update_invoice, name='update_invoice'),
     path('remove_invoice/<str:pk>', views.remove_invoice, name='remove_invoice'),
     path('view_invoice/<str:pk>', views.view_invoice, name='view_invoice'),
@@ -131,9 +147,11 @@ urlpatterns = [
     path('list_estimates', views.list_estimates, name='list_estimates'),
 
     path('send_estimate/<str:pk>', views.send_estimate, name='send_estimate'),
-    path('estimate_negotiate/<str:estimate_id>', views.view_estimate_negotiate_mode, name='view_estimate_negotiate_mode'),
+    path('estimate_negotiate/<str:pk>', views.view_estimate_negotiate_mode, name='view_estimate_negotiate_mode'),
     path('accept_estimate/<str:pk>', views.accept_estimate, name='accept_estimate'),
     path('decline_estimate/<str:pk>', views.decline_estimate, name='decline_estimate'),
+    path('generate_associated_invoice/<str:pk>', views.generate_associated_invoice, name='generate_associated_invoice'),
+    #path('generate_associated_invoice/<str:pk>', views.generate_associated_invoice, name='generate_associated_invoice'),
     #--ends
 
     #reminder urls
@@ -148,4 +166,9 @@ urlpatterns = [
     path('get_load_info/<str:load_id>/', views.get_load_info, name='get_load_info'),
     path('get_estimate_info/<str:estimate_id>/', views.get_estimate_info, name='get_estimate_info'),
 
+    #-- register entry urls
+    path('add_register_entry/<str:pk>/', views.add_register_entry, name='add_register_entry'),
+
+    #-- reports 
+    path('trip_daily_register_report', views.trip_daily_register_report, name='trip_daily_register_report'),
 ]

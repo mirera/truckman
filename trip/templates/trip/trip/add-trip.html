@@ -14,7 +14,7 @@
     <div class="container-fluid">
         <div class="nk-content-inner">
             <div class="nk-content-body">
-                <div class="nk-block-head nk-block-head-sm">
+                <div class="nk-block-head nk-block-head-sm"> 
                     <div class="nk-block-between">
                         <div class="nk-block-head-content">
                             <h3 class="nk-block-title page-title">Add Trip</h3>
@@ -86,91 +86,15 @@
                                                     </div>
                                                 </div>
                                             </div><!--col-->
-                                        </div><!--row-->
-                                    </div>
-                                </div><!-- .card-inner -->
-                                <div class="card-inner">
-                                    <div class="nk-block-head">
-                                        <div class="nk-block-head-content">
-                                            <h5 class="title nk-block-title">Truck:</h5>
-                                            <p>Trip truck information. </p>
-                                        </div>
-                                    </div>
-                                    <div class="nk-block">
-                                        <div class="row gy-4">
-                                            <div class="col-xxl-3 col-md-4">
-                                                <div class="form-group">
-                                                    <label class="form-label">Truck</label>
-                                                    <div class="form-control-wrap">
-                                                        {{ form.vehicle }}
-                                                    </div>
-                                                </div>
-                                            </div><!--col-->
-                                            <div class="col-xxl-3 col-md-4">
-                                                <div class="form-group">
-                                                    <label class="form-label">Trailer Number</label>
-                                                    <input type="text" name="trailer" class="form-control" id="trailer" value ="{{ trip.load.vehicle.trailer_number }}" readonly>
-                                                </div>
-                                            </div><!--col-->
-                                            <div class="col-xxl-3 col-md-4">
-                                                <div class="form-group">
-                                                    <label class="form-label">Odemeter</label>
-                                                    {{form.vehicle_odemeter}}
-                                                </div>
-                                            </div><!--col-->
-                                            
-                                        </div><!--row-->
-                                    </div>
-                                </div><!-- .card-inner -->
-                                <div class="card-inner">
-                                    <div class="nk-block-head">
-                                        <div class="nk-block-head-content">
-                                            <h5 class="title nk-block-title">Driver: </h5>
-                                            <p>Trip driver details. </p>
-                                        </div>
-                                    </div>
-                                    <div class="nk-block">
-                                        <div class="row gy-4">
-                                            <div class="col-xxl-3 col-md-4">
-                                                <div class="form-group">
-                                                    <label class="form-label" for="full-name">Driver </label>
-                                                    <div class="form-control-wrap">
-                                                        <input type="text" name="driver" class="form-control" id="driver" value ="{{ trip.load.vehicle.driver.first_name }} {{ trip.load.vehicle.driver.last_name }}" readonly>
-                                                    </div>
-                                                </div>
-                                            </div><!--col-->
-                                            <div class="col-xxl-3 col-md-4">
-                                                <div class="form-group">
-                                                    <label class="form-label" for="full-name">Driver Milage</label>
-                                                    <div class="form-control-wrap">
-                                                        {{form.driver_milage}}
-                                                    </div>
-                                                </div>
-                                            </div><!--col-->
-                                            <div class="col-xxl-3 col-md-4">
-                                                <div class="form-group">
-                                                    <label class="form-label" for="phone-no">Driver Accessory Pay</label>
-                                                    <div class="form-control-wrap">
-                                                        {{form.driver_accesory_pay}}
-                                                    </div>
-                                                </div>
-                                            </div><!--col-->
-                                            <div class="col-xxl-3 col-md-4">
-                                                <div class="form-group">
-                                                    <label class="form-label" for="phone-no">Driver Advance Pay</label>
-                                                    <div class="form-control-wrap">
-                                                        {{form.driver_advance}}
-                                                    </div>
-                                                </div>
-                                            </div><!--col-->
                                             <div class="col-12">
                                                 <div class="form-group">
-                                                    <button type="submit" class="btn btn-primary">Add Trip</button>
+                                                    <button type="submit" class="btn btn-primary">Submit</button>
                                                 </div>
                                             </div><!--col-->
                                         </div><!--row-->
                                     </div>
                                 </div><!-- .card-inner -->
+                                
                                 
                             </form>
                         </div>
@@ -186,30 +110,6 @@
 
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
-
-<!-- get vehicle and driver details on choosing a trip -->
-<script>
-    $(document).ready(function () {
-        // Get references to the input fields and select field
-        var vehicleSelect = $("#vehicle");
-        var vehicleInput = $("#vehicle");
-        var trailerInput = $("#trailer");
-        var driverInput = $("#driver");
-
-        // Add an event listener to the "Vehicle" select field
-        vehicleSelect.on("change", function () {
-            // Get the selected vehicle ID
-            var vehicleId = $(this).val();
-
-            // Send a GET request to fetch vehicle and customer information
-            $.get("/trip/get_vehicle_info/" + vehicleId, function (data) {
-                // Update the vehicle and customer input fields with the fetched data
-                trailerInput.val(data.trailer);
-                driverInput.val(data.driver);
-            });
-        });
-    });
-</script>
 
 <!-- get load details -->
 <script>

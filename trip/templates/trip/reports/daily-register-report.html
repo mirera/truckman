@@ -1,0 +1,193 @@
+{% extends 'base.html' %}  
+
+{% block content %}
+<!-- content @s -->
+{% if messages %}
+{% for message in messages %}
+    <div class="alert {% if message.tags == 'error' %}alert-danger{% elif message.tags == 'success' %}alert-success{% else %}alert-primary{% endif %}">
+        {{ message }}
+    </div>
+{% endfor %}
+{% endif %}
+
+{% load tz %}
+<div class="nk-content ">
+    <div class="container-fluid">
+        <div class="nk-content-inner">
+            <div class="nk-content-body">
+                <div class="nk-block-head nk-block-head-sm">
+                    <div class="nk-block-between">
+                        <div class="nk-block-head-content">
+                            <h3 class="nk-block-title page-title">Trip Daily Register Report</h3>
+                            <div class="nk-block-des text-soft">
+                                <p>This is the daily register for a trip .</p>
+                            </div>
+                        </div><!-- .nk-block-head-content -->
+                    </div><!-- .nk-block-between -->
+                </div><!-- .nk-block-head -->
+                <div class="nk-block">
+                    <div class="card card-bordered">
+                        <div class="card-inner-group">
+                            <form action="" method="POST" enctype="multipart/form-data" id="registerForm">
+                                <div class="card-inner">
+                                    <div class="nk-block-head">
+                                        <div class="nk-block-head-content">
+                                            <h5 class="title nk-block-title">Elapsed Days</h5>
+                                        </div>
+                                    </div>
+                                    <div class="nk-block">
+                                        <div class="row gy-4">
+                                            <div class="col-12">
+                                                <div class="btn-group" aria-label="Basic example"> 
+                                                    {% for day_number in day_numbers %}
+                                                        <a data-bs-toggle="modal" href="#dayReport" class="btn btn-primary btn-dim day-button" data-day="{{ day_number }}" data-trip-id="{{ trip.id }}">Day {{ day_number }}</a>
+                                                    {% endfor %}
+                                                  </div>
+                                            </div><!--col-->
+                                        </div><!--row-->
+                                    </div>
+                                </div><!-- .card-inner-group -->
+                            </form>
+                        </div>
+                    </div><!-- .card -->
+                </div><!-- .nk-block -->
+            </div>
+        </div>
+    </div>
+</div>
+<!-- content @e -->
+
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+<!-- report modal -->
+
+<div class="modal fade" tabindex="-1" id="dayReport">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <a href="#" class="close" data-dismiss="modal" aria-label="Close">
+                <em class="icon ni ni-cross"></em>
+            </a>
+            <div class="modal-header">
+                <h5 class="modal-title">Day Entries</h5>
+            </div>
+            <div class="nk-block nk-block-lg">
+                <table class="table">
+                    <thead class="table-light">
+                      <tr>
+                        <th scope="col">#</th>
+                        <th scope="col">Morning</th>
+                        <th scope="col">Midday</th>
+                        <th scope="col">Evening</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr>
+                        <th scope="row">Submission Time:</th>
+                        <td id="morning-submission-time">{% timezone request.session.user_timezone  %} {% endtimezone %}</td>
+                        <td id="midday-submission-time"></td>
+                        <td id="evening-submission-time"></td>
+                      </tr>
+                      <tr>
+                        <th scope="row">Location:</th>
+                        <td id="morning-location"></td>
+                        <td id="midday-location"></td>
+                        <td id="evening-location"></td>
+                      </tr>
+                      <tr>
+                        <th scope="row">Odometer Reading:</th>
+                        <td id="morning-odometer-reading"></td>
+                        <td id="midday-odometer-reading"></td>
+                        <td id="evening-odometer-reading"></td>
+                      </tr>
+                    </tbody>
+                </table>
+            </div><!-- nk-block -->
+            <div class="modal-footer bg-light">
+                <span class="sub-text">Driver: <span id="driver"></span></span>
+                <span class="sub-text">Distance covered: <span id="distance-covered"></span></span> <br>
+                <span class="sub-text">Sleeping location: <span id="sleeping-location"></span></span> <br>
+                <span class="sub-text">Trip Status: <span id="trip-status"></span></span> <br>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<script>
+    $(document).on('click', '.day-button', function() {
+    var dayNumber = $(this).data('day');
+    var tripId = $(this).data('trip-id');
+
+    // Get the current base URL of the website
+    var baseUrl = window.location.origin;
+
+    // Construct the API URL based on the base URL
+    var apiUrl = baseUrl + '/api/get_entries_for_day/' + tripId + '/' + dayNumber ;
+
+    // Make an AJAX request to fetch data for the selected day
+    $.ajax({
+        url: apiUrl,
+        type: 'GET',
+        success: function(data) {
+            // The data returned from the server should have a 'drivers' array.
+            if (data.drivers.length > 0) {
+                var driverData = data.drivers[0]; // Assuming you're interested in the first driver
+
+                var morningData = driverData.morning_entry;
+                var middayData = driverData.midday_entry;
+                var eveningData = driverData.evening_entry;
+
+                var distanceCovered = driverData.distance_covered;
+                var sleepingLocation = driverData.sleeping_location;
+                var tripStatus = driverData.trip_status;
+                
+                
+                if (morningData) {
+                        $('#morning-submission-time').text(driverData.sub_time);
+                        $('#morning-location').text(morningData.morning_location);
+                        $('#morning-odometer-reading').text(morningData.morning_odemeter_reading);
+                    } else {
+                        $('#morning-submission-time').text('N/A');
+                        $('#morning-location').text('N/A');
+                        $('#morning-odometer-reading').text('N/A');
+                    }
+
+                if (middayData) {
+                    $('#midday-submission-time').text(driverData.mid_sub_time);
+                    $('#midday-location').text(middayData.midday_location);
+                    $('#midday-odometer-reading').text(middayData.midday_odemeter_reading);
+                    } else {
+                        $('#midday-submission-time').text('N/A');
+                        $('#midday-location').text('N/A');
+                        $('#midday-odometer-reading').text('N/A');
+                    }
+
+                if (eveningData) {
+                    $('#evening-submission-time').text(driverData.evening_sub_time);
+                    $('#evening-location').text(eveningData.evening_location);
+                    $('#evening-odometer-reading').text(eveningData.evening_odometer_reading);
+                    } else {
+                        $('#evening-submission-time').text('N/A');
+                        $('#evening-location').text('N/A');
+                        $('#evening-odometer-reading').text('N/A');
+                    }
+
+                $('#distance-covered').text(distanceCovered ? distanceCovered + ' km' : 'N/A');
+                $('#sleeping-location').text(sleepingLocation || 'N/A');
+                $('#trip-status').text(tripStatus || 'N/A');
+                $('#driver').text(driverData.driver_name || 'N/A');
+
+                // Show the modal
+                $('#dayReport').modal('show');
+            }
+        },
+        error: function() {
+            // Handle errors if the request fails
+        }
+    });
+});
+</script>
+    
+    
+{% endblock %}

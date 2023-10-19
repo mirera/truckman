@@ -1,4 +1,6 @@
 from django.conf import settings
+import requests
+import json
 from django.core.mail import EmailMessage
 from django.template.loader import render_to_string 
 import pytz
@@ -8,9 +10,47 @@ from reportlab.pdfgen import canvas
 from django.utils.timezone import localtime
 import csv
 from django.http import HttpResponse
+from pathlib import Path
+from cryptography.fernet import Fernet
+import base64
+import dotenv
+import os
+from django.utils import timezone
+from datetime import timedelta
+import uuid
+from pyshorteners import Shortener
+from geopy.geocoders import GoogleV3
+from pprint import pprint
+import timezonefinder
+
 
 #utilies functions
+ # Build paths inside the project like this: BASE_DIR / 'subdir'.
+BASE_DIR = Path(__file__).resolve().parent.parent
+
+# Load environment variables from .env file
+dotenv_file = os.path.join(BASE_DIR, ".env")
+if os.path.isfile(dotenv_file):
+    dotenv.load_dotenv(dotenv_file)
+
+ENCRYPTION_KEY = os.environ.get('ENCRYPTION_KEY')  
  
+
+#encrypt secret
+def encrypt_secret(secret):
+    f = Fernet(ENCRYPTION_KEY.encode('utf-8')) #utf-8 encode encryption key
+    encrypted_secret = f.encrypt(secret.encode('utf-8')) #encrypt secret
+    encrypted_secret_str = base64.b64encode(encrypted_secret).decode('utf-8') #encode to base64 and decode utf-8
+    return encrypted_secret_str
+# -- ends
+
+# decrypt secret
+def decrypt_secret(encrypted_secret_str):
+    f = Fernet(ENCRYPTION_KEY.encode('utf-8'))
+    encrypted_secret = base64.b64decode(encrypted_secret_str.encode('utf-8'))
+    decrypted_secret = f.decrypt(encrypted_secret).decode('utf-8')
+    return decrypted_secret
+# -- ends
 
 #get request user company
 def get_user_company(request):
@@ -34,6 +74,48 @@ def send_email(context, template_path, from_name, from_email, subject, recipient
     )
     e_mail.send(fail_silently=False)
 #--end
+
+#sms
+def send_sms(sender_id, token, phone_no, message):
+    #if is loginit mdeni sending the sms 
+    #the token is not encrypted and stored on db instead 
+    #its on the env variables
+
+    if sender_id == 'JEKII_CPTL': #later change to Loginit or Mdeni sender id
+        token_decrypted = settings.SMS_API_TOKEN
+    else:
+        token_decrypted = decrypt_secret(token)
+
+    url = 'https://erraniumsms.com/api/v3/sms/send' 
+    headers = {
+        'Authorization': f'Bearer {token_decrypted}',
+        'Content-Type': 'application/json',
+        'Accept': 'application/json'
+    }
+    data = {
+        'recipient': phone_no,
+        'sender_id': sender_id,
+        'type': 'plain',
+        'message': message
+    }
+    response = requests.post(url, headers=headers, data=json.dumps(data))
+    # check the status code of the response
+    if response.status_code == 200:
+        # parse the JSON data from the response
+        json_data = response.json()
+        
+        # check the status field in the JSON data
+        if json_data['status'] == 'success':
+            return True, json_data['data']
+        else:
+            error_msg = json_data['message']
+            return False, error_msg
+    else:
+        response_data = response.json()
+        message = response_data['message']
+        error_msg = f"Request failed with status code {response.status_code} and this message {message} "
+        return False, error_msg
+#-- end
 
 #pdf invoice generator
 def generate_invoice_pdf(trip):
@@ -149,8 +231,117 @@ def export_model_data(request, MyModel, header):
         csv_writer.writerow(data_row)
 
     return response
-
 #ends
+
+'''
+This function generate a short , with expire time, url
+'''
+def shorten_url(url, expiration_hours=24):
+       # Generate a unique token for the shortened URL
+       token = str(uuid.uuid4())[:8]
+
+       # Get the current time
+       current_time = timezone.now()
+
+       # Calculate the expiration time
+       expiration_time = current_time + timedelta(hours=expiration_hours)
+
+       # Create a short URL
+       s = Shortener()
+       shortened_url = s.tinyurl.short(url)
+       shortened_url = s.tinyurl.short(f"{url}?token={token}&expires={expiration_time}")
+
+
+       return shortened_url
+#--ends
+
+'''
+This sends requests to the Google Geocoding API
+to convert addresses to coordinates (geocoding)
+'''
+def geocode_address(address):
+    geolocator = GoogleV3(api_key=settings.GOOGLE_MAPS_API_KEY)
+    location = geolocator.geocode(address)
+    if location:
+        return location.latitude, location.longitude
+    else:
+        return None
+
+'''
+A function for reverse geocoding (converting coordinates
+ to human-readable addresses) It returns a dictionary of
+ country and town(the town can be city if town data is
+ missing) 
+'''
+
+
+def reverse_geocode(coordinates):
+    latitude, longitude = coordinates
+    geolocator = GoogleV3(api_key=settings.GOOGLE_MAPS_API_KEY)
+    location = geolocator.reverse((latitude, longitude), exactly_one=True)
+
+    location_data = {
+        'sublocality': None,
+        'city': None,
+        'country': None,
+        'timezone': None
+    }
+
+    for component in location.raw.get('address_components', []):
+        if 'sublocality' in component.get('types', []):
+            location_data['sublocality'] = component['long_name']
+        if 'locality' in component.get('types', []):
+            location_data['city'] = component['long_name']
+        if 'country' in component.get('types', []):
+            location_data['country'] = component['long_name']
+    
+    # Determine the timezone based on coordinates
+    tf = timezonefinder.TimezoneFinder()
+    location_data['timezone'] = tf.timezone_at(lng=longitude, lat=latitude)
+    
+    return location_data
+
+
+'''
+function to format JS generated coordinates
+'''
+def format_coordinates(raw_coordinates):
+    # Extract latitude and longitude
+    try:
+        parts = raw_coordinates.split(',')
+        if len(parts) >= 2:
+            latitude = float(parts[0].replace('Lat: ', '').strip())
+            longitude = float(parts[1].replace('Lng: ', '').strip())
+        else:
+            raise ValueError("Invalid coordinates format")
+    except ValueError as e:
+        print(f'Error parsing coordinates: {e}')
+        nearest_town, country = None, None
+        return None  # Handle the error by returning None
+
+    return (latitude, longitude)
+
+
+'''
+Function to generate user's current location:
+ town,city and country
+'''
+def get_location_data(coordinates):
+    clean_coordinates = format_coordinates(coordinates)
+    location_data = reverse_geocode(clean_coordinates)
+    if location_data:
+        sublocality = location_data.get('sublocality')
+        city = location_data.get('city')
+
+        nearest_town = f"{sublocality}, {city}" if sublocality and city else city
+
+        country = location_data.get('country')
+    else:
+        nearest_town, country = None, None
+
+    return nearest_town, country
+
+
 
 phone_codes = [
     ('+93', 'AF +93'),

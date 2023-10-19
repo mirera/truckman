@@ -46,6 +46,9 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
 
+    'django.contrib.sites',
+    'api',
+
     'truckman',
     'authentication',
     'trip',
@@ -172,4 +175,14 @@ EMAIL_HOST_USER = 'mirera.moses@gmail.com'
 EMAIL_HOST_PASSWORD = 'ehwvqcdfvydltqka'
 EMAIL_USE_TLS = True
 
+
+SMS_SENDER_ID = os.environ['SMS_SENDER_ID'] 
+SMS_API_TOKEN = os.environ['SMS_API_TOKEN'] 
+GOOGLE_MAPS_API_KEY = os.environ['GOOGLE_MAPS_API_KEY'] 
+
+SITE_ID = 1
+
+PRODUCTION_DOMAIN = 'http://truckman.loginit.co.ke/'
+
+DEVELOPMENT_DOMAIN = 'http://127.0.0.1:8000/'
 

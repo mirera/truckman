@@ -1,0 +1,86 @@
+{% extends 'base.html' %}  
+
+{% block content %}
+<!-- content @s -->
+{% if messages %}
+{% for message in messages %}
+    <div class="alert {% if message.tags == 'error' %}alert-danger{% elif message.tags == 'success' %}alert-success{% else %}alert-primary{% endif %}">
+        {{ message }}
+    </div>
+{% endfor %}
+{% endif %}
+<div class="nk-content ">
+    <div class="container-fluid">
+        <div class="nk-content-inner">
+            <div class="nk-content-body">
+                <div class="nk-block-head nk-block-head-sm">
+                    <div class="nk-block-between">
+                        <div class="nk-block-head-content">
+                            <h3 class="nk-block-title page-title">Trip Daily Register Reports</h3>
+                            <div class="nk-block-des text-soft">
+                                <p>This is the daily register for a trip .</p>
+                            </div>
+                        </div><!-- .nk-block-head-content -->
+                    </div><!-- .nk-block-between -->
+                </div><!-- .nk-block-head -->
+                <div class="nk-block">
+                    <div class="card card-bordered">
+                        <div class="card-inner-group">
+                            <form action="{% url 'trip_daily_register_report' %}" method="POST" enctype="multipart/form-data" id="tripReportForm">
+                                {% csrf_token %}
+                                <div class="card-inner">
+                                    <div class="nk-block-head">
+                                        <div class="nk-block-head-content">
+                                            <h5 class="title nk-block-title">Select a Trip</h5>
+                                        </div>
+                                    </div>
+                                    <div class="nk-block">
+                                        <div class="row gy-4">
+                                            <div class="col-12">
+                                                <div class="form-group">
+                                                    <label class="form-label">Trip</label>
+                                                    <div class="form-control-wrap">
+                                                        {{ form.trip }} 
+                                                    </div>
+                                                </div>
+                                            </div><!--col-->
+                                            <div class="col-12">
+                                                <div class="form-group">
+                                                    <button type="submit" class="btn btn-primary" id="submitButton" >Submit</button>
+                                                </div>
+                                            </div><!--col-->
+                                        </div><!--row-->
+                                    </div>
+                                </div><!-- .card-inner-group -->
+                            </form>
+                        </div>
+                    </div><!-- .card -->
+                </div><!-- .nk-block -->
+            </div>
+        </div>
+    </div>
+</div>
+<!-- content @e -->
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+<!-- script to make ajax get request to server to source for 
+    daily register entries for 
+-->
+<script>
+// add event listener on the selectedTrip id
+// store the value in variable selectedTrip
+// get the trip id
+// make ajax get request and get trip daily register data if any
+//increase the buttons based on the number of days since the trip started
+</script>
+
+<!-- script to launch each day report modal-->
+<script>
+    //have envent listenr on each available button
+    //upon clicking , launch a modal the modal has 
+    // submission time, location and odemeter recording of the day so far
+</script>
+
+{% endblock content %} 
+

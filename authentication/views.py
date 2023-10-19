@@ -6,7 +6,7 @@ from django.contrib.auth.tokens import PasswordResetTokenGenerator
 from django.conf import settings
 from django.urls import reverse
 from django.contrib import messages
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.models import Permission
 from .forms import CustomUserCreationForm, StaffForm, RoleForm, ClientForm
 from .models import Client, CustomUser, Role, Preference
@@ -224,7 +224,7 @@ def add_role(request):
 @login_required(login_url='login')
 @permission_required('authentication.change_role')
 def update_role(request, pk):
-    role = Role.objects.get(id=pk)
+    role = get_object_or_404(Role, id=pk)
     if request.method == 'POST':
         company = get_user_company(request)
 
@@ -281,8 +281,7 @@ def list_roles(request):
 @login_required(login_url='login')
 @permission_required('authentication.delete_role')
 def remove_role(request, pk):
-    company = get_user_company(request) 
-    role = Role.objects.get(id=pk, company=company)    
+    role = get_object_or_404(Role, id=pk)    
     if request.method == 'POST':
         if '-admin' in role.name:
             messages.error(request, "Cannot delete the default role.")
@@ -292,8 +291,6 @@ def remove_role(request, pk):
             messages.success(request, 'Role deleted successfully!')
             return redirect('list_roles') 
 
-    #context = {'role': role}
-    #return render(request, 'authentication/role/roles-list.html', context)
     return redirect('list_roles')
 
 #----------------- Staff Views ---------------------------
@@ -306,7 +303,8 @@ def add_staff(request):
     if request.method == 'POST':
 
         role_id = request.POST.get('role')
-        role = Role.objects.get(company=company, id=role_id)
+        #role = Role.objects.get(company=company, id=role_id)
+        role = get_object_or_404(Role, id=role_id)
 
         #retrieve all permissions assigned to a role
         permissions = role.permissions.all() 
@@ -338,7 +336,7 @@ def add_staff(request):
             'company_name':staff.company.name,
             'role':staff.role.name
             }
-        preference = Preference.objects.get(company=company)
+        preference = get_object_or_404(Preference, company=company)
         send_email_task.delay(
                 context=context,
                 template_path='authentication/user/staff-welcome.html',
@@ -428,8 +426,7 @@ def list_staffs(request):
 @login_required(login_url='login')
 @permission_required('authentication.view_customuser')
 def view_staff(request, pk):
-    company = get_user_company(request)
-    staff = CustomUser.objects.get(id=pk, company=company)
+    staff = get_object_or_404(CustomUser, id=pk)
     context = {
         'staff':staff,
     }

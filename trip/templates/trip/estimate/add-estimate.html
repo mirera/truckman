@@ -67,7 +67,7 @@
                                 <div class="nk-block">
                                     <div class="row gy-4">
                                         <div class="col-xxl-3 col-md-4">
-                                            <a href="#" id="addItem" class="btn btn-sm btn-outline-primary addItem"><span>Add Item</span></a>
+                                            <a href="#" id="addItem" class="btn btn-sm btn-outline-primary"><span>Add Item</span></a>
                                         </div>
                                     </div>
                                 </div>
@@ -83,7 +83,7 @@
                                         </div><!--col-->
                                         <div class="col-xxl-2 col-md-2">
                                             <div class="form-group">
-                                                <label class="form-label" for="quantity">Route</label>
+                                                <label class="form-label"> Route</label><a data-bs-toggle="modal" href="#addRoute" class="btn btn-sm btn-outline-primary"><span>Add</span></a>
                                                 <!--<input type="text" name="quantity" class="form-control" id="quantity" value="" > -->
                                                 {{ form.route }}
                                             </div>
@@ -145,19 +145,6 @@
                                     </div><!--row-->
                                 </div>
                             </div>
-                            <!--
-                            <div class="card-inner">
-                                <div class="nk-block">
-                                    <div class="row gy-4">
-                                        <div class="col-xxl-3 col-md-6">
-                                            <div class="form-group">
-                                                <label class="form-label" for="description">Description</label>
-                                                {{ form.description }}
-                                            </div>
-                                        </div><!--col--
-                                    </div>
-                                </div>
-                            </div> -->
                             <div class="card-inner">
                                 <div class="nk-block">
                                     <div class="row gy-4">
@@ -305,6 +292,79 @@
     </div><!-- .modal-dialog -->
 </div><!-- .modal -->
 
+<!-- Add Route modal-->
+<div class="modal fade" tabindex="-1" role="dialog" id="addRoute">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <a href="#" class="close" data-bs-dismiss="modal"><em class="icon ni ni-cross-sm"></em></a>
+            <div class="modal-body modal-body-md">
+                <h5 class="modal-title">Add Route</h5>
+                <form action="{% url 'add_route' %}" class="mt-4" method="POST" id="addRouteForm">
+                    {% csrf_token %}
+                    <div class="row g-gs">
+                        <div class="col-xxl-3 col-md-4">
+                            <div class="form-group">
+                                <label class="form-label" for="name"> Name</label>
+                                <input type="text" name="name" class="form-control" id="name" placeholder="Registration Number" required>
+                            </div>
+                        </div><!--col-->
+                        <div class="col-xxl-3 col-md-4">
+                            <div class="form-group">
+                                <label class="form-label" for="name"> Start Point</label>
+                                <input type="text" name="start_point" class="form-control" id="start_point" placeholder="Dar" required>
+                            </div>
+                        </div><!--col-->
+                        <div class="col-xxl-3 col-md-4">
+                            <div class="form-group">
+                                <label class="form-label" for="name"> End Point</label>
+                                <input type="text" name="end_point" class="form-control" id="end_point" placeholder="Mombasa" required>
+                            </div>
+                        </div><!--col-->
+                        <div class="col-xxl-3 col-md-4">
+                            <div class="form-group">
+                                <label class="form-label" for="name"> Distance </label>
+                                <input type="number" name="distance" class="form-control" id="distance" placeholder="3000" >
+                            </div>
+                        </div><!--col-->
+                        
+                        <div class="col-xxl-3 col-md-4">
+                            <div class="form-group">
+                                <label class="form-label" for="border_stops"> Border Stops </label>
+                                <select name="border_stops" class="form-control" id="border_stops" multiple>
+                                    {% for border_stop in border_points %}
+                                    <option value="{{ border_stop.id }}">{{ border_stop.name }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </div><!--col-->
+                        <div class="col-xxl-3 col-md-4">
+                            <div class="form-group">
+                                <label class="form-label" for="stop_points"> Stop Points </label>
+                                <select name="stop_points" class="form-control" id="stop_points" multiple>
+                                    {% for stop_point in stop_points %}
+                                    <option value="{{ stop_point.id }}">{{ stop_point.name }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </div><!--col-->
+                        <div class="col-12">
+                            <div class="form-group">
+                                <label class="form-label" for="name"> Description </label>
+                                <input type="text" name="description" class="form-control" id="description" placeholder="Say something about the route.." >
+                            </div>
+                        </div><!--col-->
+                        <div class="col-12">
+                            <div class="form-group">
+                                <button type="submit" class="btn btn-primary">Add Route</button>
+                            </div>
+                        </div><!--col-->
+                    </div>
+                </form>
+            </div><!-- .modal-body -->
+        </div><!-- .modal-content -->
+    </div><!-- .modal-dialog -->
+</div><!-- .modal -->
+
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
 <!-- click on add item to clone item section-->
@@ -316,19 +376,20 @@
         // Function to add a new item block
         function addNewItem() {
             const newItem = $('.third-card-inner:first').clone();
+            console.log('I got here');
             
             // Increment IDs within the cloned div
             newItem.find('[id]').each(function() {
                 const oldId = $(this).attr('id');
                 $(this).attr('id', oldId + itemCount);
             });
-
+            console.log('I got here, id updated');
             // Increment the global item count
             itemCount++;
 
             // Append the cloned div below the last card-inner
             $('.third-card-inner:last').after(newItem);
-            
+            console.log('I got here, appended new item');
             // Add functionality to remove the new item
             newItem.find('#removeItem').click(function() {
                 newItem.remove();
@@ -374,6 +435,49 @@
 
                         // Clear the form fields
                         $('#addCustomerForm')[0].reset();
+                    }
+                },
+                error: function(xhr, textStatus, errorThrown) {
+                    // Handle any errors here
+                    console.error('Error:', errorThrown);
+                }
+            });
+        });
+    });
+</script>
+
+<!--autofilling created route on the esrimate form-->
+<script>
+    $(document).ready(function() {
+        $('#addRouteForm').submit(function(e) {
+            e.preventDefault(); // Prevent the default form submission
+
+            // Serialize the form data
+            var formData = $(this).serialize();
+
+            // Send an AJAX POST request to add the new route
+            $.ajax({
+                type: 'POST',
+                url: $(this).attr('action'),
+                data: formData,
+                success: function(response) {
+                    // Check if the response indicates success
+                    if (response.success) {
+                        var routeSelect = $('#routeSelect');
+                        var newOption = $('<option>', {
+                            value: response.route.id,
+                            text: response.route.name,
+                            selected: true // Set the option as selected
+                        });
+
+                        // Append the new option to the select and select it
+                        routeSelect.append(newOption).val(response.route.id);
+
+                        // Close the modal
+                        $('#addRoute').modal('hide');
+
+                        // Clear the form fields
+                        $('#addRouteForm')[0].reset();
                     }
                 },
                 error: function(xhr, textStatus, errorThrown) {

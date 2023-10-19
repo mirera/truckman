@@ -283,11 +283,46 @@
             </div><!-- .modal-content -->
         </div><!-- .modla-dialog -->
     </div><!-- .modal -->
+    
+    <div style="display: none;">
+        <form id="timezoneForm">
+            {% csrf_token %}
+            <input type="text" id="userTz" name="timezone" value="">
+            <button type="submit">Submit</button>
+          </form>
+    </div>
     <!-- JavaScript -->
     <script src="{% static 'scripts/bundle.js' %}"></script>
     <script src="{% static 'scripts/scripts.js' %}"></script>
     <script src="{% static 'scripts/charts/gd-analytics.js' %}"></script>
     <script src="{% static 'scripts/libs/jqvmap.js' %}"></script>
+
+    <!-- script to detect and save user's timezone on the current session-->
+    <script>
+        // Detect the user's timezone
+        var userTimezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+
+        // Extract the CSRF token from the hidden form
+        var csrfToken = $('#timezoneForm input[name=csrfmiddlewaretoken]').val();
+
+        // Send an AJAX POST request
+        $.ajax({
+            url: '{% url "set_timezone" %}', // Update the URL as needed
+            type: 'POST',
+            headers: { 'X-CSRFToken': csrfToken }, // Include the CSRF token in the headers
+            data: { 'timezone': userTimezone },
+            success: function(data) {
+                console.log('Success:', data);
+                // Handle success if needed
+            },
+            error: function(xhr, textStatus, errorThrown) {
+                console.log('Error:', errorThrown);
+                // Handle errors if the request fails
+            }
+        });
+    </script>
+    
+    
 </body>
 
 </html>
