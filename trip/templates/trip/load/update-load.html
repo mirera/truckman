@@ -17,10 +17,8 @@
                 <div class="nk-block-head nk-block-head-sm">
                     <div class="nk-block-between">
                         <div class="nk-block-head-content">
-                            <h3 class="nk-block-title page-title">Update Planned Load</h3>
-                            <div class="nk-block-des text-soft">
-                                <p>Update planned load information carefully.</p>
-                            </div>
+                            <h3 class="nk-block-title page-title">Update Load</h3>
+                            
                         </div><!-- .nk-block-head-content -->
                     </div><!-- .nk-block-between -->
                 </div><!-- .nk-block-head -->
@@ -42,7 +40,7 @@
                                                 <div class="form-group">
                                                     <label class="form-label" for="full-name">Customer</label>
                                                     <div class="form-control-wrap">
-                                                        {{form.customer}}
+                                                        <input type="text" name="customer" class="form-control" id="customer" value="{{ load.estimate.customer }}" readonly>
                                                     </div>
                                                 </div>
                                             </div><!--col-->
@@ -50,7 +48,7 @@
                                                 <div class="form-group">
                                                     <label class="form-label" for="phone-no">Commodity</label>
                                                     <div class="form-control-wrap">
-                                                        {{form.commodity}}
+                                                        <input type="text" name="commodity" class="form-control" id="commodity" value="{{ load.commodity }} " >
                                                     </div>
                                                 </div>
                                             </div><!--col-->
@@ -58,7 +56,7 @@
                                                 <div class="form-group">
                                                     <label class="form-label" for="phone-no">Quantity</label>
                                                     <div class="form-control-wrap">
-                                                        {{form.quantity}}
+                                                        <input type="number" name="quantity" class="form-control" id="quantity" value="{{ load.quantity }} " >
                                                     </div>
                                                 </div>
                                             </div><!--col-->
@@ -100,7 +98,7 @@
                                         <div class="row gy-4">
                                             <div class="col-xxl-3 col-md-4">
                                                 <div class="form-group">
-                                                    <label class="form-label">Shipper</label>
+                                                    <label class="form-label">Shipper</label> <a data-bs-toggle="modal" href="#addShipper" class="btn btn-sm btn-outline-primary"><span>Add Shipper</span><em class="icon ni ni-plus-sm"></em></a>
                                                     <div class="form-control-wrap">
                                                         {{form.shipper}}
                                                     </div>
@@ -119,7 +117,7 @@
                                             </div><!--col-->
                                             <div class="col-xxl-3 col-md-4">
                                                 <div class="form-group">
-                                                    <label class="form-label">Consignee</label>
+                                                    <label class="form-label">Consignee</label> <a data-bs-toggle="modal" href="#addConsignee" class="btn btn-sm btn-outline-primary"><span>Add Consignee</span><em class="icon ni ni-plus-sm"></em></a>
                                                     {{form.consignee}}
                                                 </div>
                                             </div><!--col-->
@@ -147,92 +145,12 @@
                                 <div class="card-inner">
                                     <div class="nk-block-head">
                                         <div class="nk-block-head-content">
-                                            <h5 class="title nk-block-title">Fees / Charges</h5>
-                                            <p>Add fees and charges associated with the load. </p>
+                                            <h5 class="title nk-block-title">Disclaimer</h5>
+                                            <p>Add disclaimer if any. </p>
                                         </div>
                                     </div>
                                     <div class="nk-block">
                                         <div class="row gy-4">
-                                            <div class="col-xxl-6 col-md-4">
-                                                <div class="form-group">
-                                                    <label class="form-label">Primary Fee</label>
-                                                    <div class="form-control-wrap">
-                                                        {{ form.primary_fee }}
-                                                    </div>
-                                                </div>
-                                            </div><!--col-->
-                                            <div class="col-xxl-3 col-md-4">
-                                                <div class="form-group">
-                                                    <label class="form-label">Primary Fee Type</label>
-                                                    <div class="form-control-wrap">
-                                                        {{form.primary_fee_type}}
-                                                    </div>
-                                                </div>
-                                            </div><!--col-->
-                                            <div class="col-xxl-6 col-md-4">
-                                                <div class="form-group">
-                                                    <label class="form-label">Fuel Surcharge Fee</label>
-                                                    <div class="form-control-wrap">
-                                                        {{ form.fuel_surcharge_fee }}
-                                                    </div>
-                                                </div>
-                                            </div><!--col-->
-                                            <div class="col-xxl-3 col-md-4">
-                                                <div class="form-group">
-                                                    <label class="form-label">FSC Amount Type</label>
-                                                    <div class="form-control-wrap">
-                                                        {{form.fsc_amount_type}}
-                                                    </div>
-                                                </div>
-                                            </div><!--col-->
-                                            <div class="col-xxl-3 col-md-4">
-                                                <div class="form-group">
-                                                    <label class="form-label">Border Agent Fees</label>
-                                                    <div class="form-control-wrap">
-                                                        {{form.border_agent_fee}}
-                                                    </div>
-                                                </div>
-                                            </div><!--col-->
-                                            <div class="col-xxl-3 col-md-4">
-                                                <div class="form-group">
-                                                    <label class="form-label">Road User Fees</label>
-                                                    <div class="form-control-wrap">
-                                                        {{form.road_user}}
-                                                    </div>
-                                                </div>
-                                            </div><!--col-->
-                                            <div class="col-xxl-3 col-md-4">
-                                                <div class="form-group">
-                                                    <label class="form-label">Gate Toll Fees</label>
-                                                    <div class="form-control-wrap">
-                                                        {{form.gate_tolls}}
-                                                    </div>
-                                                </div>
-                                            </div><!-- .col -->
-                                            <div class="col-xxl-3 col-md-4">
-                                                <div class="form-group">
-                                                    <label class="form-label">Fines</label>
-                                                    <div class="form-control-wrap">
-                                                        {{form.fines}}
-                                                    </div>
-                                                </div>
-                                            </div><!--col-->
-                                            <div class="col-xxl-3 col-md-4">
-                                                <div class="form-group">
-                                                    <label class="form-label">Additional Fees</label>
-                                                    <div class="form-control-wrap">
-                                                        {{form.additional_fees}}
-                                                    </div>
-                                                </div>
-                                            </div><!--col-->
-                                            <div class="col-xxl-3 col-md-4">
-                                                <div class="form-group">
-                                                    <label class="form-label">Invoice Advance</label>
-                                                    <div class="form-control-wrap">
-                                                        {{form.invoice_advance}}
-                                                    </div>
-                                                </div>
-                                            </div><!--col-->
                                             <div class="col-xxl-3 col-md-8">
                                                 <div class="form-group">
                                                     <label class="form-label" for="default-02">Legal Disclaimer</label>
@@ -244,7 +162,7 @@
                                             </div><!--col-->
                                             <div class="col-12">
                                                 <div class="form-group">
-                                                    <button type="submit" class="btn btn-primary">Update Load</button>
+                                                    <button type="submit" class="btn btn-primary">Save Load</button>
                                                 </div>
                                             </div><!--col-->
                                         </div><!--row-->
@@ -259,4 +177,343 @@
     </div>
 </div>
 <!-- content @e -->
+
+<!-- Add Shipper modal-->
+<div class="modal fade" tabindex="-1" role="dialog" id="addShipper">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <a href="#" class="close" data-bs-dismiss="modal"><em class="icon ni ni-cross-sm"></em></a>
+            <div class="modal-body modal-body-md">
+                <h5 class="modal-title">Add Shipper</h5>
+                <form action="{% url 'add_shipper_json' %}" class="mt-4" method="POST" id="addShipperForm">
+                    {% csrf_token %}
+                    <div class="row g-gs">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label class="form-label" for="name">Shipper Name</label>
+                                {{ shipper_form.name }}
+                            </div>
+                        </div><!-- .col -->
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label class="form-label" for="generic">Contact Person Name</label>
+                                {{ shipper_form.contact_person }}
+                            </div>
+                        </div><!-- .col -->
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label class="form-label" for="sKU">Contact Phone</label>
+                                {{ shipper_form.phone }}
+                            </div>
+                        </div><!-- .col -->
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label class="form-label">Contact Email</label>
+                                <div class="form-control-wrap">
+                                    {{ shipper_form.email }}
+                                </div>
+                            </div>
+                        </div><!-- .col -->
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label class="form-label">Address One</label>
+                                <div class="form-control-wrap">
+                                    {{ shipper_form.address_one }}
+                                </div>
+                            </div>
+                        </div><!-- .col -->
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label class="form-label">Address Two</label>
+                                <div class="form-control-wrap">
+                                    {{ shipper_form.address_two }}
+                                </div>
+                            </div>
+                        </div><!-- .col -->
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label class="form-label">Country</label>
+                                <div class="form-control-wrap">
+                                    {{ shipper_form.country }}
+                                </div>
+                            </div>
+                        </div><!-- .col -->
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label class="form-label">City</label>
+                                <div class="form-control-wrap">
+                                    {{ shipper_form.city }}
+                                </div>
+                            </div>
+                        </div><!-- .col -->
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label class="form-label">Website</label>
+                                <div class="form-control-wrap">
+                                    {{ shipper_form.website }}
+                                </div>
+                            </div>
+                        </div><!-- .col -->
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label class="form-label" for="customFileLabel">Company Logo</label>
+                                <div class="form-control-wrap">
+                                    <div class="form-file">
+                                        <!--<input type="file" class="form-file-input" id="customFile">-->
+                                        {{ shipper_form.logo }}
+                                        <label class="form-file-label" for="customFile">Choose file</label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div><!-- .col -->
+                        <div class="col-12">
+                            <ul class="align-center flex-wrap flex-sm-nowrap gx-4 gy-2">
+                                <button type="submit" class="btn btn-primary">Add Shipper</button>
+                            </ul>
+                        </div>
+                    </div>
+                </form>
+            </div><!-- .modal-body -->
+        </div><!-- .modal-content -->
+    </div><!-- .modal-dialog -->
+</div><!-- .modal -->
+
+<!-- Add Consignee modal-->
+<div class="modal fade" tabindex="-1" role="dialog" id="addConsignee">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <a href="#" class="close" data-bs-dismiss="modal"><em class="icon ni ni-cross-sm"></em></a>
+            <div class="modal-body modal-body-md">
+                <h5 class="modal-title">Add Consignee</h5>
+                <form action="{% url 'add_consignee_json' %}" class="mt-4" method="POST" id="addConsigneeForm">
+                    {% csrf_token %}
+                    <div class="row g-gs">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label class="form-label" for="name">Consignee Name</label>
+                                {{ shipper_form.name }}
+                            </div>
+                        </div><!-- .col -->
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label class="form-label" for="generic">Contact Person Name</label>
+                                {{ shipper_form.contact_person }}
+                            </div>
+                        </div><!-- .col -->
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label class="form-label" for="sKU">Contact Phone</label>
+                                {{ shipper_form.phone }}
+                            </div>
+                        </div><!-- .col -->
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label class="form-label">Contact Email</label>
+                                <div class="form-control-wrap">
+                                    {{ shipper_form.email }}
+                                </div>
+                            </div>
+                        </div><!-- .col -->
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label class="form-label">Address One</label>
+                                <div class="form-control-wrap">
+                                    {{ shipper_form.address_one }}
+                                </div>
+                            </div>
+                        </div><!-- .col -->
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label class="form-label">Address Two</label>
+                                <div class="form-control-wrap">
+                                    {{ shipper_form.address_two }}
+                                </div>
+                            </div>
+                        </div><!-- .col -->
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label class="form-label">Country</label>
+                                <div class="form-control-wrap">
+                                    {{ shipper_form.country }}
+                                </div>
+                            </div>
+                        </div><!-- .col -->
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label class="form-label">City</label>
+                                <div class="form-control-wrap">
+                                    {{ shipper_form.city }}
+                                </div>
+                            </div>
+                        </div><!-- .col -->
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label class="form-label">Website</label>
+                                <div class="form-control-wrap">
+                                    {{ shipper_form.website }}
+                                </div>
+                            </div>
+                        </div><!-- .col -->
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label class="form-label" for="customFileLabel">Company Logo</label>
+                                <div class="form-control-wrap">
+                                    <div class="form-file">
+                                        <!--<input type="file" class="form-file-input" id="customFile">-->
+                                        {{ shipper_form.logo }}
+                                        <label class="form-file-label" for="customFile">Choose file</label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div><!-- .col -->
+                        <div class="col-12">
+                            <ul class="align-center flex-wrap flex-sm-nowrap gx-4 gy-2">
+                                <button type="submit" class="btn btn-primary">Add Consignee</button>
+                            </ul>
+                        </div>
+                    </div>
+                </form>
+            </div><!-- .modal-body -->
+        </div><!-- .modal-content -->
+    </div><!-- .modal-dialog -->
+</div><!-- .modal -->
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+<!-- get estimate/quotation details on choosing a estimate -->
+<script>
+    $(document).ready(function () {
+        // Get references to the input fields and select field
+        var estimateSelect = $("#estimate");
+        var estimateAmountInput = $("#quoteAmount");
+        var estimateItemInput = $("#commodity");
+        var estimateQuantityInput = $("#quantity");
+        var estimateCustomerInput = $("#customer");
+
+        // Add an event listener to the "Estimate" select field
+        estimateSelect.on("change", function () {
+            // Get the selected estimate ID
+            var estimateId = $(this).val();
+
+            // Send a GET request to fetch estimate  information
+            $.get("/trip/get_estimate_info/" + estimateId, function (data) {
+                // Update the quotation amount input fields with the fetched data
+                estimateAmountInput.val(data.amount);
+                estimateItemInput.val(data.item);
+                estimateQuantityInput.val(data.quantity);
+                estimateCustomerInput.val(data.customer);
+            });
+        });
+    });
+</script>
+
+<!--autofilling shipper-->
+<script>
+    $(document).ready(function() {
+        $('#addShipperForm').submit(function(e) {
+            e.preventDefault(); // Prevent the default form submission
+
+            // Serialize the form data
+            var formData = $(this).serialize();
+
+            // Send an AJAX POST request to add a shipper instance
+            $.ajax({
+                type: 'POST',
+                url: $(this).attr('action'),
+                data: formData,
+                success: function(response) {
+                    // Check if the response indicates success
+                    if (response.success) {
+                        var shipperSelect = $('#selectedShipper'); 
+                        var newOption = $('<option>', {
+                            value: response.shipper.id,
+                            text: response.shipper.name,
+                            selected: true // Set the option as selected
+                        });
+
+                        // Append the new option to the select and select it
+                        shipperSelect.append(newOption).val(response.shipper.id); 
+
+                        // Close the modal
+                        $('#addShipper').modal('hide');
+
+                        // Clear the form fields
+                        $('#addShipperForm')[0].reset();
+
+                        // Update the "shipper" dropdown in the "Add Shipper " modal
+                        var shipperSelect = $('#selectedShipper'); //vehicleMakeSelect2
+                        var newOption = $('<option>', {
+                            value: response.shipper.id,
+                            text: response.shipper.name,
+                            selected: true // Set the option as selected
+                        });
+
+                    // Append the new option to the select and select it
+                    shipperSelect.append(newOption).val(response.shipper.id);
+                    }
+                },
+                error: function(xhr, textStatus, errorThrown) {
+                    // Handle any errors here
+                    console.error('Error:', errorThrown);
+                }
+            });
+        });
+    });
+</script>
+
+<!--autofilling consignee-->
+<script>
+    $(document).ready(function() {
+        $('#addConsigneeForm').submit(function(e) {
+            e.preventDefault(); // Prevent the default form submission
+
+            // Serialize the form data
+            var formData = $(this).serialize();
+
+            // Send an AJAX POST request to add a consignee instance
+            $.ajax({
+                type: 'POST',
+                url: $(this).attr('action'),
+                data: formData,
+                success: function(response) {
+                    // Check if the response indicates success
+                    if (response.success) {
+                        var consigneeSelect = $('#selectedConsignee'); 
+                        var newOption = $('<option>', {
+                            value: response.consignee.id,
+                            text: response.consignee.name,
+                            selected: true // Set the option as selected
+                        });
+
+                        // Append the new option to the select and select it
+                        consigneeSelect.append(newOption).val(response.consignee.id); 
+
+                        // Close the modal
+                        $('#addConsignee').modal('hide');
+
+                        // Clear the form fields
+                        $('#addConsigneeForm')[0].reset();
+
+                        // Update the "consignee" dropdown in the "Add Consignee " modal
+                        var consigneeSelect = $('#vehicleMakeSelect2'); 
+                        var newOption = $('<option>', {
+                            value: response.consignee.id,
+                            text: response.consignee.name,
+                            selected: true // Set the option as selected
+                        });
+
+                    // Append the new option to the select and select it
+                    consigneeSelect.append(newOption).val(response.consignee.id);
+                    }
+                },
+                error: function(xhr, textStatus, errorThrown) {
+                    // Handle any errors here
+                    console.error('Error:', errorThrown);
+                }
+            });
+        });
+    });
+</script>
+
+<!-- end -->
 {% endblock content %}  

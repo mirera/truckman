@@ -35,7 +35,6 @@
                                     <li><a href="{% url 'add_trip' %}">Start Trip</a></li>
                                     {% if estimate.status == 'Accepted' %}
                                     <li><a href="{% url 'add_trip' %}">Loading List</a></li>
-                                    <li><a href="{% url 'view_invoice' invoice.id %}">View Invoice</a></li>
                                     {% endif %}
                                 </ul>
                             </div>

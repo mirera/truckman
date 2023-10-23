@@ -48,7 +48,7 @@ driver to add a daily entry.
 '''
 @shared_task
 def send_driver_sms_url_task():
-    trips = Trip.objects.all() # from this we get driver and vehicle
+    trips = Trip.objects.filter(status='Dispatched') # from this we get driver and vehicle
     for trip in trips:
         vehicles = trip.load.assigned_trucks.all()
         drivers = Driver.objects.filter(assigned_vehicle__in=vehicles)
