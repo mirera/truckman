@@ -77,6 +77,7 @@ class Vehicle(models.Model):
     good_transit_licence  = models.FileField(upload_to='vehicle_images/', null=True, blank=True)
     is_assigned_driver = models.BooleanField(default=False)
     is_available = models.BooleanField(default=True)
+    tonnage = models.IntegerField(null=True)
      
 
     def __str__(self):
@@ -194,7 +195,7 @@ class Customer(models.Model):
         return self.name
 
 
-#---------------------------------- Consignee & Shipper Modules ------------------------------------------
+#---------------------------------- Consignee & Shipper Modules ---------------------------------
 
 #shipper model
 class Shipper(models.Model):
@@ -302,7 +303,7 @@ class Route(models.Model):
     def __str__(self):
         return self.name
     
-#---------------------------------- Estimate  & Service Modules -----------------------------------------------
+#---------------------------------- Estimate  & Service Modules ----------------------------------
 # service model
 UNIT_TYPE = (
     ('KM','Kilometer'),
@@ -709,13 +710,8 @@ class LoadingListItem(models.Model):
     company = models.ForeignKey(Client, on_delete=models.CASCADE)
     loading_list = models.ForeignKey(LoadingList, on_delete=models.CASCADE)
     vehicle = models.ForeignKey(Vehicle, on_delete=models.SET_NULL, null=True)
-    #truck = models.CharField(max_length=20)
-    #trailer = models.CharField(max_length=20)
-    #driver_name = models.CharField(max_length=100)
-    #mobile = models.CharField(max_length=20)
-    #passport = models.CharField(max_length=20, blank=True, null=True)
-    #driver_license = models.CharField(max_length=20, blank=True, null=True)
-    tonnage = models.IntegerField(null=True)
+    driver = models.ForeignKey(Driver, on_delete=models.SET_NULL, null=True)
+    
 
     def __str__(self):
         return f"Loading List Item {self.id}"

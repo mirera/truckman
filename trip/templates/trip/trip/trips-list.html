@@ -223,8 +223,6 @@
                                                     </div>
                                                 </div>
                                                 <div class="nk-tb-col"><span class="sub-text">Trip ID</span></div>
-                                                <div class="nk-tb-col tb-col-md"><span class="sub-text">Driver</span></div>
-                                                <div class="nk-tb-col tb-col-lg"><span class="sub-text">Truck</span></div>
                                                 <div class="nk-tb-col tb-col-md"><span class="sub-text">Pick up</span></div>
                                                 <div class="nk-tb-col tb-col-mb"><span class="sub-text">Drop off</span></div>
                                                 <div class="nk-tb-col tb-col-md"><span class="sub-text">Expected Delivery Date</span></div>
@@ -255,12 +253,6 @@
                                                 </div>
                                                 <div class="nk-tb-col">
                                                     <span>{{ trip.trip_id }}</span>
-                                                </div>
-                                                <div class="nk-tb-col tb-col-md">
-                                                    <span>{{ trip.vehicle.driver.first_name}} {{ trip.driver.last_name}}</span>
-                                                </div>
-                                                <div class="nk-tb-col tb-col-lg">
-                                                    <span>{{ trip.vehicle.plate_number }}</span>
                                                 </div>
                                                 <div class="nk-tb-col tb-col-md">
                                                     <span>{{ trip.pick_up_location }}</span>

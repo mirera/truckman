@@ -51,6 +51,7 @@ urlpatterns = [
 
     #shipper urls
     path('add_shipper', views.add_shipper, name='add_shipper'),
+    path('add_shipper_json', views.add_shipper_json, name='add_shipper_json'),
     path('update_shipper/<str:pk>', views.update_shipper, name='update_shipper'),
     path('remove_shipper/<str:pk>', views.remove_shipper, name='remove_shipper'),
     path('view_shipper/<str:pk>', views.view_shipper, name='view_shipper'),
@@ -60,6 +61,7 @@ urlpatterns = [
 
     #Consignee urls
     path('add_consignee', views.add_consignee, name='add_consignee'),
+    path('add_consignee_json', views.add_consignee_json, name='add_consignee_json'),
     path('update_consignee/<str:pk>', views.update_consignee, name='update_consignee'),
     path('remove_consignee/<str:pk>', views.remove_consignee, name='remove_consignee'),
     path('view_consignee/<str:pk>', views.view_consignee, name='view_consignee'),
@@ -76,6 +78,9 @@ urlpatterns = [
     path('list_loads', views.list_loads, name='list_loads'),
     path('load_export_to_csv', views.load_export_to_csv, name='load_export_to_csv'),
     path('assign_load_trucks/<str:pk>', views.assign_load_trucks, name='assign_load_trucks'),
+
+    path('download_loading_list_pdf/<str:pk>', views.download_loading_list_pdf, name='download_loading_list_pdf'),
+    path('view_loading_list/<str:pk>', views.view_loading_list, name='view_loading_list'),
     #--ends
 
     #load urls
@@ -95,6 +100,7 @@ urlpatterns = [
     path('list_trips', views.list_trips, name='list_trips'),
     path('view_trip/add_payment/<str:pk>', views.add_payment_trip, name='add_payment_trip'),
     path('view_trip/add_expense/<str:pk>', views.add_expense_trip, name='add_expense_trip'),
+    path('start_trip/<str:pk>', views.start_trip, name='start_trip'),
 
     #send trip doc to shipper url
     path('view_trip/<str:pk>/send_to_shipper', views.send_to_shipper, name='send_to_shipper'),

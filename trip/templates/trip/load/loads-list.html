@@ -227,6 +227,7 @@
                                                 <div class="nk-tb-col tb-col-lg"><span class="sub-text">Commodity</span></div>
                                                 <div class="nk-tb-col tb-col-md"><span class="sub-text">Total Quantity</span></div>
                                                 <div class="nk-tb-col tb-col-md"><span class="sub-text">Quotation</span></div>
+                                                <div class="nk-tb-col tb-col-md"><span class="sub-text">Status</span></div>
                                                 <div class="nk-tb-col nk-tb-col-tools">
                                                     <ul class="nk-tb-actions gx-1 my-n1">
                                                         <li>
@@ -265,7 +266,16 @@
                                                 </div>
                                                 <div class="nk-tb-col tb-col-md">
                                                     <a href="{% url 'view_estimate' load.estimate.id  %}"><span>{{ load.estimate }}</span></a>
-                                                </div>                                                
+                                                </div>
+                                                {% if not load.assigned_trucks.all %}
+                                                <div class="nk-tb-col tb-col-mb">
+                                                    <a  data-bs-toggle="modal" class="assigntruck-button btn btn-primary btn-sm" href="#assignLoadTrucks" data-pk="{{ load.id }}"> <span>Assign Trucks</span></a>
+                                                </div>  
+                                                {% else %} 
+                                                <div class="nk-tb-col tb-col-mb">
+                                                    <span>Assigned</span>
+                                                </div>   
+                                                {% endif %}                                           
                                                 <div class="nk-tb-col nk-tb-col-tools">
                                                     <ul class="nk-tb-actions gx-1">
                                                         <li>
@@ -275,7 +285,9 @@
                                                                     <ul class="link-list-opt no-bdr">
                                                                         <li><a  href="{% url 'update_load' load.id %}"><em class="icon ni ni-edit"></em><span>Update</span></a></li>
                                                                         <li><a  href="{% url 'view_load' load.id %}"><em class="icon ni ni-eye"></em><span>View Details</span></a></li>
+                                                                        {% if not load.assigned_trucks.all %}
                                                                         <li><a  data-bs-toggle="modal" class="assigntruck-button" href="#assignLoadTrucks" data-pk="{{ load.id }}">  <em class="icon ni ni-eye"></em><span>Assign Trucks</span></a></li>
+                                                                        {% endif %} 
                                                                         <li><a data-bs-toggle="modal" class="delete-button" href="#deleteLoad" data-pk="{{ load.id }}"><em class="icon ni ni-trash"></em><span>Remove Load</span></a></li>
                                                                     </ul>
                                                                 </div>

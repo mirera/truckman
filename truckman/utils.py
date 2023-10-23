@@ -118,7 +118,7 @@ def send_sms(sender_id, token, phone_no, message):
 #-- end
 
 #pdf invoice generator
-def generate_invoice_pdf(trip):
+def generate_invoice_pdf(invoice):
     # Create an in-memory buffer to store the PDF
     pdf_buffer = io.BytesIO()
 
@@ -128,8 +128,8 @@ def generate_invoice_pdf(trip):
     # Set up some basic information on the PDF
     c.setFont("Helvetica", 12)
     c.drawString(100, 750, f'Invoice ID: {invoice.invoice_id}')
-    c.drawString(100, 730, f'Trip Date: {localtime(trip.date).strftime("%Y-%m-%d %H:%M:%S")}')
-    c.drawString(100, 710, f'Customer: {trip.load.estimate.customer.name}')
+    c.drawString(100, 730, f'Trip Date: {localtime(invoice.invoice_date).strftime("%Y-%m-%d %H:%M:%S")}')
+    c.drawString(100, 710, f'Customer: {invoice.estimate.customer.name}')
     c.drawString(100, 690, 'Items:')
     
     # Add invoice line items

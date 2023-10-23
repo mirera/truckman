@@ -39,7 +39,9 @@ from . models import (
     Route, 
     BorderStop,
     StopPoint,
-    DailyRegister
+    DailyRegister,
+    LoadingList,
+    LoadingListItem
 )
 
 from .forms import (
@@ -208,6 +210,7 @@ def add_vehicle(request):
             truck_logbook = request.FILES.get('truck_logbook'),
             trailer_logbook = request.FILES.get('trailer_logbook'),
             good_transit_licence = request.FILES.get('good_transit_licence'),
+            tonnage = request.POST.get('tonnage'),
         )
 
         messages.success(request, f'Vehicle {vehicle.plate_number} was added successfully.')
@@ -255,6 +258,7 @@ def update_vehicle(request, pk):
         vehicle.condition = request.POST.get('condition')
         vehicle.notes = request.POST.get('notes')
         vehicle.good_transit_licence = request.FILES.get('good_transit_licence')
+        vehicle.tonnage = request.POST.get('tonnage'),
 
         # Check if new images/files are provided
         if request.FILES.get('truck_image'):
@@ -295,6 +299,7 @@ def update_vehicle(request, pk):
             'purchase_year': vehicle.purchase_year,
             'condition': vehicle.condition,
             'notes': vehicle.notes,
+            'tonnage': vehicle.tonnage
         }
 
         form = VehicleForm(initial=form_data, company=company )
@@ -319,7 +324,11 @@ def list_vehicles(request):
 @permission_required('trip.view_vehicle')
 def view_vehicle(request, pk):
     vehicle = Vehicle.objects.get(id=pk, company=get_user_company(request))
-    context={'vehicle':vehicle}
+    driver = get_object_or_404(Driver, assigned_vehicle=vehicle)
+    context={
+        'vehicle':vehicle,
+        'driver':driver
+        }
     return render(request, 'trip/vehicle/view-vehicle.html', context)
 #--ends
 
@@ -738,6 +747,31 @@ def add_consignee(request):
     return render(request, 'trip/consignee/add-consignee.html', context)
 #--ends
 
+# add shipper view, used within adding/updating load
+@login_required(login_url='login')
+def add_consignee_json(request):
+    company = get_user_company(request) #get request user company
+    
+    if request.method == 'POST':
+        #create instance of a consignee
+        consignee = Consignee.objects.create(
+            company=company,
+            name = request.POST.get('name'),
+            contact_person = request.POST.get('contact_person'),
+            phone = request.POST.get('phone'),
+            email = request.POST.get('email'),
+            address_one = request.POST.get('address_one'),
+            address_two = request.POST.get('address_two'),
+            country = request.POST.get('country'),
+            city = request.POST.get('city'),
+            website = request.POST.get('website'),
+            logo = request.FILES.get('logo'),
+        )
+        return JsonResponse({'success': True, 'consignee': {'id': consignee.id, 'name': consignee.name}})
+    else:
+        return JsonResponse({'success': False})
+#--ends
+
 # update consignee
 @login_required(login_url='login')
 @permission_required('trip.change_consignee')
@@ -841,7 +875,7 @@ def add_shipper(request):
     #instantiate the two kwargs to be able to access them on the forms.py
     form = ShipperForm(request.POST) 
     if request.method == 'POST':
-        #create instance of a driver
+        #create instance of a shipper
         shipper = Shipper.objects.create(
             company=company,
             name = request.POST.get('name'),
@@ -861,6 +895,31 @@ def add_shipper(request):
 
     context= {'form':form}
     return render(request, 'trip/shipper/add-shipper.html', context)
+#--ends
+
+# add shipper view, used within adding/updating load
+@login_required(login_url='login')
+def add_shipper_json(request):
+    company = get_user_company(request) #get request user company
+    
+    if request.method == 'POST':
+        #create instance of a shipper
+        shipper = Shipper.objects.create(
+            company=company,
+            name = request.POST.get('name'),
+            contact_person = request.POST.get('contact_person'),
+            phone = request.POST.get('phone'),
+            email = request.POST.get('email'),
+            address_one = request.POST.get('address_one'),
+            address_two = request.POST.get('address_two'),
+            country = request.POST.get('country'),
+            city = request.POST.get('city'),
+            website = request.POST.get('website'),
+            logo = request.FILES.get('logo'),
+        )
+        return JsonResponse({'success': True, 'shipper': {'id': shipper.id, 'name': shipper.name}})
+    else:
+        return JsonResponse({'success': False})
 #--ends
 
 # update shipper
@@ -1024,16 +1083,6 @@ def update_load(request, pk):
         load.quantity_type = request.POST.get('quantity_type')
         load.commodity = request.POST.get('commodity')
         load.driver_instructions = request.POST.get('driver_instructions')
-        load.primary_fee = request.POST.get('primary_fee')
-        load.primary_fee_type = request.POST.get('primary_fee_type')
-        load.fuel_surcharge_fee = request.POST.get('fuel_surcharge_fee')
-        load.fsc_amount_type = request.POST.get('fsc_amount_type')
-        load.border_agent_fee = request.POST.get('border_agent_fee')
-        load.road_user = request.POST.get('road_user')
-        load.gate_tolls = request.POST.get('gate_tolls')
-        load.fines = request.POST.get('fines')
-        load.additional_fees = request.POST.get('additional_fees')
-        load.invoice_advance = request.POST.get('invoice_advance')
         load.legal_disclaimer = request.POST.get('legal_disclaimer')
         load.notes = request.POST.get('notes')
         
@@ -1044,6 +1093,7 @@ def update_load(request, pk):
     else:
         # prepopulate the form with existing data
         form_data = {
+            'estimate': load.estimate,
             'shipper': load.shipper,
             'consignee': load.consignee,
             'pickup_date': load.pickup_date,
@@ -1053,24 +1103,19 @@ def update_load(request, pk):
             'quantity_type': load.quantity_type,
             'driver_instructions': load.driver_instructions,
             'commodity': load.commodity,
-            'primary_fee': load.primary_fee,
-            'primary_fee_type': load.primary_fee_type,
-            'fuel_surcharge_fee': load.fuel_surcharge_fee,
-            'border_agent_fee': load.border_agent_fee,
-            'road_user': load.road_user,
-            'gate_tolls': load.gate_tolls,
-            'fines': load.fines,
-            'additional_fees': load.additional_fees,
-            'invoice_advance': load.invoice_advance,
             'legal_disclaimer': load.legal_disclaimer,
             'notes': load.notes,
             
         }
 
         form = LoadForm(initial=form_data, company=company )
+        shipper_form = ShipperForm()
+        consignee_form = ConsigneeForm()
         context = {
             'load':load,
-            'form':form
+            'form':form,
+            'shipper_form': shipper_form,
+            consignee_form:consignee_form
         }
         return render(request,'trip/load/update-load.html', context)
 #--ends
@@ -1084,10 +1129,11 @@ def list_loads(request):
     number_of_loads = loads.count()
     vehicles = Vehicle.objects.filter(company=company, is_available=True)
 
+    
     context = {
         'loads':loads,
         'number_of_loads':number_of_loads, 
-        'vehicles':vehicles
+        'vehicles':vehicles,
     }
     return render(request, 'trip/load/loads-list.html', context)
 #--ends
@@ -1097,7 +1143,16 @@ def list_loads(request):
 @permission_required('trip.view_load')
 def view_load(request, pk):
     load = Load.objects.get(id=pk, company=get_user_company(request))
-    context={'load':load}
+    try:
+        loading_list = LoadingList.objects.get(estimate=load.estimate)
+        loading_list_items = loading_list.loadinglistitem_set.all()
+    except:
+        loading_list, loading_list_items = None, None
+    context={
+        'load':load,
+        'loading_list':loading_list,
+        'loading_list_items':loading_list_items
+        }
     return render(request, 'trip/load/view-load.html', context)
 #--ends
 
@@ -1149,10 +1204,16 @@ def assign_load_trucks(request, pk):
 
         #generate and send associated loading list to client
         loading_list = generate_loading_list(load.estimate) 
-        loading_list_pdf_path = '' #set it later
+        #loading_list_pdf_path = '' #set it later
 
         #generate asscoaited invoice & send to client
-        invoice = generate_invoice(load.estimate)
+        #invoice = generate_invoice(load.estimate)
+
+        #create a trip instance, to be used later.
+        trip = Trip.objects.create(
+           company = load.company,
+           load = load 
+        )
 
         context = {
             'company':load.company.name,
@@ -1169,6 +1230,7 @@ def assign_load_trucks(request, pk):
                 replyto_email=settings.EMAIL_HOST_USER,
                 attachment_path=''
             ) 
+        '''
         send_email_with_attachment_task.delay(
                 context=context, 
                 template_path='trip/load/loading-list-email.html', 
@@ -1179,7 +1241,7 @@ def assign_load_trucks(request, pk):
                 replyto_email=settings.EMAIL_HOST_USER,
                 attachment_path=''
             ) 
-
+        '''
 
         messages.success(request, 'Load assigned vehicles successfully ')
         return redirect('view_load', load.id)
@@ -1190,6 +1252,54 @@ def assign_load_trucks(request, pk):
     
     return render(request, 'trip/load/loads-list.html' , context)
 #--ends
+
+#view loading list
+def view_loading_list(request, pk):
+    loading_list = get_object_or_404(LoadingList, id=pk)
+    loading_list_items = loading_list.loadinglistitem_set.all()
+    
+    
+    context = {
+        'company':loading_list.company,
+        'loading_list_items':loading_list_items,
+        'loading_list':loading_list
+    }  
+    return render(request, 'trip/load/loading-list-template.html', context)
+
+'''
+download loading list pdf
+'''
+def download_loading_list_pdf(request, pk):
+    loading_list = get_object_or_404(LoadingList, id=pk)
+    loading_list_items = loading_list.loadinglistitem_set.all()
+
+    # Path to  HTML template.
+    template_path = 'trip/load/loading-list-template-download.html'
+
+    # Load the HTML template using Django's get_template method.
+    template = get_template(template_path)
+    context = {
+        'company':loading_list.company,
+        'loading_list_items':loading_list_items
+    }  
+
+    # Render the template with the context data.
+    html = template.render(context)
+
+    # Create a response object with PDF content type.
+    response = HttpResponse(content_type='application/pdf')
+    response['Content-Disposition'] = f'attachment; filename="{loading_list.loading_list_id}.pdf"'
+
+    # Create a PDF object using xhtml2pdf's pisa.CreatePDF.
+    pdf = pisa.CreatePDF(html, dest=response)
+
+    # Check if PDF generation was successful.
+    if not pdf.err:
+        return response
+
+    # If PDF generation failed, return an error message.
+    return HttpResponse('PDF generation failed: %s' % pdf.err)
+
 
 #---------------------------------- Route views------------------------------------------
 # add route
@@ -1420,26 +1530,32 @@ def list_trips(request):
 @permission_required('trip.view_trip')
 def view_trip(request, pk):
     company=get_user_company(request)
-    trip = Trip.objects.get(id=pk, company=company)
-    expenses = Expense.objects.filter(company=company, trip=trip)
-    invoice = Invoice.objects.get(estimate=trip.load.estimate)
-    payments = Payment.objects.filter(company=company, invoice=invoice) #invoice in invoices associated with the trip 
+    trip = get_object_or_404(Trip, id=pk)
+    
+    try:
+        expenses = Expense.objects.filter(company=company, trip=trip)
+        invoice = Invoice.objects.get(estimate=trip.load.estimate)
+        payments = Payment.objects.filter(company=company, invoice=invoice) #invoice in invoices associated with the trip 
+        documents = ''
+    except:
+        expenses, invoice, payments, documents = None, None, None, None
+
     form = ExpenseForm(request.POST, company=company) # for expense modal
     category_form = ExpenseCategoryForm(request.POST) # for expense category modal
     payment_form = PaymentForm(request.POST, company=company) # for payment modal
-    vehicle = trip.vehicle
+    #vehicle = trip.vehicle
     #if vehicle.is_assigned_driver:
-    driver = Driver.objects.get(assigned_vehicle=vehicle)        
+    #driver = Driver.objects.get(assigned_vehicle=vehicle)        
     context={
         'company':company,
         'trip':trip,
-        'driver':driver,
         'expenses':expenses,
         'invoice':invoice,
         'payments':payments,
         'form':form,
         'category_form':category_form,
-        'payment_form':payment_form
+        'payment_form':payment_form,
+        'documents':documents
     }
     return render(request, 'trip/trip/view-trip.html', context)
 #--ends
@@ -1586,6 +1702,58 @@ def trip_export_to_csv(request):
               'distance', 'status', 'start_time', 'end_time', 'date_added']
     response = export_model_data(request, Trip, header)
     return response 
+
+#start trip view
+@login_required(login_url='login')
+@permission_required('trip.view_trip')
+def start_trip(request, pk):
+    company = get_user_company(request)
+    trip = get_object_or_404(Trip, id=pk)
+    if trip.status == 'Not Started' and trip.load.assigned_trucks.all() :
+        trip.status = 'Dispatched'
+        trip.save()
+
+        #generate invoice form estimate 
+        invoice = generate_invoice(trip.load.estimate)
+        preference = get_object_or_404(Preference, company=company) 
+
+        invoice_url = request.build_absolute_uri(reverse('view_invoice', args=[invoice.id]))
+
+        context = {
+            'customer_name': trip.load.estimate.customer.name,
+            'invoice_url' : invoice_url,
+            'company_name':company.name
+        }
+
+        send_email_task.delay(
+            context=context,  
+            template_path='trip/invoice/trip-invoice.html', 
+            from_name=preference.email_from_name, 
+            from_email=preference.from_email, 
+            subject=f'Trip Started - Trip Invoice:{invoice.invoice_id}', 
+            recipient_email=trip.load.estimate.customer.email, 
+            replyto_email=company.email,
+        )
+
+        '''
+        send_email_with_attachment_task.delay(
+            context=context,  
+            template_path='trip/invoice/trip-invoice.html', 
+            from_name=preference.email_from_name, 
+            from_email=preference.from_email, 
+            subject=f'Trip Started - Trip Invoice:{invoice.invoice_id}', 
+            recipient_email=trip.load.estimate.customer.email, 
+            replyto_email=company.email,
+            attachment_path=invoice_path
+        )
+        '''
+
+        messages.success(request, 'Trip started successfully.')
+    elif trip.status == 'Dispatched':
+        messages.info(request, 'Trip already dispatched.')
+    else:
+        messages.info(request, 'Trip already completed.')
+    return redirect('view_trip', trip.id )
 
 #---------------------------------- Payment views------------------------------------------
 
@@ -1822,7 +1990,7 @@ def remove_expense_category(request, pk):
         return redirect('list_trips')
 #--ends
 
-#---------------------------------- Expense views------------------------------------------
+#---------------------------------- Expense views--------------------------------------------------
 
 # add expense
 @login_required(login_url='login')
@@ -2145,7 +2313,7 @@ def generate_invoice_pdf(request, pk):
     return HttpResponse('PDF generation failed: %s' % pdf.err)
 
 
-#---------------------------------- Estimate views------------------------------------------
+#---------------------------------- Estimate/Quotations views------------------------------------------
 
 # add estimate
 @login_required(login_url='login')
@@ -2312,7 +2480,7 @@ def send_estimate(request, pk):
     estimate = get_object_or_404(Estimate, id=pk)
     preference = get_object_or_404(Preference, company=company)
 
-    estimate_url = request.build_absolute_uri(reverse('view_estimate', args=[estimate.estimate_id]))
+    estimate_url = request.build_absolute_uri(reverse('view_estimate', args=[estimate.id]))
     #having this context because delay() need model serialzation
     context = {
         'customer_name': estimate.customer.name,
@@ -2344,13 +2512,15 @@ def accept_estimate(request, pk):
         company = estimate.company,
         estimate = estimate
      )
+    #create a notification 
+    #send email to admin notify them about 
+    #the acceptance and assign trucks to the load link.
 
-    #send email to admin notify them about the acceptance
     estimate_url = request.build_absolute_uri(reverse('view_estimate', args=[pk]))
     context = {
         'estimate':estimate.id,
-        'estimate_url' : estimate_url,
-        'load':load
+        'estimate_url' : estimate_url, 
+        #'load':load
     }
     
     send_email_task.delay(
@@ -2559,7 +2729,9 @@ def get_estimate_info(request, estimate_id):
         return JsonResponse(estimate_info)
     except Estimate.DoesNotExist:
         return JsonResponse({'error': 'Estimate not found'}, status=404)
-    
+
+
+
 #--------------------------- daily register views _________________________________________________
 
 def add_register_entry(request, pk):
@@ -2610,7 +2782,6 @@ def add_register_entry(request, pk):
 
 #---ends
 
-#--------------------------- daily register report views _________________________________________________
 
 #view to render daily trip register report
 @login_required(login_url='login')

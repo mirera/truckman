@@ -1,0 +1,476 @@
+<div class="card-inner p-0">
+    <div class="nk-tb-list nk-tb-ulist">
+        <div class="nk-tb-item nk-tb-head">
+            <div class="nk-tb-col nk-tb-col-check">
+                <div class="custom-control custom-control-sm custom-checkbox notext">
+                    <input type="checkbox" class="custom-control-input" id="uid">
+                    <label class="custom-control-label" for="uid"></label>
+                </div>
+            </div>
+            <div class="nk-tb-col"><span class="sub-text">Document</span></div>
+            <div class="nk-tb-col tb-col-sm"><span class="sub-text">Status</span></div>
+            <div class="nk-tb-col tb-col-mb"><span class="sub-text">Category</span></div>
+            <div class="nk-tb-col tb-col-mb"><span class="sub-text">Download</span></div>
+        </div><!-- .nk-tb-item -->
+        <div class="nk-tb-item">
+            <div class="nk-tb-col nk-tb-col-check">
+                <div class="custom-control custom-control-sm custom-checkbox notext">
+                    <input type="checkbox" class="custom-control-input" id="uid1">
+                    <label class="custom-control-label" for="uid1"></label>
+                </div>
+            </div>
+            <div class="nk-tb-col">
+                <a href="{% url 'view_vehicle' trip.vehicle.id %}">
+                    <div class="user-card">
+                        <div class="user-info">
+                            <span class="tb-lead">Truck Logbook</span>
+                        </div>
+                    </div>
+                </a>
+            </div>
+            <div class="nk-tb-col tb-col-sm">
+                {% if trip.vehicle.truck_logbook %}   
+                <span class="fw-medium text-success">Uploaded</span>
+                {% else %}
+                <span class="fw-medium text-warning">Not Uploaded</span>
+                {% endif %}
+            </div>
+            <div class="nk-tb-col tb-col-mb">
+                <span>Truck</span>
+            </div>
+            <div class="nk-tb-col tb-col-mb">
+                {% if trip.vehicle.truck_logbook %}
+                <ul class="list-inline list-download">
+                    <li>Truck logbook<a href="{{ trip.vehicle.truck_logbook.url }}" target="_blank" class="popup"><em class="icon ni ni-download"></em></a></li>
+                </ul>
+                {% endif %}
+            </div>
+            <div class="nk-tb-col nk-tb-col-tools">
+                <ul class="nk-tb-actions gx-1">
+                    <li class="nk-tb-action-hidden">
+                        {% if trip.vehicle.truck_logbook %}
+                        <a href="{{ trip.vehicle.truck_logbook.url }}" target="_blank" class="btn btn-trigger btn-icon" data-bs-toggle="tooltip" data-bs-placement="top" title="View Document">
+                            <em class="icon ni ni-eye"></em>
+                        </a>
+                        {% endif %}
+                    </li>
+                    
+                </ul>
+            </div>
+        </div><!-- .nk-tb-item -->
+        <div class="nk-tb-item">
+            <div class="nk-tb-col nk-tb-col-check">
+                <div class="custom-control custom-control-sm custom-checkbox notext">
+                    <input type="checkbox" class="custom-control-input" id="uid10">
+                    <label class="custom-control-label" for="uid10"></label>
+                </div>
+            </div>
+            <div class="nk-tb-col">
+                <a href="{% url 'view_vehicle' trip.vehicle.id %}">
+                    <div class="user-card">
+                        <div class="user-info">
+                            <span class="tb-lead">Trailer Logbook</span>
+                        </div>
+                    </div>
+                </a>
+            </div>
+            <div class="nk-tb-col tb-col-sm">
+                {% if trip.vehicle.trailer_logbook %}   
+                <span class="fw-medium text-success">Uploaded</span>
+                {% else %}
+                <span class="fw-medium text-warning">Not Uploaded</span>
+                {% endif %}
+            </div>
+            <div class="nk-tb-col tb-col-mb">
+                <span>Trailer</span>
+            </div>
+            <div class="nk-tb-col tb-col-mb">
+                {% if trip.vehicle.trailer_logbook %} 
+                <ul class="list-inline list-download">
+                    <li>Trailer logbook<a href="{{ trip.vehicle.trailer_logbook.url }}" target="_blank" class="popup"><em class="icon ni ni-download"></em></a></li>
+                </ul>
+                {% endif %} 
+            </div>
+            <div class="nk-tb-col nk-tb-col-tools">
+                <ul class="nk-tb-actions gx-1">
+                    <li class="nk-tb-action-hidden">
+                        <a href="{{ trip.vehicle.trailer_logbook.url }}" target="_blank" class="btn btn-trigger btn-icon" data-bs-toggle="tooltip" data-bs-placement="top" title="View Document">
+                            <em class="icon ni ni-eye"></em>
+                        </a>
+                    </li>
+                    
+                </ul>
+            </div>
+        </div><!-- .nk-tb-item -->
+        <div class="nk-tb-item">
+            <div class="nk-tb-col nk-tb-col-check">
+                <div class="custom-control custom-control-sm custom-checkbox notext">
+                    <input type="checkbox" class="custom-control-input" id="uid2">
+                    <label class="custom-control-label" for="uid2"></label>
+                </div>
+            </div>
+            <div class="nk-tb-col">
+                <a href="{% url 'view_vehicle' trip.vehicle.id %}">
+                    <div class="user-card">
+                        <div class="user-info">
+                            <span class="tb-lead">Truck Image</span>
+                        </div>
+                    </div>
+                </a>
+            </div>
+            <div class="nk-tb-col tb-col-sm">
+                {% if trip.vehicle.truck_image %}   
+                <span class="fw-medium text-success">Uploaded</span>
+                {% else %}
+                <span class="fw-medium text-warning">Not Uploaded</span>
+                {% endif %}
+            </div>
+            <div class="nk-tb-col tb-col-mb">
+                <span>Truck</span>
+            </div>
+            <div class="nk-tb-col tb-col-mb">
+                <ul class="list-inline list-download">
+                    {% if trip.vehicle.truck_image %}
+                    <li>Truck image<a href="{{ trip.vehicle.truck_image.url }}" target="_blank" class="popup"><em class="icon ni ni-download"></em></a></li>
+                    {% endif %}
+                </ul>
+            </div>
+            <div class="nk-tb-col nk-tb-col-tools">
+                <ul class="nk-tb-actions gx-1">
+                    <li class="nk-tb-action-hidden">
+                        {% if trip.vehicle.truck_image %}
+                        <a href="{{ trip.vehicle.truck_image.url }}" target="_blank" class="btn btn-trigger btn-icon" data-bs-toggle="tooltip" data-bs-placement="top" title="View Document">
+                            <em class="icon ni ni-eye"></em>
+                        </a>
+                        {% endif %}
+                    </li>
+                    
+                </ul>
+            </div>
+        </div><!-- .nk-tb-item -->
+        <div class="nk-tb-item">
+            <div class="nk-tb-col nk-tb-col-check">
+                <div class="custom-control custom-control-sm custom-checkbox notext">
+                    <input type="checkbox" class="custom-control-input" id="uid3">
+                    <label class="custom-control-label" for="uid3"></label>
+                </div>
+            </div>
+            <div class="nk-tb-col">
+                <a href="{% url 'view_vehicle' trip.vehicle.id %}">
+                    <div class="user-card">
+                        <div class="user-info">
+                            <span class="tb-lead">Trailer Image</span>
+                        </div>
+                    </div>
+                </a>
+            </div>
+            <div class="nk-tb-col tb-col-sm">
+                {% if trip.vehicle.trailer_image %}   
+                <span class="fw-medium text-success">Uploaded</span>
+                {% else %}
+                <span class="fw-medium text-warning">Not Uploaded</span>
+                {% endif %}
+            </div>
+            <div class="nk-tb-col tb-col-mb">
+                <span>Trailer</span>
+            </div>
+            <div class="nk-tb-col tb-col-mb">
+                <ul class="list-inline list-download">
+                    {% if trip.vehicle.trailer_image %} 
+                    <li>Trailer Image<a href="{{ trip.vehicle.trailer_image.url }}" target="_blank" class="popup"><em class="icon ni ni-download"></em></a></li>
+                    {% endif %}
+                </ul>
+            </div>
+            <div class="nk-tb-col nk-tb-col-tools">
+                <ul class="nk-tb-actions gx-1">
+                    <li class="nk-tb-action-hidden">
+                        {% if trip.vehicle.trailer_image %}
+                        <a href="{{ trip.vehicle.trailer_image.url }}" target="_blank" class="btn btn-trigger btn-icon" data-bs-toggle="tooltip" data-bs-placement="top" title="View Document">
+                            <em class="icon ni ni-eye"></em>
+                        </a>
+                        {% endif %}
+                    </li>
+                    
+                </ul>
+            </div>
+        </div><!-- .nk-tb-item -->
+        <div class="nk-tb-item">
+            <div class="nk-tb-col nk-tb-col-check">
+                <div class="custom-control custom-control-sm custom-checkbox notext">
+                    <input type="checkbox" class="custom-control-input" id="uid4">
+                    <label class="custom-control-label" for="uid4"></label>
+                </div>
+            </div>
+            <div class="nk-tb-col">
+                <a href="{% url 'view_vehicle' trip.vehicle.id %}">
+                    <div class="user-card">
+                        <div class="user-info">
+                            <span class="tb-lead">Good Transit Licence</span>
+                        </div>
+                    </div>
+                </a>
+            </div>
+            <div class="nk-tb-col tb-col-sm">
+                {% if trip.vehicle.good_transit_licence %}   
+                <span class="fw-medium text-success">Uploaded</span>
+                {% else %}
+                <span class="fw-medium text-warning">Not Uploaded</span>
+                {% endif %}
+            </div>
+            <div class="nk-tb-col tb-col-mb">
+                <span>Trailer</span>
+            </div>
+            <div class="nk-tb-col tb-col-mb">
+                <ul class="list-inline list-download">
+                    {% if trip.vehicle.good_transit_licence %} 
+                    <li>Good Transit Licence<a href="{{ trip.vehicle.good_transit_licence.url }}" target="_blank" class="popup"><em class="icon ni ni-download"></em></a></li>
+                    {% endif %}
+                </ul>
+            </div>
+            <div class="nk-tb-col nk-tb-col-tools">
+                <ul class="nk-tb-actions gx-1">
+                    <li class="nk-tb-action-hidden">
+                        {% if trip.vehicle.good_transit_licence %} 
+                        <a href="{{ trip.vehicle.good_transit_licence.url }}" target="_blank" class="btn btn-trigger btn-icon" data-bs-toggle="tooltip" data-bs-placement="top" title="View Document">
+                            <em class="icon ni ni-eye"></em>
+                        </a>
+                        {% endif %}
+                    </li>
+                    
+                </ul>
+            </div>
+        </div><!-- .nk-tb-item -->
+        <div class="nk-tb-item">
+            <div class="nk-tb-col nk-tb-col-check">
+                <div class="custom-control custom-control-sm custom-checkbox notext">
+                    <input type="checkbox" class="custom-control-input" id="uid5">
+                    <label class="custom-control-label" for="uid5"></label>
+                </div>
+            </div>
+            <div class="nk-tb-col">
+                <a href="{% url 'view_driver' driver.id %}">
+                    <div class="user-card">
+                        <div class="user-info">
+                            <span class="tb-lead">Driver Photo</span>
+                        </div>
+                    </div>
+                </a>
+            </div>
+            <div class="nk-tb-col tb-col-sm">
+                {% if driver.driver_photo %}   
+                <span class="fw-medium text-success">Uploaded</span>
+                {% else %}
+                <span class="fw-medium text-warning">Not Uploaded</span>
+                {% endif %}
+                
+            </div>
+            <div class="nk-tb-col tb-col-mb">
+                <span>Driver</span>
+            </div>
+            <div class="nk-tb-col tb-col-mb">
+                {% if driver.driver_photo %} 
+                <ul class="list-inline list-download">
+                    <li>Driver Photo<a href="{{ driver.driver_photo.url }}" target="_blank" class="popup"><em class="icon ni ni-download"></em></a></li>
+                </ul>
+                {% endif %} 
+            </div>
+            <div class="nk-tb-col nk-tb-col-tools">
+                <ul class="nk-tb-actions gx-1">
+                    <li class="nk-tb-action-hidden">
+                        {% if driver.driver_photo %} 
+                        <a href="{{ driver.driver_photo.url }}" target="_blank" class="btn btn-trigger btn-icon" data-bs-toggle="tooltip" data-bs-placement="top" title="View Document">
+                            <em class="icon ni ni-eye"></em>
+                        </a>
+                        {% endif %}
+                    </li>
+                    
+                </ul>
+            </div>
+        </div><!-- .nk-tb-item -->
+        <div class="nk-tb-item">
+            <div class="nk-tb-col nk-tb-col-check">
+                <div class="custom-control custom-control-sm custom-checkbox notext">
+                    <input type="checkbox" class="custom-control-input" id="uid6">
+                    <label class="custom-control-label" for="uid6"></label>
+                </div>
+            </div>
+            <div class="nk-tb-col">
+                <a href="{% url 'view_driver' driver.id %}">
+                    <div class="user-card">
+                        <div class="user-info">
+                            <span class="tb-lead">Driver ID </span>
+                        </div>
+                    </div>
+                </a>
+            </div>
+            <div class="nk-tb-col tb-col-sm">
+                {% if driver.id_img %}   
+                <span class="fw-medium text-success">Uploaded</span>
+                {% else %}
+                <span class="fw-medium text-warning">Not Uploaded</span>
+                {% endif %}
+                
+            </div>
+            <div class="nk-tb-col tb-col-mb">
+                <span>Driver</span>
+            </div>
+            <div class="nk-tb-col tb-col-mb">
+                {% if driver.id_img %} 
+                <ul class="list-inline list-download">
+                    <li>Driver ID <a href="{{ driver.id_img.url }}" target="_blank" class="popup"><em class="icon ni ni-download"></em></a></li>
+                </ul>
+                {% endif %}
+            </div>
+            <div class="nk-tb-col nk-tb-col-tools">
+                <ul class="nk-tb-actions gx-1">
+                    {% if driver.id_img %} 
+                    <li class="nk-tb-action-hidden">
+                        <a href="{{ driver.id_img.url }}" target="_blank" class="btn btn-trigger btn-icon" data-bs-toggle="tooltip" data-bs-placement="top" title="View Document">
+                            <em class="icon ni ni-eye"></em>
+                        </a>
+                    </li>
+                    {% endif %}
+                </ul>
+            </div>
+        </div><!-- .nk-tb-item -->
+        <div class="nk-tb-item">
+            <div class="nk-tb-col nk-tb-col-check">
+                <div class="custom-control custom-control-sm custom-checkbox notext">
+                    <input type="checkbox" class="custom-control-input" id="uid7">
+                    <label class="custom-control-label" for="uid7"></label>
+                </div>
+            </div>
+            <div class="nk-tb-col">
+                <a href="{% url 'view_driver' driver.id %}">
+                    <div class="user-card">
+                        <div class="user-info">
+                            <span class="tb-lead">Driver DL Front </span>
+                        </div>
+                    </div>
+                </a>
+            </div>
+            <div class="nk-tb-col tb-col-sm">
+                {% if driver.dl_front_img %}   
+                <span class="fw-medium text-success">Uploaded</span>
+                {% else %}
+                <span class="fw-medium text-warning">Not Uploaded</span>
+                {% endif %}
+                
+            </div>
+            <div class="nk-tb-col tb-col-mb">
+                <span>Driver</span>
+            </div>
+            <div class="nk-tb-col tb-col-mb">
+                {% if driver.dl_front_img %}
+                <ul class="list-inline list-download">
+                    <li>Driver DL Front <a href="{{ driver.dl_front_img.url }}" target="_blank" class="popup"><em class="icon ni ni-download"></em></a></li>
+                </ul>
+                {% endif %}
+            </div>
+            <div class="nk-tb-col nk-tb-col-tools">
+                <ul class="nk-tb-actions gx-1">
+                    {% if driver.dl_front_img %}
+                    <li class="nk-tb-action-hidden">
+                        <a href="{{ driver.dl_front_img.url }}" target="_blank" class="btn btn-trigger btn-icon" data-bs-toggle="tooltip" data-bs-placement="top" title="View Document">
+                            <em class="icon ni ni-eye"></em>
+                        </a>
+                    </li>
+                    {% endif %}
+                </ul>
+            </div>
+        </div><!-- .nk-tb-item -->
+        <div class="nk-tb-item">
+            <div class="nk-tb-col nk-tb-col-check">
+                <div class="custom-control custom-control-sm custom-checkbox notext">
+                    <input type="checkbox" class="custom-control-input" id="uid8">
+                    <label class="custom-control-label" for="uid8"></label>
+                </div>
+            </div>
+            <div class="nk-tb-col">
+                <a href="{% url 'view_driver' driver.id %}">
+                    <div class="user-card">
+                        <div class="user-info">
+                            <span class="tb-lead">Driver DL Back </span>
+                        </div>
+                    </div>
+                </a>
+            </div>
+            <div class="nk-tb-col tb-col-sm">
+                {% if driver.dl_back_img %}   
+                <span class="fw-medium text-success">Uploaded</span>
+                {% else %}
+                <span class="fw-medium text-warning">Not Uploaded</span>
+                {% endif %}
+                
+            </div>
+            <div class="nk-tb-col tb-col-mb">
+                <span>Driver</span>
+            </div>
+            <div class="nk-tb-col tb-col-mb">
+                {% if driver.dl_back_img %} 
+                <ul class="list-inline list-download">
+                    <li>Driver DL Back <a href="{{ driver.dl_back_img.url }}" target="_blank" class="popup"><em class="icon ni ni-download"></em></a></li>
+                </ul>
+                {% endif %}
+            </div>
+            <div class="nk-tb-col nk-tb-col-tools">
+                <ul class="nk-tb-actions gx-1">
+                    {% if driver.dl_back_img %} 
+                    <li class="nk-tb-action-hidden">
+                        <a href="{{ driver.dl_back_img.url }}" target="_blank" class="btn btn-trigger btn-icon" data-bs-toggle="tooltip" data-bs-placement="top" title="View Document">
+                            <em class="icon ni ni-eye"></em>
+                        </a>
+                    </li>
+                    {% endif %}
+                </ul>
+            </div>
+        </div><!-- .nk-tb-item -->
+        <div class="nk-tb-item">
+            <div class="nk-tb-col nk-tb-col-check">
+                <div class="custom-control custom-control-sm custom-checkbox notext">
+                    <input type="checkbox" class="custom-control-input" id="uid9">
+                    <label class="custom-control-label" for="uid9"></label>
+                </div>
+            </div>
+            <div class="nk-tb-col">
+                <a href="{% url 'view_driver' driver.id %}">
+                    <div class="user-card">
+                        <div class="user-info">
+                            <span class="tb-lead">Driver Passport </span>
+                        </div>
+                    </div>
+                </a>
+            </div>
+            <div class="nk-tb-col tb-col-sm">
+                {% if driver.passport_image %}   
+                <span class="fw-medium text-success">Uploaded</span>
+                {% else %}
+                <span class="fw-medium text-warning">Not Uploaded</span>
+                {% endif %}
+                
+            </div>
+            <div class="nk-tb-col tb-col-mb">
+                <span>Driver</span>
+            </div>
+            <div class="nk-tb-col tb-col-mb">
+                {% if driver.passport_image %}
+                <ul class="list-inline list-download">
+                    <li>Driver Passport <a href="{{ driver.passport_image.url }}" target="_blank" class="popup"><em class="icon ni ni-download"></em></a></li>
+                </ul>
+                {% endif %}
+            </div>
+            <div class="nk-tb-col nk-tb-col-tools">
+                <ul class="nk-tb-actions gx-1">
+                    <li class="nk-tb-action-hidden">
+                        {% if driver.passport_image %}
+                        <a href="{{ driver.passport_image.url }}" target="_blank" class="btn btn-trigger btn-icon" data-bs-toggle="tooltip" data-bs-placement="top" title="View Document">
+                            <em class="icon ni ni-eye"></em>
+                        </a>
+                        {% endif %}
+                    </li>
+                    
+                </ul>
+            </div>
+        </div><!-- .nk-tb-item -->
+    </div><!-- .nk-tb-list -->
+</div><!-- .card-inner -->

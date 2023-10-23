@@ -89,6 +89,7 @@ class VehicleForm(forms.ModelForm):
                 'truck_logbook': forms.FileInput(attrs={'class': 'form-file-input', 'id': 'customFile'}),
                 'trailer_logbook': forms.FileInput(attrs={'class': 'form-file-input', 'id': 'customFile'}),
                 'good_transit_licence': forms.FileInput(attrs={'class': 'form-file-input', 'id': 'customFile'}),
+                'tonnage': forms.NumberInput(attrs={'class': 'form-control number-spinner','value': '0', 'placeholder':'32'}),
             } 
         
 #---------------------------------- Driver forms ------------------------------------------
@@ -221,7 +222,6 @@ class LoadForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         company = kwargs.pop('company')# Get the company from kwargs
         super(LoadForm, self).__init__(*args, **kwargs)
-        #self.fields['customer'].queryset = Customer.objects.filter(company=company) 
         self.fields['shipper'].queryset = Shipper.objects.filter(company=company) 
         self.fields['consignee'].queryset = Consignee.objects.filter(company=company) 
         self.fields['estimate'].queryset = Estimate.objects.filter(company=company, status='Accepted') 
@@ -232,9 +232,8 @@ class LoadForm(forms.ModelForm):
         exclude =['company', 'load_id', 'date_added']
 
         widgets = {
-                #'customer': forms.Select(attrs={'class': 'form-select js-select2'}),
-                'shipper': forms.Select(attrs={'class': 'form-select js-select2'}), 
-                'consignee': forms.Select(attrs={'class': 'form-select js-select2'}),
+                'shipper': forms.Select(attrs={'class': 'form-select js-select2', 'id':'selectedShipper'}), 
+                'consignee': forms.Select(attrs={'class': 'form-select js-select2', 'id':'selectedConsignee'}),
                 'estimate': forms.Select(attrs={'class': 'form-select js-select2', 'id':'estimate'}),
                 #load details
                 'weight': forms.NumberInput(attrs={'class': 'form-control', 'placeholder':'7800, weigh in Tons'}),
