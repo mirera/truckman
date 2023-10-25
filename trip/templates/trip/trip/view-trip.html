@@ -383,7 +383,7 @@
                                         </div><!--tab pane-->
 
                                         <div class="tab-pane" id="tabItem6">
-                                            {% if expenses %}
+                                            
                                             <div class="nk-block nk-block-between">
                                                 <div class="nk-block-head">
                                                     <h6 class="title">Expense Information</h6>
@@ -395,6 +395,7 @@
                                                     </a>
                                                 </div>
                                             </div>
+                                            {% if expenses %}
                                             <div class="nk-block">
                                                 <div class="card">
                                                     <div class="nk-tb-list nk-tb-ulist is-compact">
@@ -426,7 +427,7 @@
                                             </div><!-- .nk-block -->
                                             {% else %}
                                             <div class="nk-block-head">
-                                                <p class="title">Expenses data not available.</p>
+                                                <p class="title">No Data Available!</p>
                                             </div><!-- .nk-block-head -->
                                             {% endif %}
                                         </div><!--tab pane-->

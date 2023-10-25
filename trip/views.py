@@ -1814,7 +1814,7 @@ def add_payment_trip(request, pk):
     if request.method == 'POST':
 
         trip = Trip.objects.get(id=pk)
-        invoice = Invoice.objects.get(trip=trip)
+        invoice = Invoice.objects.get(estimate=trip.load.estimate) 
         amount = float(request.POST.get('amount'))
 
         #create instance of a payment
@@ -1862,18 +1862,10 @@ def update_payment(request, pk):
         load_id = request.POST.get('load')
         load = Load.objects.get(company=company, id=load_id)
 
-        driver_id = request.POST.get('driver')
-        driver = Driver.objects.get(company=company, id=driver_id)
-
-        vehicle_id = request.POST.get('vehicle')
-        vehicle = Vehicle.objects.get(company=company, id=vehicle_id)
         #update instance 
         trip.company = company
-        trip.driver = driver
         trip.load = load
-        trip.vehicle = vehicle
         trip.driver_accesory_pay = request.POST.get('driver_accesory_pay')
-        trip.vehicle_odemeter = request.POST.get('vehicle_odemeter')
         trip.driver_advance = request.POST.get('driver_advance')
         trip.save()
         
@@ -1882,11 +1874,8 @@ def update_payment(request, pk):
     else:
         # prepopulate the form with existing data
         form_data = {
-            'driver': trip.driver,
             'load': trip.load,
-            'vehicle': trip.vehicle,
             'driver_accesory_pay': trip.driver_accesory_pay,
-            'vehicle_odemeter': trip.vehicle_odemeter,
             'driver_advance': trip.driver_advance
         }
 
