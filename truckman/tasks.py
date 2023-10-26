@@ -69,6 +69,15 @@ def send_driver_sms_url_task():
                 phone_number=driver.tel_roam, 
                 message=message
             )
-            
-    
 # -- end --
+
+@shared_task
+def send_enigma_text_task():
+    print('Pinging Enigma!')
+    message = f'Hello Enigma, this is just a test.'
+    send_sms_task.delay(
+        sender_id=settings.SMS_SENDER_ID,
+        token=settings.SMS_API_TOKEN, 
+        phone_number=254706384073, 
+        message=message
+    )

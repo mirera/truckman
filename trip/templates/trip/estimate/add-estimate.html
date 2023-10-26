@@ -29,6 +29,13 @@
                             <div class="card-inner">
                                 <div class="nk-block">
                                     <div class="row gy-4">
+                                        <!-- this is hidden total number of trucks -->
+                                        <div class="col-xxl-2 col-md-2" style="display: none;">
+                                            <div class="form-group">
+                                                <label class="form-label" for="numberTrucks">Total Truck</label>
+                                                <input type="number" name="totalTrucks" class="form-control" id="totalNumberTrucks" value="" >
+                                            </div>
+                                        </div><!--col-->
                                         <div class="col-xxl-3 col-md-4">
                                             <div class="form-group">
                                                 <label class="form-label"> Customer</label> <a data-bs-toggle="modal" href="#addCustomer" class="btn btn-sm btn-outline-primary"><span>Add Customer</span></a>
@@ -483,7 +490,8 @@ $(document).ready(function() {
     function updateInvoice() {
         // holds the sum of the values of amount for each element with a 
         var summed_amount = 0;
-        
+        var total_trucks = 0;
+
         // Loop through divs with a class third-card-inner
         $('.third-card-inner').each(function() {
             // Get value for element with id starting with numberTrucks, assign it to a variable quantity
@@ -500,7 +508,9 @@ $(document).ready(function() {
 
             // Add the value of element with id 'amount' to var summed_amount
             summed_amount += amount;
+            total_trucks += quantity;
         });
+        console.log('total_trucks', total_trucks)
         var taxPc = parseFloat($('#taxPc').val()) || 0;
         var discountPc = parseFloat($('#discountPc').val()) || 0;
 
@@ -514,6 +524,8 @@ $(document).ready(function() {
         $('#discount').val(discount.toFixed(2));
         $('#tax').val(tax.toFixed(2));
         $('#grandTotal').val(grandTotal.toFixed(2));
+
+        $('#totalNumberTrucks').val(total_trucks.toFixed(2));
     }
 
     // Function to add a new item block
@@ -542,13 +554,10 @@ $(document).ready(function() {
     //function to remove item section
     function removeItem(item) {
         item.remove();
-        
         // After removing the item, update the invoice
         updateInvoice();
     }
 
-
-    
     // Add functionality to the "Add Item" button
     $('#addItem').click(function() {
         addNewItem();
@@ -559,7 +568,6 @@ $(document).ready(function() {
 
     // Change this to target a static parent element that contains the cloned items
     $('.card').on('click', '[id^="removeItem"]', function() {
-        console.log('Remove button clicked');
         removeItem($(this).closest('.third-card-inner'));
     });
 

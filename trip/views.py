@@ -2330,7 +2330,7 @@ def add_estimate(request):
             valid_till = request.POST.get('valid_till'),
             description = route.description,
             item = request.POST.get('item'),
-            trucks = request.POST.get('trucks'),
+            trucks = request.POST.get('totalTrucks'),
             rate = request.POST.get('rate'),
             sub_total = request.POST.get('sub_total'),
             discount = request.POST.get('discount'),
@@ -2375,7 +2375,7 @@ def update_estimate(request, pk):
             estimate.valid_till = request.POST.get('valid_till')
             estimate.description = route.description
             estimate.item = request.POST.get('item')
-            estimate.trucks = request.POST.get('trucks')
+            estimate.trucks = request.POST.get('totalTrucks'),
             estimate.rate = request.POST.get('rate')
             estimate.sub_total = request.POST.get('sub_total')
             estimate.discount = request.POST.get('discount')
