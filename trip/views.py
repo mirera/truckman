@@ -2,7 +2,7 @@ from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required 
 from truckman.decorators import permission_required
 from django.utils import timezone
-from datetime import datetime, timedelta, time
+from datetime import datetime
 import pytz
 import os
 from django.shortcuts import get_object_or_404
@@ -20,6 +20,7 @@ from django.conf import settings
 from django.urls import reverse
 
 from . models import (
+    CustomUser,
     Vehicle, 
     Vehicle_Make, 
     Vehicle_Model, 
@@ -33,7 +34,6 @@ from . models import (
     Invoice,
     Expense_Category,
     Reminder,
-    Service,
     Estimate,
     Vehicle_Owner,
     Route, 
@@ -41,7 +41,8 @@ from . models import (
     StopPoint,
     DailyRegister,
     LoadingList,
-    LoadingListItem
+    LoadingListItem,
+    TripIncident
 )
 
 from .forms import (
@@ -60,7 +61,8 @@ from .forms import (
     ReminderForm,
     InvoiceForm,
     EstimateForm,
-    DailyRegisterForm
+    DailyRegisterForm,
+    TripIncidentForm
 )
 
 from truckman.utils import get_user_company, generate_invoice_pdf, export_model_data, reverse_geocode, format_coordinates, get_location_data
@@ -210,7 +212,7 @@ def add_vehicle(request):
             truck_logbook = request.FILES.get('truck_logbook'),
             trailer_logbook = request.FILES.get('trailer_logbook'),
             good_transit_licence = request.FILES.get('good_transit_licence'),
-            tonnage = request.POST.get('tonnage'),
+            tonnage = int(request.POST.get('tonnage')),
         )
 
         messages.success(request, f'Vehicle {vehicle.plate_number} was added successfully.')
@@ -258,7 +260,7 @@ def update_vehicle(request, pk):
         vehicle.condition = request.POST.get('condition')
         vehicle.notes = request.POST.get('notes')
         vehicle.good_transit_licence = request.FILES.get('good_transit_licence')
-        vehicle.tonnage = request.POST.get('tonnage'),
+        vehicle.tonnage = int(request.POST.get('tonnage'))
 
         # Check if new images/files are provided
         if request.FILES.get('truck_image'):
@@ -303,9 +305,14 @@ def update_vehicle(request, pk):
         }
 
         form = VehicleForm(initial=form_data, company=company )
-        context = {
+        vehicle_form = VehicleMakeForm(request.POST)
+        vehicle_model_form = VehicleModelForm(request.POST, company=company)
+
+        context= {
+            'vehicle':vehicle,
             'form':form,
-            'vehicle':vehicle
+            'vehicle_form':vehicle_form,
+            'vehicle_model_form':vehicle_model_form
         }
         return render(request,'trip/vehicle/update-vehicle.html',context)
 #--ends
@@ -1545,7 +1552,9 @@ def view_trip(request, pk):
     payment_form = PaymentForm(request.POST, company=company) # for payment modal
     #vehicle = trip.vehicle
     #if vehicle.is_assigned_driver:
-    #driver = Driver.objects.get(assigned_vehicle=vehicle)        
+    #driver = Driver.objects.get(assigned_vehicle=vehicle) 
+    trip_incidents = TripIncident.objects.filter(trip=trip) 
+    incident_form = TripIncidentForm(request.POST, company=company)    
     context={
         'company':company,
         'trip':trip,
@@ -1555,7 +1564,9 @@ def view_trip(request, pk):
         'form':form,
         'category_form':category_form,
         'payment_form':payment_form,
-        'documents':documents
+        'documents':documents,
+        'trip_incidents':trip_incidents,
+        'incident_form':incident_form
     }
     return render(request, 'trip/trip/view-trip.html', context)
 #--ends
@@ -2330,7 +2341,7 @@ def add_estimate(request):
             valid_till = request.POST.get('valid_till'),
             description = route.description,
             item = request.POST.get('item'),
-            trucks = request.POST.get('totalTrucks'),
+            trucks = float(request.POST.get('totalTrucks')),
             rate = request.POST.get('rate'),
             sub_total = request.POST.get('sub_total'),
             discount = request.POST.get('discount'),
@@ -2375,7 +2386,7 @@ def update_estimate(request, pk):
             estimate.valid_till = request.POST.get('valid_till')
             estimate.description = route.description
             estimate.item = request.POST.get('item')
-            estimate.trucks = request.POST.get('totalTrucks'),
+            estimate.trucks = float(request.POST.get('totalTrucks'))
             estimate.rate = request.POST.get('rate')
             estimate.sub_total = request.POST.get('sub_total')
             estimate.discount = request.POST.get('discount')
@@ -2801,6 +2812,33 @@ def trip_daily_register_report(request):
     }
     return render(request, 'trip/reports/daily-register-select-trip.html', context)
 
+#--------------------------- Trip incident views _________________________________________________
 
+#-- add trip incident
+def add_trip_incident(request, trip_id):
+    trip = get_object_or_404(Trip, id=trip_id)
+    if request.method == 'POST':
+        #get vehicle
+        vehicle_id = request.POST.get('vehicle')
+        vehicle = get_object_or_404(Vehicle, id=vehicle_id)
 
+        #create the trip incident object
+        TripIncident.objects.create(
+            company = get_user_company(request),
+            trip = trip,
+            description = request.POST.get('description'),
+            vehicle = vehicle, 
+            added_by = request.user
+        )
+        messages.success(request, 'Trip incident added successfuly.')
+        return redirect('view_trip', trip.id)
+    return redirect('view_trip', trip.id)
+#-- ends
 
+#-- delete trip incident view 
+def delete_trip_incident(request, trip_id, incident_id):
+    trip = get_object_or_404(Trip, id=trip_id)
+    incident = get_object_or_404(TripIncident, id=incident_id)
+    incident.delete()
+    messages.success(request, 'Incident deleted!')
+    return redirect('view_trip', trip.id)

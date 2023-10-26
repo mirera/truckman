@@ -39,14 +39,12 @@
                                         <div class="col-xxl-3 col-md-4">
                                             <div class="form-group">
                                                 <label class="form-label" for="trip">Customer</label>
-                                                <!--<input type="text" name="plate_number" class="form-control" id="name" placeholder="Registration Number" required> -->
                                                 {{ form.customer }}
                                             </div>
                                         </div><!--col-->
                                         <div class="col-xxl-3 col-md-4">
                                             <div class="form-group">
                                                 <label class="form-label" for="trip">Status</label>
-                                                <!--<input type="text" name="plate_number" class="form-control" id="name" placeholder="Registration Number" required> -->
                                                 {{ form.status }}
                                             </div>
                                         </div><!--col-->
@@ -57,7 +55,6 @@
                                                     <div class="form-icon form-icon-right">
                                                         <em class="icon ni ni-calendar"></em>
                                                     </div>
-                                                    <!--<input type="text" name="insurance_expiry" class="form-control date-picker" data-date-format="yyyy-mm-dd" placeholder="yyyy-mm-dd">-->
                                                     {{ form.valid_till }}
                                                 </div>
                                             </div>
@@ -83,9 +80,9 @@
                                                 {{ form.item }}
                                             </div>
                                         </div><!--col-->
-                                        <div class="col-xxl-2 col-md-2">
+                                        <div class="col-xxl-3 col-md-3">
                                             <div class="form-group">
-                                                <label class="form-label" for="quantity">Route</label>
+                                                <label class="form-label"> Route</label><a data-bs-toggle="modal" href="#addRoute" class="btn btn-sm btn-outline-primary"><span>Add</span></a>
                                                 {{ form.route }}
                                             </div>
                                         </div><!--col-->
@@ -107,12 +104,12 @@
                                                 <input type="number" name="amount" class="form-control" id="amount" value="{{ estimate.sub_total }}" readonly >
                                             </div>
                                         </div><!--col-->
-                                        <div class="col-xxl-3 col-md-1" style="display: none;">
+                                        <div class="col-xxl-3 col-md-1" id="removeButton" style="display: none;">
                                             <div class="form-group">
                                                 <label class="form-label" for="amount">Remove</label>
                                                 <a href="#" class="btn btn-danger" id="removeItem"><em class="icon ni ni-cross-round"></em></a>
                                             </div>
-                                        </div><!--col-->
+                                        </div> <!--col-->
                                         <!-- 
                                         <div class="col-xxl-3 col-md-6">
                                             <div class="form-group">
@@ -194,6 +191,79 @@
 <!-- content @e -->
 
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+<!-- Add Route modal-->
+<div class="modal fade" tabindex="-1" role="dialog" id="addRoute">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <a href="#" class="close" data-bs-dismiss="modal"><em class="icon ni ni-cross-sm"></em></a>
+            <div class="modal-body modal-body-md">
+                <h5 class="modal-title">Add Route</h5>
+                <form action="{% url 'add_route' %}" class="mt-4" method="POST" id="addRouteForm">
+                    {% csrf_token %}
+                    <div class="row g-gs">
+                        <div class="col-xxl-3 col-md-4">
+                            <div class="form-group">
+                                <label class="form-label" for="name"> Name</label>
+                                <input type="text" name="name" class="form-control" id="name" placeholder="Dar - Morogoro" required>
+                            </div>
+                        </div><!--col-->
+                        <div class="col-xxl-3 col-md-4">
+                            <div class="form-group">
+                                <label class="form-label" for="name"> Start Point</label>
+                                <input type="text" name="start_point" class="form-control" id="start_point" placeholder="Dar" required>
+                            </div>
+                        </div><!--col-->
+                        <div class="col-xxl-3 col-md-4">
+                            <div class="form-group">
+                                <label class="form-label" for="name"> End Point</label>
+                                <input type="text" name="end_point" class="form-control" id="end_point" placeholder="Morogoro" required>
+                            </div>
+                        </div><!--col-->
+                        <div class="col-xxl-3 col-md-4">
+                            <div class="form-group">
+                                <label class="form-label" for="name"> Distance </label>
+                                <input type="number" name="distance" class="form-control" id="distance" placeholder="3000" >
+                            </div>
+                        </div><!--col-->
+                        
+                        <div class="col-xxl-3 col-md-4">
+                            <div class="form-group">
+                                <label class="form-label" for="border_stops"> Border Stops </label>
+                                <select name="border_stops" class="form-control" id="border_stops" multiple>
+                                    {% for border_stop in border_points %}
+                                    <option value="{{ border_stop.id }}">{{ border_stop.name }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </div><!--col-->
+                        <div class="col-xxl-3 col-md-4">
+                            <div class="form-group">
+                                <label class="form-label" for="stop_points"> Stop Points </label>
+                                <select name="stop_points" class="form-control" id="stop_points" multiple>
+                                    {% for stop_point in stop_points %}
+                                    <option value="{{ stop_point.id }}">{{ stop_point.name }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </div><!--col-->
+                        <div class="col-12">
+                            <div class="form-group">
+                                <label class="form-label" for="name"> Description </label>
+                                <input type="text" name="description" class="form-control" id="description" placeholder="Say something about the route.." >
+                            </div>
+                        </div><!--col-->
+                        <div class="col-12">
+                            <div class="form-group">
+                                <button type="submit" class="btn btn-primary">Add Route</button>
+                            </div>
+                        </div><!--col-->
+                    </div>
+                </form>
+            </div><!-- .modal-body -->
+        </div><!-- .modal-content -->
+    </div><!-- .modal-dialog -->
+</div><!-- .modal -->
 
 <!--autofilling created customer on the esrimate form-->
 <script>
@@ -280,6 +350,7 @@
         });
     });
 </script>
+ 
 
 <!-- get trip details on choosing a trip -->
 <script>
@@ -306,98 +377,96 @@
 <!-- end -->
 
 <script>
-    $(document).ready(function() {
-        // Function to calculate and update values
-        function updateInvoice() {
-            // holds the sum of the values of amount for each element with a 
-            var summed_amount = 0;
-            var total_trucks = 0;
-    
-            // Loop through divs with a class third-card-inner
-            $('.third-card-inner').each(function() {
-                // Get value for element with id starting with numberTrucks, assign it to a variable quantity
-                var quantity = parseFloat($(this).find('[id^="numberTrucks"]').val()) || 0;
-    
-                // Get value for element with id starting with routeRate, assign it to a variable unitPrice
-                var unitPrice = parseFloat($(this).find('[id^="routeRate"]').val()) || 0;
-    
-                // Find the product of quantity and the unitPrice, store it in a variable 'amount'
-                var amount = quantity * unitPrice;
-    
-                // Update the value of the element with id 'amount'
-                $(this).find('[id^="amount"]').val(amount.toFixed(2));
-    
-                // Add the value of element with id 'amount' to var summed_amount
-                summed_amount += amount;
-                total_trucks += quantity;
-            });
-            console.log('total_trucks', total_trucks)
-            var taxPc = parseFloat($('#taxPc').val()) || 0;
-            var discountPc = parseFloat($('#discountPc').val()) || 0;
-    
-            var subTotal = summed_amount;
-            var discount = (discountPc / 100) * subTotal;
-            var tax = (taxPc / 100) * subTotal;
-            var grandTotal = subTotal - discount + tax;
-    
-            // Update the fields
-            $('#subTotal').val(subTotal.toFixed(2));
-            $('#discount').val(discount.toFixed(2));
-            $('#tax').val(tax.toFixed(2));
-            $('#grandTotal').val(grandTotal.toFixed(2));
-    
-            $('#totalNumberTrucks').val(total_trucks.toFixed(2));
-        }
-    
-        // Function to add a new item block
-        // Counter for unique IDs
-        let itemCount = 1;
-    
-        function addNewItem() {
-            const newItem = $('.third-card-inner:first').clone();
-            newItem.find('#removeButton').removeAttr('style');
-    
-            // Increment IDs within the cloned div
-            newItem.find('[id]').each(function() {
-                const oldId = $(this).attr('id');
-                $(this).attr('id', oldId + itemCount);
-            });
-    
-            // Initialize Select2 for the new dropdown
-            newItem.find('select').select2();
-    
-    
-            // Append the cloned div below the last card-inner
-            $('.third-card-inner:last').after(newItem);
-            itemCount++;
-        }
-    
-        //function to remove item section
-        function removeItem(item) {
-            item.remove();
-            // After removing the item, update the invoice
-            updateInvoice();
-        }
-    
-        // Add functionality to the "Add Item" button
-        $('#addItem').click(function() {
-            addNewItem();
-    
-            // Call updateInvoice for the initial cloned div
-            updateInvoice();
-        });
-    
-        // Change this to target a static parent element that contains the cloned items
-        $('.card').on('click', '[id^="removeItem"]', function() {
-            removeItem($(this).closest('.third-card-inner'));
-        });
-    
-    
-        // Attach the function to input change events for the initial div
-        // Attach the function to input change events for the initial div and any cloned divs
-        $(document).on('input', '[id^="numberTrucks"], [id^="routeRate"], #taxPc, #discountPc', updateInvoice);
-    
-    });
-</script>
+$(document).ready(function() {
+    // Function to calculate and update values
+    function updateInvoice() {
+        // holds the sum of the values of amount for each element with a 
+        var summed_amount = 0;
+        var total_trucks = 0;
 
+        // Loop through divs with a class third-card-inner
+        $('.third-card-inner').each(function() {
+            // Get value for element with id starting with numberTrucks, assign it to a variable quantity
+            var quantity = parseFloat($(this).find('[id^="numberTrucks"]').val()) || 0;
+
+            // Get value for element with id starting with routeRate, assign it to a variable unitPrice
+            var unitPrice = parseFloat($(this).find('[id^="routeRate"]').val()) || 0;
+
+            // Find the product of quantity and the unitPrice, store it in a variable 'amount'
+            var amount = quantity * unitPrice;
+
+            // Update the value of the element with id 'amount'
+            $(this).find('[id^="amount"]').val(amount.toFixed(2));
+
+            // Add the value of element with id 'amount' to var summed_amount
+            summed_amount += amount;
+            total_trucks += quantity;
+        });
+        var taxPc = parseFloat($('#taxPc').val()) || 0;
+        var discountPc = parseFloat($('#discountPc').val()) || 0;
+
+        var subTotal = summed_amount;
+        var discount = (discountPc / 100) * subTotal;
+        var tax = (taxPc / 100) * subTotal;
+        var grandTotal = subTotal - discount + tax;
+
+        // Update the fields
+        $('#subTotal').val(subTotal.toFixed(2));
+        $('#discount').val(discount.toFixed(2));
+        $('#tax').val(tax.toFixed(2));
+        $('#grandTotal').val(grandTotal.toFixed(2));
+
+        $('#totalNumberTrucks').val(total_trucks.toFixed(2));
+    }
+
+    // Function to add a new item block
+    // Counter for unique IDs
+    let itemCount = 1;
+
+    function addNewItem() {
+        const newItem = $('.third-card-inner:first').clone();
+        newItem.find('#removeButton').removeAttr('style');
+
+        // Increment IDs within the cloned div
+        newItem.find('[id]').each(function() {
+            const oldId = $(this).attr('id');
+            $(this).attr('id', oldId + itemCount);
+        });
+
+        // Initialize Select2 for the new dropdown
+        newItem.find('select').select2();
+
+
+        // Append the cloned div below the last card-inner
+        $('.third-card-inner:last').after(newItem);
+        itemCount++;
+    }
+
+    //function to remove item section
+    function removeItem(item) {
+        item.remove();
+        // After removing the item, update the invoice
+        updateInvoice();
+    }
+
+    // Add functionality to the "Add Item" button
+    $('#addItem').click(function() {
+        addNewItem();
+
+        // Call updateInvoice for the initial cloned div
+        updateInvoice();
+    });
+
+    // Change this to target a static parent element that contains the cloned items
+    $('.card').on('click', '[id^="removeItem"]', function() {
+        removeItem($(this).closest('.third-card-inner'));
+    });
+
+
+    // Attach the function to input change events for the initial div
+    // Attach the function to input change events for the initial div and any cloned divs
+    $(document).on('input', '[id^="numberTrucks"], [id^="routeRate"], #taxPc, #discountPc', updateInvoice);
+
+});
+</script>
 {% endblock content %}

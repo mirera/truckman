@@ -50,7 +50,6 @@
                                                     <div class="form-icon form-icon-right">
                                                         <em class="icon ni ni-calendar"></em>
                                                     </div>
-                                                    <!--<input type="text" name="insurance_expiry" class="form-control date-picker" data-date-format="yyyy-mm-dd" placeholder="yyyy-mm-dd">-->
                                                     {{ form.valid_till }}
                                                 </div>
                                             </div>
@@ -311,7 +310,7 @@
                         <div class="col-xxl-3 col-md-4">
                             <div class="form-group">
                                 <label class="form-label" for="name"> Name</label>
-                                <input type="text" name="name" class="form-control" id="name" placeholder="Registration Number" required>
+                                <input type="text" name="name" class="form-control" id="name" placeholder="Dar - Morogoro" required>
                             </div>
                         </div><!--col-->
                         <div class="col-xxl-3 col-md-4">
@@ -510,7 +509,6 @@ $(document).ready(function() {
             summed_amount += amount;
             total_trucks += quantity;
         });
-        console.log('total_trucks', total_trucks)
         var taxPc = parseFloat($('#taxPc').val()) || 0;
         var discountPc = parseFloat($('#discountPc').val()) || 0;
 

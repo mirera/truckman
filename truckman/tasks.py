@@ -48,17 +48,20 @@ driver to add a daily entry.
 '''
 @shared_task
 def send_driver_sms_url_task():
+    print('Step 1')
     trips = Trip.objects.filter(status='Dispatched') # from this we get driver and vehicle
-
+    #print(f'Trips:{trips}')
+    print('Step 2')
     for trip in trips:
+        print('Step 3')
         vehicles = trip.load.assigned_trucks.all()
         drivers = Driver.objects.filter(assigned_vehicle__in=vehicles)
         for driver, vehicle in zip(drivers, vehicles):
             trip_id = str(trip.id)
             url = reverse('add_register_entry', args=[trip_id]) 
             #current_site = Site.objects.get_current()
-            #domain = settings.DEVELOPMENT_DOMAIN 
-            domain = settings.PRODUCTION_DOMAIN #change this when pushing to production server
+            domain = settings.DEVELOPMENT_DOMAIN 
+            #domain = settings.PRODUCTION_DOMAIN #change this when pushing to production server
             full_url = f"{domain}{url}"
 
             ready_url = shorten_url(full_url) #append the trip.id to url  
@@ -70,7 +73,7 @@ def send_driver_sms_url_task():
                 message=message
             )
 # -- end --
-
+'''
 @shared_task
 def send_enigma_text_task():
     print('Pinging Enigma!')
@@ -81,3 +84,4 @@ def send_enigma_text_task():
         phone_number=254706384073, 
         message=message
     )
+'''
