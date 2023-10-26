@@ -48,9 +48,12 @@ driver to add a daily entry.
 '''
 @shared_task
 def send_driver_sms_url_task():
+    print('Step 1')
     trips = Trip.objects.filter(status='Dispatched') # from this we get driver and vehicle
-
+    #print(f'Trips:{trips}')
+    print('Step 2')
     for trip in trips:
+        print('Step 3')
         vehicles = trip.load.assigned_trucks.all()
         drivers = Driver.objects.filter(assigned_vehicle__in=vehicles)
         for driver, vehicle in zip(drivers, vehicles):
@@ -70,7 +73,7 @@ def send_driver_sms_url_task():
                 message=message
             )
 # -- end --
-
+'''
 @shared_task
 def send_enigma_text_task():
     print('Pinging Enigma!')
@@ -81,3 +84,4 @@ def send_enigma_text_task():
         phone_number=254706384073, 
         message=message
     )
+'''

@@ -175,6 +175,10 @@ urlpatterns = [
     #-- register entry urls
     path('add_register_entry/<str:pk>/', views.add_register_entry, name='add_register_entry'),
 
-    #-- reports 
+    #-- reports urls
     path('trip_daily_register_report', views.trip_daily_register_report, name='trip_daily_register_report'),
+
+    #-- trip incident urls
+    path('add_trip_incident/<str:trip_id>/', views.add_trip_incident, name='add_trip_incident'),
+    path('delete_trip_incident/<str:trip_id>/<str:incident_id>/', views.delete_trip_incident, name='delete_trip_incident'),
 ]

@@ -117,32 +117,31 @@
                                             <div class="nk-block">
                                                 <div class="nk-block-head nk-block-head-sm nk-block-between">
                                                     <h5 class="title">Trip Incidents</h5>
-                                                    <a href="#" class="link link-sm">+ Add Incident</a>
+                                                    <a data-bs-toggle="modal" href="#addIncident" class="link link-sm">+ Add Incident</a>
                                                 </div><!-- .nk-block-head -->
+                                                {% if trip_incidents %}
                                                 <div class="bq-note">
+                                                    {% for trip_incident in trip_incidents %}
                                                     <div class="bq-note-item">
                                                         <div class="bq-note-text">
-                                                            <p>Aproin at metus et dolor tincidunt feugiat eu id quam. Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. Aenean sollicitudin non nunc vel pharetra. </p>
+                                                            <p>{{ trip_incident.description }}</p>
                                                         </div>
                                                         <div class="bq-note-meta">
-                                                            <span class="bq-note-added">Added on <span class="date">November 18, 2019</span> at <span class="time">5:34 PM</span></span>
+                                                            <span class="bq-note-added">Vehicle Involved  <span class="date">{{ trip_incident.vehicle.plate_number}}</span></span></span>
                                                             <span class="bq-note-sep sep">|</span>
-                                                            <span class="bq-note-by">By <span>Softnio</span></span>
-                                                            <a href="#" class="link link-sm link-danger">Delete Note</a>
+                                                            <span class="bq-note-added">Added on <span class="date">{{ trip_incident.time_added | timesince}} ago</span></span></span>
+                                                            <span class="bq-note-sep sep">|</span>
+                                                            <span class="bq-note-by">By <span>{{ trip_incident.added_by}}</span></span>
+                                                            <a href="{% url 'delete_trip_incident' trip.id trip_incident.id %}" class="link link-sm link-danger">Delete Incident</a>
                                                         </div>
                                                     </div><!-- .bq-note-item -->
-                                                    <div class="bq-note-item">
-                                                        <div class="bq-note-text">
-                                                            <p>Aproin at metus et dolor tincidunt feugiat eu id quam. Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. Aenean sollicitudin non nunc vel pharetra. </p>
-                                                        </div>
-                                                        <div class="bq-note-meta">
-                                                            <span class="bq-note-added">Added on <span class="date">November 18, 2019</span> at <span class="time">5:34 PM</span></span>
-                                                            <span class="bq-note-sep sep">|</span>
-                                                            <span class="bq-note-by">By <span>Softnio</span></span>
-                                                            <a href="#" class="link link-sm link-danger">Delete Note</a>
-                                                        </div>
-                                                    </div><!-- .bq-note-item -->
+                                                    {% endfor %}
                                                 </div><!-- .bq-note -->
+                                                {% else %}
+                                                <div class="nk-block-head">
+                                                    <p class="title">No incident recorded!</p>
+                                                </div><!-- .nk-block-head -->
+                                                {% endif %}
                                             </div><!-- .nk-block -->
                                         </div><!-- tab pane -->
 
@@ -700,6 +699,47 @@
                             <ul class="align-center flex-wrap flex-sm-nowrap gx-4 gy-2">
                                 <li>
                                     <button type="submit" class="btn btn-primary" > Add Payment</button>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </form>
+            </div><!-- .modal-body -->
+        </div><!-- .modal-content -->
+    </div><!-- .modal-dialog -->
+</div><!-- .modal -->
+
+<!-- Add trip incident-->
+<div class="modal fade" tabindex="-1" role="dialog" id="addIncident">
+    <div class="modal-dialog modal-md" role="document">
+        <div class="modal-content">
+            <a href="#" class="close" data-bs-dismiss="modal"><em class="icon ni ni-cross-sm"></em></a>
+            <div class="modal-body modal-body-md">
+                <h5 class="modal-title">Add Trip Incident</h5>
+                <form action="{% url 'add_trip_incident' trip.id %}" class="mt-4" method="POST">
+                    {% csrf_token %}
+                    <div class="row g-gs">
+                        <div class="col-md-12">
+                            <div class="form-group">
+                                <label class="form-label" for="category">Vehicle</label>
+                                <div class="form-control-wrap">
+                                    {{ incident_form.vehicle }}
+                                </div>
+                            </div>
+                        </div><!-- .col -->
+                        
+                        <div class="col-md-12">
+                            <div class="form-group">
+                                <label class="form-label" for="category">Description</label>
+                                <div class="form-control-wrap">
+                                    {{ incident_form.description }}
+                                </div>
+                            </div>
+                        </div><!-- .col -->
+                        <div class="col-12">
+                            <ul class="align-center flex-wrap flex-sm-nowrap gx-4 gy-2">
+                                <li>
+                                    <button type="submit" class="btn btn-primary" > Add Incident</button>
                                 </li>
                             </ul>
                         </div>

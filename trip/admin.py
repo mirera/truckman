@@ -22,7 +22,8 @@ from .models import (
     LoadingListItem,
     BorderStop,
     StopPoint,
-    DailyRegister
+    DailyRegister,
+    TripIncident
 )
 
 # Register your models here.
@@ -49,3 +50,4 @@ admin.site.register(LoadingListItem)
 admin.site.register(BorderStop)
 admin.site.register(StopPoint)
 admin.site.register(DailyRegister)
+admin.site.register(TripIncident)

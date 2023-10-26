@@ -360,7 +360,7 @@
     $(document).ready(function() {
         $('#addVehicleMakeForm').submit(function(e) {
             e.preventDefault(); // Prevent the default form submission
-
+ 
             // Serialize the form data
             var formData = $(this).serialize();
 
@@ -387,6 +387,17 @@
 
                         // Clear the form fields
                         $('#addVehicleMakeForm')[0].reset();
+
+                        // Update the "make" dropdown in the "Add Vehicle Model" modal
+                        var makeSelect = $('#vehicleMakeSelect2');
+                        var newOption = $('<option>', {
+                            value: response.make.id,
+                            text: response.make.name,
+                            selected: true // Set the option as selected
+                        });
+
+                    // Append the new option to the select and select it
+                    makeSelect.append(newOption).val(response.make.id);
                     }
                 },
                 error: function(xhr, textStatus, errorThrown) {
@@ -430,6 +441,60 @@
 
                         // Clear the form fields
                         $('#addVehicleModelForm')[0].reset();
+                    }
+                },
+                error: function(xhr, textStatus, errorThrown) {
+                    // Handle any errors here
+                    console.error('Error:', errorThrown);
+                }
+            });
+        });
+    });
+</script>
+
+<!--autofilling vehicle owner-->
+<script>
+    $(document).ready(function() {
+        $('#addVehicleOwnerForm').submit(function(e) {
+            e.preventDefault(); // Prevent the default form submission
+
+            // Serialize the form data
+            var formData = $(this).serialize();
+
+            // Send an AJAX POST request to add the new vehicle make
+            $.ajax({
+                type: 'POST',
+                url: $(this).attr('action'),
+                data: formData,
+                success: function(response) {
+                    // Check if the response indicates success
+                    if (response.success) {
+                        var ownerSelect = $('#vehicleOwnerSelect');
+                        var newOption = $('<option>', {
+                            value: response.partner.id,
+                            text: response.partner.name,
+                            selected: true // Set the option as selected
+                        });
+
+                        // Append the new option to the select and select it
+                        ownerSelect.append(newOption).val(response.partner.id);
+
+                        // Close the modal
+                        $('#addVehicleOwner').modal('hide');
+
+                        // Clear the form fields
+                        $('#addVehicleOwnerForm')[0].reset();
+
+                        // Update the "owner" dropdown in the "Add Vehicle Owner" modal
+                        var ownerSelect = $('#vehicleOwnerSelect2');
+                        var newOption = $('<option>', {
+                            value: response.partner.id,
+                            text: response.partner.name,
+                            selected: true // Set the option as selected
+                        });
+
+                    // Append the new option to the select and select it
+                    ownerSelect.append(newOption).val(response.partner.id);
                     }
                 },
                 error: function(xhr, textStatus, errorThrown) {

@@ -730,6 +730,7 @@ PARKING_REASONS = (
     ('Missing Documentation Client Side','Missing Documentation Client Side'),
 )
 class DailyRegister(models.Model):
+    #id = models.UUIDField(default=uuid.uuid4, unique=True, primary_key=True) 
     company = models.ForeignKey(Client, on_delete=models.CASCADE, null=True)
     trip = models.ForeignKey(Trip, on_delete=models.SET_NULL, null=True)
     driver = models.ForeignKey(Driver, on_delete=models.SET_NULL, null=True)
@@ -745,3 +746,23 @@ class DailyRegister(models.Model):
     vehicle_status = models.CharField(choices=VEHICLE_CHOICES)
     reason_parked = models.CharField(choices=PARKING_REASONS, null=True, blank=True)
     
+    def __str__(self):
+        return self.driver.first_name
+#---------------------------------- Trip Incident Model ----------------------------------------------- 
+
+class TripIncident(models.Model):
+    id = models.UUIDField(default=uuid.uuid4, unique=True, primary_key=True) 
+    company = models.ForeignKey(Client, on_delete=models.CASCADE, null=True)
+    trip = models.ForeignKey(Trip, on_delete=models.SET_NULL, null=True)
+    vehicle = models.ForeignKey(Vehicle, on_delete=models.SET_NULL, null=True)
+    time_added = models.DateTimeField(auto_now_add=True)
+    description = models.TextField(max_length=255, null=True) 
+    time_happened = models.DateTimeField(null=True)
+    added_by = models.ForeignKey(CustomUser, on_delete=models.CASCADE, null=True)
+
+    class Meta:
+        ordering = ['-time_added']
+    
+    def __str__(self):
+        return self.vehicle.plate_number
+  

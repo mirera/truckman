@@ -17,7 +17,8 @@ from .models import (
     Expense_Category,
     Expense,
     Reminder,
-    DailyRegister
+    DailyRegister,
+    TripIncident
 )
 
 
@@ -444,5 +445,22 @@ class DailyRegisterForm(forms.ModelForm):
                 
             }    
 
-#---------------------------------- Reminder forms --------------------------------------
+#---------------------------------- Trip Incident forms --------------------------------------
+
+class TripIncidentForm(forms.ModelForm):
+
+    def __init__(self, *args, **kwargs):
+        company = kwargs.pop('company')# Get the company from kwargs
+        super(TripIncidentForm, self).__init__(*args, **kwargs)
+        self.fields['vehicle'].queryset = Vehicle.objects.filter(company=company, is_available=False)  #vehicles which are on the trip
+     
+    class Meta:
+        model = TripIncident
+        fields = ['vehicle', 'description', 'time_happened']
+        
+        widgets = {
+                'vehicle': forms.Select(attrs={'class': 'form-select js-select2', 'id':'vehicleSelect'}),
+                'description': forms.Textarea(attrs={'class': 'form-control', 'placeholder':'Describe the incident here..'}),
+                #'time_happened': forms.DateInput(attrs={'class': 'form-control  date-picker time-picker', 'data-date-format':'yyyy-mm-dd', 'placeholder':'yyyy-mm-dd'}),     
+            }    
 
