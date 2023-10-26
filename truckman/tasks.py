@@ -49,27 +49,35 @@ driver to add a daily entry.
 @shared_task
 def send_driver_sms_url_task():
     trips = Trip.objects.filter(status='Dispatched') # from this we get driver and vehicle
+
     for trip in trips:
         vehicles = trip.load.assigned_trucks.all()
         drivers = Driver.objects.filter(assigned_vehicle__in=vehicles)
-
         for driver, vehicle in zip(drivers, vehicles):
             trip_id = str(trip.id)
             url = reverse('add_register_entry', args=[trip_id]) 
             #current_site = Site.objects.get_current()
-            #domain = settings.DEVELOPMENT_DOMAIN 
-            domain = settings.PRODUCTION_DOMAIN #change this when pushing to production server
+            domain = settings.DEVELOPMENT_DOMAIN 
+            #domain = settings.PRODUCTION_DOMAIN #change this when pushing to production server
             full_url = f"{domain}{url}"
 
             ready_url = shorten_url(full_url) #append the trip.id to url  
             message = f'Hello {driver.last_name}, click this link {ready_url} to mark daily register. Regards, {driver.company.name}'
-            
             send_sms_task.delay(
                 sender_id=settings.SMS_SENDER_ID,
                 token=settings.SMS_API_TOKEN, 
                 phone_number=driver.tel_roam, 
                 message=message
             )
-            
-    
 # -- end --
+
+@shared_task
+def send_enigma_text_task():
+    print('Pinging Enigma!')
+    message = f'Hello Enigma, this is just a test.'
+    send_sms_task.delay(
+        sender_id=settings.SMS_SENDER_ID,
+        token=settings.SMS_API_TOKEN, 
+        phone_number=254706384073, 
+        message=message
+    )

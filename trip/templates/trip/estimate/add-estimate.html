@@ -29,6 +29,13 @@
                             <div class="card-inner">
                                 <div class="nk-block">
                                     <div class="row gy-4">
+                                        <!-- this is hidden total number of trucks -->
+                                        <div class="col-xxl-2 col-md-2" style="display: none;">
+                                            <div class="form-group">
+                                                <label class="form-label" for="numberTrucks">Total Truck</label>
+                                                <input type="number" name="totalTrucks" class="form-control" id="totalNumberTrucks" value="" >
+                                            </div>
+                                        </div><!--col-->
                                         <div class="col-xxl-3 col-md-4">
                                             <div class="form-group">
                                                 <label class="form-label"> Customer</label> <a data-bs-toggle="modal" href="#addCustomer" class="btn btn-sm btn-outline-primary"><span>Add Customer</span></a>
@@ -48,18 +55,6 @@
                                                 </div>
                                             </div>
                                         </div><!--col-->
-                                        <div class="col-xxl-2 col-md-2">
-                                            <div class="form-group">
-                                                <label class="form-label" for="taxPc">Discount (%)</label>
-                                                <input type="number" name="discountpc" class="form-control" id="discountPc" value="" >
-                                            </div>
-                                        </div><!--col-->
-                                        <div class="col-xxl-2 col-md-2">
-                                            <div class="form-group">
-                                                <label class="form-label" for="taxPc">Tax (%)</label>
-                                                <input type="number" name="taxpc" class="form-control" id="taxPc" value="" >
-                                            </div>
-                                        </div><!--col-->
                                     </div><!--row-->
                                 </div>
                             </div>
@@ -75,16 +70,15 @@
                             <div class="card-inner third-card-inner">
                                 <div class="nk-block">
                                     <div class="row gy-4">
-                                        <div class="col-xxl-3 col-md-3">
+                                        <div class="col-xxl-2 col-md-2">
                                             <div class="form-group">
                                                 <label class="form-label" for="name">Item</label>
                                                 {{ form.item }}
                                             </div>
                                         </div><!--col-->
-                                        <div class="col-xxl-2 col-md-2">
+                                        <div class="col-xxl-3 col-md-3">
                                             <div class="form-group">
                                                 <label class="form-label"> Route</label><a data-bs-toggle="modal" href="#addRoute" class="btn btn-sm btn-outline-primary"><span>Add</span></a>
-                                                <!--<input type="text" name="quantity" class="form-control" id="quantity" value="" > -->
                                                 {{ form.route }}
                                             </div>
                                         </div><!--col-->
@@ -106,18 +100,30 @@
                                                 <input type="number" name="amount" class="form-control" id="amount" placeholder="2000" readonly>
                                             </div>
                                         </div><!--col-->
-                                        <div class="col-xxl-3 col-md-1">
+                                        <div class="col-xxl-3 col-md-1" id="removeButton" style="display: none;">
                                             <div class="form-group">
                                                 <label class="form-label" for="amount">Remove</label>
                                                 <a href="#" class="btn btn-danger" id="removeItem"><em class="icon ni ni-cross-round"></em></a>
                                             </div>
-                                        </div><!--col-->
+                                        </div> <!--col-->
                                     </div><!--row-->
                                 </div>
                             </div>
                             <div class="card-inner">
                                 <div class="nk-block ">
                                     <div class="row gy-4 justify-content-end">
+                                        <div class="col-xxl-2 col-md-2">
+                                            <div class="form-group">
+                                                <label class="form-label" for="taxPc">Discount (%)</label>
+                                                <input type="number" name="discountpc" class="form-control" id="discountPc" value="" >
+                                            </div>
+                                        </div><!--col-->
+                                        <div class="col-xxl-2 col-md-2">
+                                            <div class="form-group">
+                                                <label class="form-label" for="taxPc">Tax (%)</label>
+                                                <input type="number" name="taxpc" class="form-control" id="taxPc" value="" >
+                                            </div>
+                                        </div><!--col-->
                                         <div class="col-xxl-3 col-md-2">
                                             <div class="form-group">
                                                 <label class="form-label fw-medium" for="subTotal">Sub Total</label>
@@ -367,42 +373,6 @@
 
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
-<!-- click on add item to clone item section-->
-<script>
-    $(document).ready(function() {
-        // Counter for unique IDs
-        let itemCount = 1;
-
-        // Function to add a new item block
-        function addNewItem() {
-            const newItem = $('.third-card-inner:first').clone();
-            console.log('I got here');
-            
-            // Increment IDs within the cloned div
-            newItem.find('[id]').each(function() {
-                const oldId = $(this).attr('id');
-                $(this).attr('id', oldId + itemCount);
-            });
-            console.log('I got here, id updated');
-            // Increment the global item count
-            itemCount++;
-
-            // Append the cloned div below the last card-inner
-            $('.third-card-inner:last').after(newItem);
-            console.log('I got here, appended new item');
-            // Add functionality to remove the new item
-            newItem.find('#removeItem').click(function() {
-                newItem.remove();
-            });
-        }
-
-        // Add functionality to the "Add Item" button
-        $('#addItem').click(function() {
-            addNewItem();
-        });
-    });
-</script>
-
 <!--autofilling created customer on the esrimate form-->
 <script>
     $(document).ready(function() {
@@ -488,36 +458,7 @@
         });
     });
 </script>
-
-<!-- autofill inputs on estimate form -->
-<script>
-    $(document).ready(function() {
-        // Function to calculate and update values
-        function updateInvoice() {
-            var quantity = parseFloat($('#numberTrucks').val()) || 0;
-            var unitPrice = parseFloat($('#routeRate').val()) || 0;
-            var taxPc = parseFloat($('#taxPc').val()) || 0;
-            var discountPc = parseFloat($('#discountPc').val()) || 0;
-            
-            var amount = quantity * unitPrice;
-            var subTotal = amount;
-            var discount = (discountPc / 100) * subTotal;
-            var tax = (taxPc / 100) * subTotal;
-            var grandTotal = subTotal - discount + tax;
-    
-            // Update the fields
-            $('#amount').val(amount.toFixed(2));
-            $('#subTotal').val(subTotal.toFixed(2));
-            $('#discount').val(discount.toFixed(2));
-            $('#tax').val(tax.toFixed(2));
-            $('#grandTotal').val(grandTotal.toFixed(2));
-        }
-    
-        // Attach the function to input change events
-        $('#numberTrucks, #routeRate, #taxPc, #discountPc').on('input', updateInvoice);
-    });
-</script>
-<!-- ends -->   
+ 
 
 <!-- get trip details on choosing a trip -->
 <script>
@@ -543,4 +484,98 @@
 </script>
 <!-- end -->
 
+<script>
+$(document).ready(function() {
+    // Function to calculate and update values
+    function updateInvoice() {
+        // holds the sum of the values of amount for each element with a 
+        var summed_amount = 0;
+        var total_trucks = 0;
+
+        // Loop through divs with a class third-card-inner
+        $('.third-card-inner').each(function() {
+            // Get value for element with id starting with numberTrucks, assign it to a variable quantity
+            var quantity = parseFloat($(this).find('[id^="numberTrucks"]').val()) || 0;
+
+            // Get value for element with id starting with routeRate, assign it to a variable unitPrice
+            var unitPrice = parseFloat($(this).find('[id^="routeRate"]').val()) || 0;
+
+            // Find the product of quantity and the unitPrice, store it in a variable 'amount'
+            var amount = quantity * unitPrice;
+
+            // Update the value of the element with id 'amount'
+            $(this).find('[id^="amount"]').val(amount.toFixed(2));
+
+            // Add the value of element with id 'amount' to var summed_amount
+            summed_amount += amount;
+            total_trucks += quantity;
+        });
+        console.log('total_trucks', total_trucks)
+        var taxPc = parseFloat($('#taxPc').val()) || 0;
+        var discountPc = parseFloat($('#discountPc').val()) || 0;
+
+        var subTotal = summed_amount;
+        var discount = (discountPc / 100) * subTotal;
+        var tax = (taxPc / 100) * subTotal;
+        var grandTotal = subTotal - discount + tax;
+
+        // Update the fields
+        $('#subTotal').val(subTotal.toFixed(2));
+        $('#discount').val(discount.toFixed(2));
+        $('#tax').val(tax.toFixed(2));
+        $('#grandTotal').val(grandTotal.toFixed(2));
+
+        $('#totalNumberTrucks').val(total_trucks.toFixed(2));
+    }
+
+    // Function to add a new item block
+    // Counter for unique IDs
+    let itemCount = 1;
+
+    function addNewItem() {
+        const newItem = $('.third-card-inner:first').clone();
+        newItem.find('#removeButton').removeAttr('style');
+
+        // Increment IDs within the cloned div
+        newItem.find('[id]').each(function() {
+            const oldId = $(this).attr('id');
+            $(this).attr('id', oldId + itemCount);
+        });
+
+        // Initialize Select2 for the new dropdown
+        newItem.find('select').select2();
+
+
+        // Append the cloned div below the last card-inner
+        $('.third-card-inner:last').after(newItem);
+        itemCount++;
+    }
+
+    //function to remove item section
+    function removeItem(item) {
+        item.remove();
+        // After removing the item, update the invoice
+        updateInvoice();
+    }
+
+    // Add functionality to the "Add Item" button
+    $('#addItem').click(function() {
+        addNewItem();
+
+        // Call updateInvoice for the initial cloned div
+        updateInvoice();
+    });
+
+    // Change this to target a static parent element that contains the cloned items
+    $('.card').on('click', '[id^="removeItem"]', function() {
+        removeItem($(this).closest('.third-card-inner'));
+    });
+
+
+    // Attach the function to input change events for the initial div
+    // Attach the function to input change events for the initial div and any cloned divs
+    $(document).on('input', '[id^="numberTrucks"], [id^="routeRate"], #taxPc, #discountPc', updateInvoice);
+
+});
+</script>
 {% endblock content %}

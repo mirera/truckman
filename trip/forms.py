@@ -302,7 +302,7 @@ class EstimateForm(forms.ModelForm):
 
         widgets = {
                 'customer': forms.Select(attrs={'class': 'form-select js-select2', 'id':'customerSelect'}),
-                'item': forms.Select(attrs={'class': 'form-select js-select2', 'id':'itemSelect'}),
+                'item': forms.Select(attrs={'class': 'form-select js-select2', 'id':'itemSelect'}), 
                 'route': forms.Select(attrs={'class': 'form-select js-select2', 'id':'routeSelect'}),
                 'rate': forms.NumberInput(attrs={'class': 'form-control', 'placeholder':'7800', 'id':'rate'}),
                 'trucks': forms.NumberInput(attrs={'class': 'form-control', 'placeholder':'7800', 'id':'trucks'}),
