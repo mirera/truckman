@@ -589,6 +589,8 @@ def add_customer(request):
             credit_limit = request.POST.get('credit_limit'),
             payment_term = request.POST.get('payment_term'),
             logo = request.FILES.get('logo'),
+            tin = request.POST.get('tin'),
+            brn = request.POST.get('brn'),
         )
 
         messages.success(request, f'Customer was added successfully.')
@@ -620,6 +622,8 @@ def add_customer_modal(request):
             credit_limit = request.POST.get('credit_limit'),
             payment_term = request.POST.get('payment_term'),
             logo = request.FILES.get('logo'),
+            tin = request.POST.get('tin'),
+            brn = request.POST.get('brn'),
         )
         return JsonResponse({'success': True, 'customer': {'id': customer.id, 'name': customer.name}})
     else:
@@ -646,6 +650,8 @@ def update_customer(request, pk):
         customer.website = request.POST.get('website')
         customer.credit_limit = request.POST.get('credit_limit')
         customer.payment_term = request.POST.get('payment_term')
+        customer.tin = request.POST.get('tin')
+        customer.brn = request.POST.get('brn')
 
         # Check if new images/files are provided
         if request.FILES.get('logo'):
@@ -669,6 +675,8 @@ def update_customer(request, pk):
             'website': customer.website,
             'credit_limit': customer.credit_limit,
             'payment_term': customer.payment_term,
+            'tin':customer.tin,
+            'brn':customer.brn
         }
 
         form = CustomerForm(initial=form_data)
@@ -2744,7 +2752,7 @@ def add_register_entry(request, pk):
     if request.method == 'POST':
         general_coordinates = format_coordinates(request.POST.get('general_coordinates'))
 
-        location_data = reverse_geocode(general_coordinates)
+        location_data = reverse_geocode(general_coordinates) 
         user_timezone = location_data.get('timezone')
 
         user_tz = pytz.timezone(user_timezone)
@@ -2755,7 +2763,7 @@ def add_register_entry(request, pk):
         if 5 <= current_time.hour < 11:
             datetime_field = 'morning'
         elif 12 <= current_time.hour < 16:
-            datetime_field = 'midday'
+            datetime_field = 'midday' 
         elif 17 <= current_time.hour < 21:
             datetime_field = 'evening'
         else:

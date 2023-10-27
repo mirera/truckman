@@ -175,6 +175,8 @@ class Customer(models.Model):
     credit_limit = models.IntegerField(null=True)
     date_added = models.DateTimeField(auto_now_add=True)
     logo = models.ImageField(upload_to='customer_logo/', null=True, blank=True)
+    tin = models.CharField(max_length=150, null=True, blank=True) #Tax Identification Number
+    brn = models.CharField(max_length=150, null=True, blank=True) #Business registration number
 
     #generate customer_id 
     def save(self, *args, **kwargs):
@@ -764,5 +766,5 @@ class TripIncident(models.Model):
         ordering = ['-time_added']
     
     def __str__(self):
-        return self.vehicle.plate_number
+        return self.vehicle.plate_number 
   

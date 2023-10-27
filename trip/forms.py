@@ -162,6 +162,9 @@ class CustomerForm(forms.ModelForm):
                 'credit_limit': forms.NumberInput(attrs={'class': 'form-control', 'placeholder':'20'}),
                 'payment_term': forms.Select(attrs={'class': 'form-select js-select2'}),
                 'logo': forms.FileInput(attrs={'class': 'form-file-input', 'id': 'customFile'}),
+                'tin': forms.TextInput(attrs={'class': 'form-control', 'placeholder':'Tax Identification Number'}),
+                'brn': forms.TextInput(attrs={'class': 'form-control', 'placeholder':'Business Registration Number'}),
+
             }    
 
 #---------------------------------- Consignee forms ------------------------------------------ 
@@ -462,5 +465,5 @@ class TripIncidentForm(forms.ModelForm):
                 'vehicle': forms.Select(attrs={'class': 'form-select js-select2', 'id':'vehicleSelect'}),
                 'description': forms.Textarea(attrs={'class': 'form-control', 'placeholder':'Describe the incident here..'}),
                 #'time_happened': forms.DateInput(attrs={'class': 'form-control  date-picker time-picker', 'data-date-format':'yyyy-mm-dd', 'placeholder':'yyyy-mm-dd'}),     
-            }    
+         }    
 
