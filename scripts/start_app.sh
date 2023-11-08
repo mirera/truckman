@@ -12,14 +12,6 @@ python manage.py collectstatic
 sudo service gunicorn restart
 sudo service nginx restart
 
-sudo systemctl disable celery-beat-mdeni.service
-sudo systemctl stop celery-beat-mdeni.service
-
-sudo systemctl disable celery-worker-mdeni.service
-sudo systemctl stop celery-worker-mdeni.service
-
-sudo rm -r /etc/systemd/system/celery-beat-mdeni.service
-rm -r /etc/systemd/system/celery-worker-mdeni.service
 
 sudo cp /home/ubuntu/truckman/celery/celery-beat-truckman.service  /etc/systemd/system/celery-beat-truckman.service
 sudo cp /home/ubuntu/truckman/celery/celery-worker-truckman.service  /etc/systemd/system/celery-worker-truckman.service 

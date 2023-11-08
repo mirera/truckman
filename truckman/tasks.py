@@ -49,9 +49,7 @@ driver to add a daily entry.
 @shared_task
 def send_driver_sms_url_task():
     trips = Trip.objects.filter(status='Dispatched') # from this we get driver and vehicle
-
     for trip in trips:
-        print('Step 3')
         vehicles = trip.load.assigned_trucks.all()
         drivers = Driver.objects.filter(assigned_vehicle__in=vehicles)
         for driver, vehicle in zip(drivers, vehicles):
@@ -63,7 +61,7 @@ def send_driver_sms_url_task():
             full_url = f"{domain}{url}"
 
             ready_url = shorten_url(full_url) #append the trip.id to url  
-            message = f'Hello {driver.last_name}, click this link {ready_url} to mark daily register. Regards, {driver.company.name}'
+            message = f'Hello {driver.first_name} {driver.last_name}, click this link {ready_url} to mark daily register. Regards, {driver.company.name}'
             send_sms_task.delay(
                 sender_id=settings.SMS_SENDER_ID,
                 token=settings.SMS_API_TOKEN, 
