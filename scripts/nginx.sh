@@ -10,3 +10,5 @@ sudo ln -s /etc/nginx/sites-available/truckman /etc/nginx/sites-enabled/
 sudo gpasswd -a www-data ubuntu
 sudo systemctl restart nginx
 
+
+

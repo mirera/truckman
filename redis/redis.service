@@ -1,0 +1,16 @@
+
+
+[Unit]
+Description=Redis Server
+After=network.target
+
+[Service]
+ExecStart=/usr/bin/redis-server /etc/redis/redis.conf
+ExecReload=/bin/kill -s HUP $MAINPID
+Type=notify
+User=redis
+Group=redis
+Restart=always
+
+[Install]
+WantedBy=multi-user.target

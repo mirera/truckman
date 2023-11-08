@@ -1,0 +1,15 @@
+
+[Unit]
+Description=Celery Beat Service daemon for truckman
+After=network.target
+
+[Service]
+User=ubuntu
+Group=www-data
+WorkingDirectory=/home/ubuntu/truckman
+ExecStart=/home/ubuntu/truckman_env/bin/celery -A truckman beat  -s /var/lib/celery/truckman/celerybeat-schedule --logfile=/home/ubuntu/truckman/truckman/celery-beat.log
+Restart=always
+
+[Install]
+WantedBy=multi-user.target
+

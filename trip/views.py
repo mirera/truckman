@@ -5,6 +5,7 @@ from django.utils import timezone
 from datetime import datetime
 import pytz
 import os
+import json
 from django.shortcuts import get_object_or_404
 from django.conf import settings
 from django.contrib import messages
@@ -42,7 +43,8 @@ from . models import (
     DailyRegister,
     LoadingList,
     LoadingListItem,
-    TripIncident
+    TripIncident, 
+    EstimateItem
 )
 
 from .forms import (
@@ -62,7 +64,8 @@ from .forms import (
     InvoiceForm,
     EstimateForm,
     DailyRegisterForm,
-    TripIncidentForm
+    TripIncidentForm, 
+    EstimateItemForm
 )
 
 from truckman.utils import get_user_company, generate_invoice_pdf, export_model_data, reverse_geocode, format_coordinates, get_location_data
@@ -589,6 +592,8 @@ def add_customer(request):
             credit_limit = request.POST.get('credit_limit'),
             payment_term = request.POST.get('payment_term'),
             logo = request.FILES.get('logo'),
+            tin = request.POST.get('tin'),
+            brn = request.POST.get('brn'),
         )
 
         messages.success(request, f'Customer was added successfully.')
@@ -620,6 +625,8 @@ def add_customer_modal(request):
             credit_limit = request.POST.get('credit_limit'),
             payment_term = request.POST.get('payment_term'),
             logo = request.FILES.get('logo'),
+            tin = request.POST.get('tin'),
+            brn = request.POST.get('brn'),
         )
         return JsonResponse({'success': True, 'customer': {'id': customer.id, 'name': customer.name}})
     else:
@@ -646,6 +653,8 @@ def update_customer(request, pk):
         customer.website = request.POST.get('website')
         customer.credit_limit = request.POST.get('credit_limit')
         customer.payment_term = request.POST.get('payment_term')
+        customer.tin = request.POST.get('tin')
+        customer.brn = request.POST.get('brn')
 
         # Check if new images/files are provided
         if request.FILES.get('logo'):
@@ -669,6 +678,8 @@ def update_customer(request, pk):
             'website': customer.website,
             'credit_limit': customer.credit_limit,
             'payment_term': customer.payment_term,
+            'tin':customer.tin,
+            'brn':customer.brn
         }
 
         form = CustomerForm(initial=form_data)
@@ -2320,29 +2331,23 @@ def generate_invoice_pdf(request, pk):
 @permission_required('trip.add_estimate')
 def add_estimate(request):
     company = get_user_company(request) 
+    
     #instantiate the two kwargs to be able to access them on the forms.py
     stop_points = StopPoint.objects.filter(company=company)
     border_points = BorderStop.objects.filter(company=company)
     form = EstimateForm(request.POST, company=company)  
-    customer_form = CustomerForm(request.POST) 
-    if request.method == 'POST':
+    customer_form = CustomerForm(request.POST)
+    item_form = EstimateItemForm(request.POST)  
 
+    if request.method == 'POST':
         customer_id = request.POST.get('customer')
         customer = Customer.objects.get(company=company, id=customer_id)
-
-        route_id = request.POST.get('route')
-        route = Route.objects.get(company=company, id=route_id)
 
         #create instance of a invoice
         estimate = Estimate.objects.create(
             company=company,
             customer = customer,
-            route = route,
             valid_till = request.POST.get('valid_till'),
-            description = route.description,
-            item = request.POST.get('item'),
-            trucks = float(request.POST.get('totalTrucks')),
-            rate = request.POST.get('rate'),
             sub_total = request.POST.get('sub_total'),
             discount = request.POST.get('discount'),
             tax = request.POST.get('tax'),
@@ -2350,12 +2355,35 @@ def add_estimate(request):
             note = request.POST.get('note'),
         )
 
+        
+        # get the items added original and added/cloned
+        quotation_items_json = request.POST.get('quotation_items')
+        quotation_items = json.loads(quotation_items_json)
+
+        for key, item_data in quotation_items.items():
+            route_id = item_data['route']
+            route = get_object_or_404(Route, id=route_id)
+            estimate_item = EstimateItem.objects.create(
+                company=estimate.company,
+                estimate=estimate,
+                item_type=item_data['item_type'],
+                route=route,
+                trucks=int(item_data['trucks']),
+                rate=int(item_data['rate']),
+                amount=int(item_data['amount']),
+            )
+
+            estimate.description = estimate_item.route.description,
+            estimate.save()
+            print(f'Each item description: {estimate.description}')
+
         messages.success(request, f'Estimate was added successfully.')
         return redirect('view_estimate', estimate.id)
 
     context= {
         'form':form,
         'customer_form':customer_form,
+        'item_form':item_form,
         'stop_points':stop_points,
         'border_points':border_points
 
@@ -2744,7 +2772,7 @@ def add_register_entry(request, pk):
     if request.method == 'POST':
         general_coordinates = format_coordinates(request.POST.get('general_coordinates'))
 
-        location_data = reverse_geocode(general_coordinates)
+        location_data = reverse_geocode(general_coordinates) 
         user_timezone = location_data.get('timezone')
 
         user_tz = pytz.timezone(user_timezone)
@@ -2755,7 +2783,7 @@ def add_register_entry(request, pk):
         if 5 <= current_time.hour < 11:
             datetime_field = 'morning'
         elif 12 <= current_time.hour < 16:
-            datetime_field = 'midday'
+            datetime_field = 'midday' 
         elif 17 <= current_time.hour < 21:
             datetime_field = 'evening'
         else:

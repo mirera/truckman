@@ -10,7 +10,7 @@
 {% endfor %}
 {% endif %}
 <div class="nk-content ">
-    <div class="container-fluid">
+    <div class="container-fluid"> 
         <div class="nk-content-inner">
             <div class="nk-content-body">
                 <div class="nk-block-head nk-block-head-sm">
@@ -55,6 +55,22 @@
                                             <label class="form-label">Contact Email</label>
                                             <div class="form-control-wrap">
                                                 {{ form.email }}
+                                            </div>
+                                        </div>
+                                    </div><!--col-->
+                                    <div class="col-xxl-3 col-md-4">
+                                        <div class="form-group">
+                                            <label class="form-label">Business Registration Number (BRN)</label>
+                                            <div class="form-control-wrap">
+                                                {{ form.brn }} 
+                                            </div>
+                                        </div>
+                                    </div><!--col-->
+                                    <div class="col-xxl-3 col-md-4">
+                                        <div class="form-group">
+                                            <label class="form-label">Tax Indentification Number (TIN)</label>
+                                            <div class="form-control-wrap">
+                                                {{ form.tin }} 
                                             </div>
                                         </div>
                                     </div><!--col-->
