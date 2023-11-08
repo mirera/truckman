@@ -28,10 +28,6 @@ app.conf.beat_schedule = {
             hour='6,13,18',  # Run at 7am, 1pm, and 6pm
         ),
     },
-    'send_driver_sms_url_task': {
-        'task': 'truckman.tasks.send_driver_sms_url_task',
-        'schedule': crontab(minute='*'),
-    },
     
 } 
 '''
