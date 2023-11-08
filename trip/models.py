@@ -3,6 +3,9 @@ from django.db import transaction
 import uuid
 from django.utils import timezone
 from authentication.forms import Client, CustomUser
+from decimal import Decimal
+
+
 import uuid
 
 #---------------------------------- Vehicle models ------------------------------------------
@@ -326,7 +329,7 @@ class Service(models.Model):
 
     def __str__(self):
         return self.name
-
+ 
 # estimate model
 ESTIMATE_STATUS = (
     ('Accepted','Accepted'),
@@ -342,12 +345,12 @@ class Estimate(models.Model):
     id = models.UUIDField(default=uuid.uuid4, unique=True, primary_key=True) 
     company = models.ForeignKey(Client, on_delete=models.CASCADE)
     customer = models.ForeignKey(Customer, on_delete=models.SET_NULL, null=True)
-    route = models.ForeignKey(Route, on_delete=models.SET_NULL, null=True)
+    #route = models.ForeignKey(Route, on_delete=models.SET_NULL, null=True)
     estimate_id = models.CharField(max_length=7, unique=True, editable=False)
-    item = models.CharField(max_length=20, default='Container', choices=ESTIMATE_ITEM_TYPE)
-    trucks = models.IntegerField(default=0.00) #initially quantity
-    rate = models.IntegerField(default=0.00) #initially unit_price
-    description = models.CharField(max_length=100, null=True)
+    #item = models.CharField(max_length=20, default='Container', choices=ESTIMATE_ITEM_TYPE)
+    #trucks = models.IntegerField(default=0.00) #initially quantity
+    #rate = models.IntegerField(default=0.00) #initially unit_price
+    #description = models.CharField(max_length=100, null=True)
     sub_total = models.FloatField(default=0.00)
     tax = models.FloatField(default=0.00)
     discount = models.FloatField(default=0.00)
@@ -378,8 +381,26 @@ class Estimate(models.Model):
 
     def __str__(self):
         return self.estimate_id
+
+ITEM_TYPE = (
+    ('Container','Container'),
+    ('Loose Cargo','Loose Cargo'),
+) 
+class EstimateItem(models.Model):
+    id = models.UUIDField(default=uuid.uuid4, unique=True, primary_key=True) 
+    company = models.ForeignKey(Client, on_delete=models.CASCADE)
+    estimate = models.ForeignKey(Estimate, on_delete=models.CASCADE)
+    item_type = models.CharField(max_length=20, default='Container', choices=ESTIMATE_ITEM_TYPE)
+    route = models.ForeignKey(Route, on_delete=models.SET_NULL, null=True)
+    trucks = models.DecimalField(max_digits=10, decimal_places=2, default=Decimal('0.00'))
+    rate = models.DecimalField(max_digits=10, decimal_places=2, default=Decimal('0.00'))
+    amount = models.DecimalField(max_digits=10, decimal_places=2, default=Decimal('0.00'))
+
+    description = models.CharField(max_length=100, null=True)
     
 
+    def __str__(self):
+        return f"Loading List Item {self.id}"
 #---------------------------------- Trip & Load Modules -----------------------------------------------
 
 #Load model
@@ -768,3 +789,5 @@ class TripIncident(models.Model):
     def __str__(self):
         return self.vehicle.plate_number 
   
+
+

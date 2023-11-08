@@ -18,7 +18,8 @@ from .models import (
     Expense,
     Reminder,
     DailyRegister,
-    TripIncident
+    TripIncident,
+    EstimateItem
 )
 
 
@@ -306,10 +307,10 @@ class EstimateForm(forms.ModelForm):
 
         widgets = {
                 'customer': forms.Select(attrs={'class': 'form-select js-select2', 'id':'customerSelect'}),
-                'item': forms.Select(attrs={'class': 'form-select js-select2', 'id':'itemSelect'}), 
-                'route': forms.Select(attrs={'class': 'form-select js-select2', 'id':'routeSelect'}),
-                'rate': forms.NumberInput(attrs={'class': 'form-control', 'placeholder':'7800', 'id':'rate'}),
-                'trucks': forms.NumberInput(attrs={'class': 'form-control', 'placeholder':'7800', 'id':'trucks'}),
+                #'item': forms.Select(attrs={'class': 'form-select js-select2', 'id':'itemSelect'}), 
+                #'route': forms.Select(attrs={'class': 'form-select js-select2', 'id':'routeSelect'}),
+                #'rate': forms.NumberInput(attrs={'class': 'form-control', 'placeholder':'7800', 'id':'rate'}),
+                #'trucks': forms.NumberInput(attrs={'class': 'form-control', 'placeholder':'7800', 'id':'trucks'}),
                 'description': forms.TextInput(attrs={'class': 'form-control', 'placeholder':'Some descriptions.'}),
                 #'sub_total': forms.NumberInput(attrs={'class': 'form-control', 'placeholder':'7800'}),
                 #'tax': forms.NumberInput(attrs={'class': 'form-control', 'placeholder':'7800'}),
@@ -318,7 +319,24 @@ class EstimateForm(forms.ModelForm):
                 'valid_till': forms.DateInput(attrs={'class': 'form-control  date-picker', 'data-date-format':'yyyy-mm-dd', 'placeholder':'yyyy-mm-dd'}),
                 'note': forms.Textarea(attrs={'class': 'form-control', 'placeholder':'Note some terms/remarks here.'}),
                 'status': forms.Select(attrs={'class': 'form-select js-select2'}), #for updating estimate.
-            }    
+            }  
+
+#---------------------------------- Estimate forms -----------------------------------------------
+class EstimateItemForm(forms.ModelForm):
+    
+    class Meta:
+        model = EstimateItem
+        fields = '__all__' 
+        exclude =['company', 'estimate', 'id', 'description']
+
+        widgets = {
+                'item_type': forms.Select(attrs={'class': 'form-select js-select2', 'id':'item_type'}), 
+                'route': forms.Select(attrs={'class': 'form-select js-select2', 'id':'routeSelect'}),
+                'rate': forms.NumberInput(attrs={'class': 'form-control', 'placeholder':'7800', 'id':'rate'}),
+                'trucks': forms.NumberInput(attrs={'class': 'form-control', 'placeholder':'7800', 'id':'trucks_assigned'}),
+                'amount': forms.NumberInput(attrs={'class': 'form-control', 'placeholder':'7800', 'id':'amount'}),
+                
+            }   
 
 #---------------------------------- Invoice forms -----------------------------------------------
 
@@ -467,3 +485,4 @@ class TripIncidentForm(forms.ModelForm):
                 #'time_happened': forms.DateInput(attrs={'class': 'form-control  date-picker time-picker', 'data-date-format':'yyyy-mm-dd', 'placeholder':'yyyy-mm-dd'}),     
          }    
 
+#-- ends

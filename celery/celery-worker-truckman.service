@@ -1,0 +1,14 @@
+
+[Unit]
+Description=Celery Worker Service daemon for truckman
+After=network.target
+
+[Service]
+User=ubuntu
+Group=www-data
+WorkingDirectory=/home/ubuntu/truckman
+ExecStart=/home/ubuntu/truckman_env/bin/celery -A truckman worker --logfile=/home/ubuntu/truckman/truckman/celery-worker.log
+Restart=always
+
+[Install]
+WantedBy=multi-user.target

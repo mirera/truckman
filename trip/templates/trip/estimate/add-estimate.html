@@ -71,14 +71,14 @@
                                     <div class="row gy-4">
                                         <div class="col-xxl-2 col-md-2">
                                             <div class="form-group">
-                                                <label class="form-label" for="name">Item</label>
-                                                {{ form.item }}
+                                                <label class="form-label" for="name">Item</label> 
+                                                {{ item_form.item_type }}
                                             </div>
                                         </div><!--col-->
                                         <div class="col-xxl-3 col-md-3">
                                             <div class="form-group">
                                                 <label class="form-label"> Route</label><a data-bs-toggle="modal" href="#addRoute" class="btn btn-sm btn-outline-primary"><span>Add</span></a>
-                                                {{ form.route }}
+                                                {{ item_form.route }} 
                                             </div>
                                         </div><!--col-->
                                         <div class="col-xxl-3 col-md-2">
@@ -90,7 +90,7 @@
                                         <div class="col-xxl-2 col-md-2">
                                             <div class="form-group">
                                                 <label class="form-label" for="numberTrucks">Truck(s)</label>
-                                                <input type="number" name="trucks" class="form-control" id="numberTrucks" value="" >
+                                                <input type="number" name="trucks" class="form-control" id="trucks_assigned" value="" >
                                             </div>
                                         </div><!--col-->
                                         <div class="col-xxl-3 col-md-2">
@@ -147,6 +147,8 @@
                                                 <input type="number" name="total" class="form-control text-uppercase fw-bold" id="grandTotal" value="" readonly>
                                             </div>
                                         </div><!--col-->
+                                        <!-- input to receive value of the quotation items-->
+                                        <input type="hidden" name="quotation_items" id="quotation_items" value="">
                                     </div><!--row-->
                                 </div>
                             </div>
@@ -501,16 +503,35 @@
 
 <script>
 $(document).ready(function() {
+    // Initialize quotationItems as an empty object
+    var quotationItems = {};
+
     // Function to calculate and update values
     function updateInvoice() {
         // holds the sum of the values of amount for each element with a 
         var summed_amount = 0;
         var total_trucks = 0;
 
+        // Loop through divs with a class 'third-card-inner'
+        $('.third-card-inner').each(function(index) {
+            var itemId = 'div-' + index;  // Generate a unique item ID
+            quotationItems[itemId] = {
+                'item_type': $(this).find('[id^="item_type"]').val(),
+                'route': $(this).find('[id^="route"]').val(),
+                'trucks': $(this).find('[id^="trucks_assigned"]').val(),
+                'rate': $(this).find('[id^="routeRate"]').val(),
+                'amount': $(this).find('[id^="amount"]').val()
+            };
+        });
+
+        // Update the hidden input field with the JSON string representation of the quotationItems
+        $('#quotation_items').val(JSON.stringify(quotationItems));
+        console.log('Quotation Items:', quotationItems)
+
         // Loop through divs with a class third-card-inner
         $('.third-card-inner').each(function() {
             // Get value for element with id starting with numberTrucks, assign it to a variable quantity
-            var quantity = parseFloat($(this).find('[id^="numberTrucks"]').val()) || 0;
+            var quantity = parseFloat($(this).find('[id^="trucks_assigned"]').val()) || 0;
 
             // Get value for element with id starting with routeRate, assign it to a variable unitPrice
             var unitPrice = parseFloat($(this).find('[id^="routeRate"]').val()) || 0;
@@ -588,8 +609,11 @@ $(document).ready(function() {
 
     // Attach the function to input change events for the initial div
     // Attach the function to input change events for the initial div and any cloned divs
-    $(document).on('input', '[id^="numberTrucks"], [id^="routeRate"], #taxPc, #discountPc', updateInvoice);
+    $(document).on('input', '[id^="trucks_assigned"], [id^="routeRate"], #taxPc, #discountPc', updateInvoice);
+
 
 });
 </script>
+
+
 {% endblock content %}
