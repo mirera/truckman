@@ -12,11 +12,15 @@ python manage.py collectstatic
 sudo service gunicorn restart
 sudo service nginx restart
 
-
+sudo cp /home/ubuntu/truckman/redis/redis.service  /etc/systemd/system/redis.service
 sudo cp /home/ubuntu/truckman/celery/celery-beat-truckman.service  /etc/systemd/system/celery-beat-truckman.service
 sudo cp /home/ubuntu/truckman/celery/celery-worker-truckman.service  /etc/systemd/system/celery-worker-truckman.service 
 
 sudo systemctl daemon-reload
+
+sudo systemctl start redis.service
+sudo systemctl enable redis.service 
+
 sudo systemctl start celery-beat-truckman
 sudo systemctl enable celery-beat-truckman
 
