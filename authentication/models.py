@@ -98,3 +98,13 @@ class CustomUser(AbstractUser):
     dark_mode = models.BooleanField(default=False)
 
 
+#---------------------------WhatsappSetting model--------------------------------------
+class WhatsappSetting(models.Model):
+    id = models.UUIDField(default=uuid.uuid4, unique=True, primary_key=True) 
+    company = models.ForeignKey(Client, on_delete=models.CASCADE)
+    access_token = models.CharField(max_length=255, null=True)
+    instance_id = models.CharField(max_length=255, null=True)
+    
+    
+    def __str__(self):
+        return self.company.name

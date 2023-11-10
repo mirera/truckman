@@ -112,8 +112,8 @@ class DriverForm(forms.ModelForm):
                 'first_name': forms.TextInput(attrs={'class': 'form-control', 'placeholder':'John '}),
                 'last_name': forms.TextInput(attrs={'class': 'form-control', 'placeholder':'Moriasi'}),
                 'id_no': forms.TextInput(attrs={'class': 'form-control', 'placeholder':'34567800'}),
-                'tel_home': forms.TextInput(attrs={'class': 'form-control', 'placeholder':'0700000000'}),
-                'tel_roam': forms.TextInput(attrs={'class': 'form-control', 'placeholder':'0700000000'}),
+                'tel_home': forms.TextInput(attrs={'class': 'form-control', 'placeholder':'254700000000', 'minlength':'12', 'maxlength':'12'}),
+                'tel_roam': forms.TextInput(attrs={'class': 'form-control', 'placeholder':'254700000000', 'minlength':'12', 'maxlength':'12'}),
                 'date_hired': forms.DateInput(attrs={'class': 'form-control  date-picker', 'data-date-format':'yyyy-mm-dd', 'placeholder':'yyyy-mm-dd'}),
                 'date_terminated': forms.DateInput(attrs={'class': 'form-control  date-picker-range', 'data-date-format':'yyyy-mm-dd', 'placeholder':'yyyy-mm-dd'}),
                 'driver_photo': forms.FileInput(attrs={'class': 'form-file-input', 'id': 'customFile'}),
@@ -128,15 +128,15 @@ class DriverForm(forms.ModelForm):
                 #next of kin
                 'emergency_contact_person': forms.TextInput(attrs={'class': 'form-control', 'placeholder':'Moriasi Ndoyo'}),
                 'emergency_contact_person_rlshp': forms.Select(attrs={'class': 'form-select js-select2'}),
-                'emergency_contact_no': forms.TextInput(attrs={'class': 'form-control', 'placeholder':'0700000000'}),
+                'emergency_contact_no': forms.TextInput(attrs={'class': 'form-control', 'placeholder':'254700000000', 'minlength':'12', 'maxlength':'12'}),
 
                 'emergency_contact_person_two': forms.TextInput(attrs={'class': 'form-control', 'placeholder':'Moriasi Ndoyo'}),
                 'emergency_contact_person_two_rlshp': forms.Select(attrs={'class': 'form-select js-select2'}),
-                'emergency_contact_no_two': forms.TextInput(attrs={'class': 'form-control', 'placeholder':'0700000000'}),
+                'emergency_contact_no_two': forms.TextInput(attrs={'class': 'form-control', 'placeholder':'254700000000', 'minlength':'12', 'maxlength':'12'}),
 
                 'emergency_contact_person_three': forms.TextInput(attrs={'class': 'form-control', 'placeholder':'Moriasi Ndoyo'}),
                 'emergency_contact_person_three_rlshp': forms.Select(attrs={'class': 'form-select js-select2'}),
-                'emergency_contact_no_three': forms.TextInput(attrs={'class': 'form-control', 'placeholder':'0700000000'}),
+                'emergency_contact_no_three': forms.TextInput(attrs={'class': 'form-control', 'placeholder':'254700000000', 'minlength':'12', 'maxlength':'12'}),
                 #vehicle data
                 'assigned_vehicle': forms.Select(attrs={'class': 'form-select js-select2'}),
                 'status': forms.Select(attrs={'class': 'form-select js-select2'}),
@@ -153,7 +153,7 @@ class CustomerForm(forms.ModelForm):
         widgets = {
                 'name': forms.TextInput(attrs={'class': 'form-control', 'placeholder':'John Shippers'}),
                 'contact_person': forms.TextInput(attrs={'class': 'form-control', 'placeholder':'Moriasi Iteo'}),
-                'phone': forms.TextInput(attrs={'class': 'form-control', 'placeholder':'034567800'}),
+                'phone': forms.TextInput(attrs={'class': 'form-control', 'placeholder':'254734567800', 'minlength':'12', 'maxlength':'12'}),
                 'email': forms.EmailInput(attrs={'class': 'form-control', 'placeholder':'info@company.com'}),
                 'address_one': forms.TextInput(attrs={'class': 'form-control', 'placeholder':'ABC Road'}),
                 'address_two': forms.TextInput(attrs={'class': 'form-control', 'placeholder':'ABC Road'}),
@@ -184,7 +184,7 @@ class ConsigneeForm(forms.ModelForm):
         widgets = {
                 'name': forms.TextInput(attrs={'class': 'form-control', 'placeholder':'John Shippers'}),
                 'contact_person': forms.TextInput(attrs={'class': 'form-control', 'placeholder':'Moriasi Iteo'}),
-                'phone': forms.TextInput(attrs={'class': 'form-control', 'placeholder':'034567800'}),
+                'phone': forms.TextInput(attrs={'class': 'form-control', 'placeholder':'254734567800', 'minlength':'12', 'maxlength':'12'}),
                 'email': forms.EmailInput(attrs={'class': 'form-control', 'placeholder':'info@company.com'}),
                 'address_one': forms.TextInput(attrs={'class': 'form-control', 'placeholder':'ABC Road'}),
                 'address_two': forms.TextInput(attrs={'class': 'form-control', 'placeholder':'ABC Road'}),
@@ -210,7 +210,7 @@ class ShipperForm(forms.ModelForm):
         widgets = {
                 'name': forms.TextInput(attrs={'class': 'form-control', 'placeholder':'John Shippers'}),
                 'contact_person': forms.TextInput(attrs={'class': 'form-control', 'placeholder':'Moriasi Iteo'}),
-                'phone': forms.TextInput(attrs={'class': 'form-control', 'placeholder':'034567800'}),
+                'phone': forms.TextInput(attrs={'class': 'form-control', 'placeholder':'254734567800', 'minlength':'12', 'maxlength':'12'}),
                 'email': forms.EmailInput(attrs={'class': 'form-control', 'placeholder':'info@company.com'}),
                 'address_one': forms.TextInput(attrs={'class': 'form-control', 'placeholder':'ABC Road'}),
                 'address_two': forms.TextInput(attrs={'class': 'form-control', 'placeholder':'ABC Road'}),

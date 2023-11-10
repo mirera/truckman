@@ -9,7 +9,7 @@
         {{ message }}
     </div>
 {% endfor %}
-{% endif %}
+{% endif %} 
 
 <!-- content @s -->
 <div class="nk-content ">
@@ -36,7 +36,7 @@
                                 <a class="nav-link" data-bs-toggle="tab" href="#email"><em class="icon ni ni-mail-fill"></em><span>Email</span> </a>
                             </li>
                             <li class="nav-item">
-                                <a class="nav-link" data-bs-toggle="tab" href="#mpesa"><em class="icon ni ni-wallet"></em><span>Mpesa</span></a>
+                                <a class="nav-link" data-bs-toggle="tab" href="#whatsapp"><em class="icon ni ni-whatsapp"></em><span>Whatsapp</span></a>
                             </li>
                             <li class="nav-item">
                                 <a class="nav-link" data-bs-toggle="tab" href="#sms"><em class="icon ni ni-emails"></em><span>SMS</span></a>
@@ -44,9 +44,7 @@
                             <li class="nav-item">
                                 <a class="nav-link" data-bs-toggle="tab" href="#security"><em class="icon ni ni-cc-secure-fill"></em><span>Security</span></a>
                             </li>
-                            <li class="nav-item">
-                                <a class="nav-link" data-bs-toggle="tab" href="#templates"><em class="icon ni ni-cc-alt2-fill"></em><span>Templates</span></a>
-                            </li>
+                            
                         </ul>
                         <div class="tab-content">
                             <div class="tab-pane active" id="site">
@@ -546,6 +544,47 @@
                                     </form>
                                 </div>
                             </div><!-- .tab-pane -->
+                            <div class="tab-pane" id="whatsapp">
+                                <form id="connectForm" action="{% url 'update_whatsapp' company.id %}" method="POST" >
+                                    {% csrf_token %}
+                                    <div class="card-inner pt-0">
+                                        <div class="nk-block-head">
+                                            <div class="nk-block-head-content">
+                                                <h4 class="title nk-block-title">Whatsapp Settings</h4>
+                                                <p>Get Access Token from <a href="https://wa.erraniumsms.com/">Erranium</a> </p>
+                                            </div>
+                                        </div>
+                                        <div class="row g-gs">
+                                            <div class="row g-3 align-center">
+                                                <div class="col-lg-5">
+                                                    <div class="form-group">
+                                                        <label class="form-label" for="site-copyright">Access Token</label>
+                                                    </div>
+                                                </div>
+                                                <div class="col-lg-7">
+                                                    <div class="form-group">
+                                                        <div class="form-control-wrap">
+                                                            {{form_whatsapp.access_token}}
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div> <!-- .row -->
+                                        <div class="row g-3">
+                                            <div class="col-lg-7">
+                                                <div class="form-group mt-2">
+                                                    <!--<button type="submit" class="btn btn-lg btn-secondary">Connect</button>-->
+                                                    <a data-bs-toggle="modal" href="#connectModal" class="btn btn-lg btn-secondary" id="connectButton">Connect</a>
+                                                    {% if form_whatsapp.access_token %}
+                                                    <a href="{% url 'reconnect_whatsapp' %}" class="btn btn-lg btn-primary">Reconnect</a>
+                                                    <a data-bs-toggle="modal" href="#testModal" class="btn btn-lg btn-secondary" id="testButton">Test</a>
+                                                    {% endif %}
+                                                </div>
+                                            </div><!-- .col -->
+                                        </div><!-- .row -->
+                                    </div>
+                                </form>
+                            </div><!-- .tab-pane -->
                             <div class="tab-pane" id="sms">
                                 <form action="{% url 'update_sms' company.id %}" method="POST" >
                                     {% csrf_token %}
@@ -714,6 +753,54 @@
 
 <!-- change company logo -->
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+<!-- QRcode Modal -->
+<div class="modal fade" tabindex="-1" role="dialog" id="connectModal">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <a href="#" class="close" data-bs-dismiss="modal"><em class="icon ni ni-cross-sm"></em></a>
+            <div class="modal-header">
+                <h5 class="modal-title">Scan QR Code to Connect</h5>
+                
+            </div>
+            <div class="modal-body">
+                <img id="qrcodeImage" src="" alt="QR Code" />
+            </div>
+            
+        </div><!-- .modal-content -->
+    </div><!-- .modal-dialog -->
+</div><!-- .modal -->
+
+<!-- test message modal-->
+<div class="modal fade" tabindex="-1" role="dialog" id="testModal">
+    <div class="modal-dialog modal-sm" role="document">
+        <div class="modal-content">
+            <a href="#" class="close" data-bs-dismiss="modal"><em class="icon ni ni-cross-sm"></em></a>
+            <div class="modal-body modal-body-md">
+                <h5 class="modal-title">Send Test Message</h5>
+                <form action="{% url 'test_whatsapp' %}" class="mt-4" method="POST" id="addVehicleMakeForm">
+                    {% csrf_token %}
+                    <div class="row g-gs">
+                        <div class="col-md-12">
+                            <div class="form-group">
+                                <label class="form-label" for="vehicleMake">Telephone</label> 
+                                <div class="form-control-wrap">
+                                    <input type="number" class="form-control" name="phone_number" value="{{ company.phone_no }}" placeholder="{{ company.phone_no }}" required>
+                                </div>
+                            </div>
+                        </div><!-- .col -->
+                        <div class="col-12">
+                            <ul class="align-center flex-wrap flex-sm-nowrap gx-4 gy-2">
+                                <button type="submit" class="btn btn-primary">Send</button>
+                            </ul>
+                        </div>
+                    </div>
+                </form>
+            </div><!-- .modal-body -->
+        </div><!-- .modal-content -->
+    </div><!-- .modal-dialog -->
+</div><!-- .modal -->
+
 <script>
     $(document).ready(function() {
         const logoInput = $("#logoInput");
@@ -773,5 +860,28 @@
     });
 </script>
 
+<!-- script to handle qrcode displaying-->
+<script>
+    $(document).ready(function () {
+        // When the Connect button is clicked
+        $("#connectButton").click(function () {
+            // Make a POST request to the server
+            $.post($("#connectForm").attr("action"), $("#connectForm").serialize(), function (data) {
+                // Update the QR code image source
+                $("#qrcodeImage").attr("src", data.qr_code);
+
+                // Show the modal
+                $("#connectModal").modal("show");
+
+                // Close the modal when the QR code is successfully scanned
+                // Add your logic here to detect when the QR code is successfully scanned
+                // For demonstration purposes, I'm using a setTimeout to close the modal after 5000 milliseconds (5 seconds)
+                setTimeout(function () {
+                    $("#connectModal").modal("hide");
+                }, 6000);
+            }, "json");
+        });
+    });
+</script>
 
 {% endblock %}

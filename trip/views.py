@@ -2370,10 +2370,10 @@ def add_estimate(request):
                 route=route,
                 trucks=int(item_data['trucks']),
                 rate=int(item_data['rate']),
-                amount=int(item_data['amount']),
+                amount=float(item_data['amount']),
             )
 
-            estimate.description = estimate_item.route.description,
+            estimate.description = estimate_item.route.description
             estimate.save()
             print(f'Each item description: {estimate.description}')
 
@@ -2396,7 +2396,8 @@ def add_estimate(request):
 @permission_required('trip.change_estimate')
 def update_estimate(request, pk):
     company = get_user_company(request) #get request user company
-    estimate = Estimate.objects.get(id=pk, company=company)
+    estimate = get_object_or_404(Estimate, id=pk)
+    estimate_items = EstimateItem.objects.filter(estimate=estimate)
     if request.method == 'POST':
         # block updates on accepted quotes
         if estimate.status != 'Accepted':
@@ -2404,18 +2405,10 @@ def update_estimate(request, pk):
             customer_id = request.POST.get('customer')
             customer = Customer.objects.get(company=company, id=customer_id)
 
-            route_id = request.POST.get('route')
-            route = Route.objects.get(company=company, id=route_id)
-
             #update instance 
             estimate.company = company
             estimate.customer = customer
-            estimate.route = route
             estimate.valid_till = request.POST.get('valid_till')
-            estimate.description = route.description
-            estimate.item = request.POST.get('item')
-            estimate.trucks = float(request.POST.get('totalTrucks'))
-            estimate.rate = request.POST.get('rate')
             estimate.sub_total = request.POST.get('sub_total')
             estimate.discount = request.POST.get('discount')
             estimate.tax = request.POST.get('tax')
@@ -2433,23 +2426,20 @@ def update_estimate(request, pk):
         # prepopulate the form with existing data
         form_data = {
             'customer': estimate.customer,
-            'route': estimate.route,
             'valid_till': estimate.valid_till,
-            'item': estimate.item,
-            'trucks': estimate.trucks,
-            'rate': estimate.rate,
             'sub_total': estimate.sub_total,
             'tax': estimate.tax,
             'total': estimate.total,
-            'description': estimate.description,
             'note': estimate.note, 
-            'status':estimate.status           
+            'status':estimate.status,
+                    
         }
 
         form = EstimateForm(initial=form_data, company=company )
         context = {
             'estimate':estimate,
-            'form':form
+            'form':form,
+            'estimate_items':estimate_items  
         }
         return render(request,'trip/estimate/update-estimate.html', context)
 #--ends
@@ -2471,8 +2461,8 @@ def list_estimates(request):
 @login_required(login_url='login')
 @permission_required('trip.view_estimate')
 def view_estimate(request, pk):
-    company=get_user_company(request)
-    estimate = Estimate.objects.get(id=pk, company=company)
+    estimate = get_object_or_404(Estimate, id=pk) 
+    estimate_items = EstimateItem.objects.filter(estimate=estimate)
 
     # check if invoice associated with the estimate exists
     #it will only exist is the estimate has been accepted.
@@ -2483,7 +2473,8 @@ def view_estimate(request, pk):
 
     context={
         'estimate':estimate,
-        'company':company, 
+        'estimate_items':estimate_items,
+        'company':get_user_company(request), 
         'invoice':invoice,
         }
     return render(request, 'trip/estimate/view-estimate.html', context)
@@ -2590,10 +2581,12 @@ def decline_estimate(request, pk):
 #share estimate uri with customer
 def view_estimate_negotiate_mode(request, pk):
     estimate = Estimate.objects.get(id=pk)
+    estimate_items = EstimateItem.objects.filter(estimate=estimate)
     company = estimate.company
     context={
         'estimate':estimate,
-        'company':company
+        'company':company,
+        'estimate_items':estimate_items
         }
     return render(request, 'trip/estimate/view-estimate-nego-mode.html', context)
 #--ends

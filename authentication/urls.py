@@ -13,12 +13,16 @@ urlpatterns = [
     # organization preferences urls
     path('settings', views.global_settings, name='global_settings'), 
     path('sms/<str:pk>', views.update_sms, name='update_sms'),
+    path('whatsapp/<str:pk>', views.update_whatsapp, name='update_whatsapp'),
     path('email/<str:pk>', views.update_email, name='update_email'),
     path('test-email/<str:pk>', views.send_test_email, name='test_email'),
     path('preferences/<str:pk>', views.update_preferences, name='update_preferences'),
     path('disable-2fa/<str:pk>', views.disable_2fa, name='disable_2fa'),
     path('enable-2fa/<str:pk>', views.enable_2fa, name='enable_2fa'),
     path('change_logo', views.change_logo, name='change_logo'), 
+
+    path('test_whatsapp', views.test_whatsapp, name='test_whatsapp'),
+    path('reconnect_whatsapp', views.reconnect_whatsapp, name='reconnect_whatsapp'),
 
     #role urls
     path('add_role', views.add_role, name='add_role'),

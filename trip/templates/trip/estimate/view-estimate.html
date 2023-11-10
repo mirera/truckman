@@ -109,6 +109,7 @@
                                         <thead>
                                             <tr>
                                                 <th class="w-150px">Item </th>
+                                                <th class="w-150px">Route </th>
                                                 <th class="w-60">Description</th>
                                                 <th>Rate</th>
                                                 <th>Trucks</th>
@@ -116,14 +117,16 @@
                                             </tr>
                                         </thead>
                                         <tbody>
-                                            
+                                            {% for item in estimate_items %}
                                             <tr>
-                                                <td>{{ estimate.item }}</td>
-                                                <td>{{ estimate.description }}</td>
-                                                <td>${{ estimate.rate }}</td>
-                                                <td>{{ estimate.trucks}}</td>
-                                                <td>${{ estimate.sub_total }}</td>
+                                                <td>{{ item.item_type }}</td>
+                                                <td>{{ item.route }}</td>
+                                                <td>{{ item.description }}</td>
+                                                <td>${{ item.rate }}</td>
+                                                <td>{{ item.trucks}}</td>
+                                                <td>${{ item.amount }}</td>
                                             </tr>
+                                            {% endfor %}
                                         </tbody>
                                         <tfoot>
                                             <tr>
