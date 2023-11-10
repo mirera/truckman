@@ -16,6 +16,9 @@ sudo cp /home/ubuntu/truckman/redis/redis.service  /etc/systemd/system/redis.ser
 sudo cp /home/ubuntu/truckman/celery/celery-beat-truckman.service  /etc/systemd/system/celery-beat-truckman.service
 sudo cp /home/ubuntu/truckman/celery/celery-worker-truckman.service  /etc/systemd/system/celery-worker-truckman.service 
 
+# Start Redis on port 
+redis-server --port 6379 --daemonize yes --logfile /home/ubuntu/truckman/truckman/redis.log
+
 sudo systemctl daemon-reload
 
 sudo systemctl start redis.service
@@ -27,8 +30,7 @@ sudo systemctl enable celery-beat-truckman
 sudo systemctl start celery-worker-truckman
 sudo systemctl enable celery-worker-truckman
 
-# Start Redis on port 
-#redis-server --port 6379 --daemonize yes --logfile /home/ubuntu/truckman/truckman/redis.log
+
 #celery -A truckman beat &
 #celery -A truckman worker --logfile=/home/ubuntu/truckman/truckman/celery.log --detach
 

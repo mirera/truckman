@@ -60,7 +60,8 @@ def get_user_company(request):
         except:
             company = None
         return company
-
+    
+#------------------------------------------------ e-mail calls ----------------------------------------------------------------
 #send email 
 def send_email(context, template_path, from_name, from_email, subject, recipient_email, replyto_email):
     from_name_email = f'{from_name} <{from_email}>'
@@ -75,6 +76,27 @@ def send_email(context, template_path, from_name, from_email, subject, recipient
     e_mail.send(fail_silently=False)
 #--end
 
+#send email with attachement
+def send_email_with_attachment(context, template_path, from_name, from_email, subject, recipient_email, replyto_email, attachment_path):
+    # Build the email message
+    from_name_email = f'{from_name} <{from_email}>'
+    template = render_to_string(template_path, context)
+    e_mail = EmailMessage(
+        subject,
+        template,
+        from_name_email,  # 'John Doe <john.doe@example.com>'
+        [recipient_email],
+        reply_to=[replyto_email, from_email],
+    )
+    
+    # Attach an attachment
+    e_mail.attach_file(attachment_path)
+
+    try:
+        e_mail.send(fail_silently=False)
+    except Exception as e:
+        # Handle email sending failure
+        print(f"Email sending failed: {str(e)}")
 #sms
 def send_sms(sender_id, token, phone_no, message):
     #if is loginit mdeni sending the sms 
@@ -117,6 +139,221 @@ def send_sms(sender_id, token, phone_no, message):
         return False, error_msg
 #-- end
 
+#------------------------------------------------ Whatsapp API Calls -------------------------------------------------------------
+#create whatsapp instance
+def create_wa_instance(access_token):
+    #get decrypted access_token from db
+    access_token_decrypted = decrypt_secret(access_token)
+    url = f'https://wa.erraniumsms.com/api/create_instance?access_token={access_token_decrypted}'
+    response = requests.get(url)
+
+    # check the status code of the response
+    if response.status_code == 200:
+        # parse the JSON data from the response
+        json_data = response.json()
+
+        # check the status field in the JSON data
+        if json_data['status'] == 'success':
+            #return True, json_data['instance_id']
+            return json_data['instance_id']
+        else:
+            error_msg = json_data['message']
+            return False, error_msg
+    else:
+        response_data = response.json()
+        message = response_data['message']
+        error_msg = f"Request failed with status code {response.status_code} and this message {message} "
+        return False, error_msg
+#--ends
+
+#get whatsapp QRcode
+def get_wa_qrcode(access_token, instance_id):
+    #get decrypted access_token from db
+    access_token_decrypted = decrypt_secret(access_token)
+    url = f'https://wa.erraniumsms.com/api/get_qrcode?instance_id={instance_id}&access_token={access_token_decrypted}'
+    response = requests.get(url)
+
+    # check the status code of the response
+    if response.status_code == 200:
+        # parse the JSON data from the response
+        json_data = response.json()
+
+        # check the status field in the JSON data
+        if json_data['status'] == 'success':
+            return json_data['base64'] #the qrcode key is named base64
+        else:
+            error_msg = json_data['message']
+            return False, error_msg
+    else:
+        response_data = response.json()
+        message = response_data['message']
+        error_msg = f"Request failed with status code {response.status_code} and this message {message} "
+        return False, error_msg
+#--ends
+
+#send whatsapp text
+def send_whatsapp_text(instance_id, access_token, phone_no, message):
+    print(f'Instance: {instance_id}')
+    
+    #get decrypted access_token from db
+    access_token_decrypted = decrypt_secret(access_token)
+    print(f'Access token: {access_token_decrypted}')
+
+    url = 'https://wa.erraniumsms.com/api/send' 
+    headers = {
+        'Authorization': f'Bearer {access_token_decrypted}',
+        'Content-Type': 'application/json',
+        'Accept': 'application/json'
+    }
+    
+    data = {
+        'number': phone_no,
+        'instance_id': instance_id,
+        'type': 'text',
+        'message': message,
+        'access_token': access_token_decrypted
+    }
+
+    response = requests.post(url, headers=headers, data=json.dumps(data))
+    print(f'Response:{response}')
+    # check the status code of the response
+    if response.status_code == 200:
+        # parse the JSON data from the response
+        json_data = response.json()
+        print(f'Status:{json_data["status"]}')
+        print(f'Mesage:{json_data["message"]}')
+        
+        # check the status field in the JSON data
+        if json_data['status'] == 'success':
+            return True, json_data['message']
+        else:
+            error_msg = json_data['message']
+            return False, error_msg
+    else:
+        response_data = response.json()
+        message = response_data['message']
+        error_msg = f"Request failed with status code {response.status_code} and this message {message} "
+        return False, error_msg
+#-- end
+
+#send whatsapp text
+def send_whatsapp_media(instance_id, access_token, phone_no, message, media_url):
+    
+    #get decrypted access_token from db
+    access_token_decrypted = decrypt_secret(access_token)
+
+    url = 'https://wa.erraniumsms.com/api/send' 
+    headers = {
+        'Authorization': f'Bearer {access_token_decrypted}',
+        'Content-Type': 'application/json',
+        'Accept': 'application/json'
+    }
+    data = {
+        'number': phone_no,
+        'instance_id': instance_id,
+        'type': 'text',
+        'message': message,
+        "media_url": media_url,
+        "access_token": access_token_decrypted
+    }
+    response = requests.post(url, headers=headers, data=json.dumps(data))
+    # check the status code of the response
+    if response.status_code == 200:
+        # parse the JSON data from the response
+        json_data = response.json()
+        
+        # check the status field in the JSON data
+        if json_data['status'] == 'success':
+            return True, json_data['data']
+        else:
+            error_msg = json_data['message']
+            return False, error_msg
+    else:
+        response_data = response.json()
+        message = response_data['message']
+        error_msg = f"Request failed with status code {response.status_code} and this message {message} "
+        return False, error_msg
+#-- end
+
+#This will logout Whatsapp web, Change Instance ID, Delete all old instance data
+def reset_wa_instance(access_token, instance_id):
+    #get decrypted access_token from db
+    access_token_decrypted = decrypt_secret(access_token)
+    url = f'https://wa.erraniumsms.com/api/reset_instance?instance_id={instance_id}&access_token={access_token_decrypted}'
+
+    response = requests.post(url)
+
+    # check the status code of the response
+    if response.status_code == 200:
+        # parse the JSON data from the response
+        json_data = response.json()
+
+        # check the status field in the JSON data
+        if json_data['status'] == 'success':
+            return True, json_data['message'] 
+        else:
+            error_msg = json_data['message']
+            return False, error_msg
+    else:
+        response_data = response.json()
+        message = response_data['message']
+        error_msg = f"Request failed with status code {response.status_code} and this message {message} "
+        return False, error_msg
+#--ends
+
+#Re-initiate connection from app to Whatsapp web when lost connection
+def reconnect_wa_instance(access_token, instance_id):
+    #get decrypted access_token from db
+    access_token_decrypted = decrypt_secret(access_token)
+    url = f'https://wa.erraniumsms.com/api/reconnect?instance_id={instance_id}&access_token={access_token_decrypted}'
+
+    response = requests.post(url)
+
+    # check the status code of the response
+    if response.status_code == 200:
+        # parse the JSON data from the response
+        json_data = response.json()
+
+        # check the status field in the JSON data
+        if json_data['status'] == 'success':
+            return True, json_data['message'] 
+        else:
+            error_msg = json_data['message']
+            return False, error_msg
+    else:
+        response_data = response.json()
+        message = response_data['message']
+        error_msg = f"Request failed with status code {response.status_code} and this message {message} "
+        return False, error_msg
+#--ends
+
+#Logout Whatsapp web and do a fresh scan
+def reboot_wa_instance(access_token, instance_id):
+    #get decrypted access_token from db
+    access_token_decrypted = decrypt_secret(access_token)
+    url = f'https://wa.erraniumsms.com/api/reboot?instance_id={instance_id}&access_token={access_token_decrypted}'
+
+    response = requests.post(url)
+
+    # check the status code of the response
+    if response.status_code == 200:
+        # parse the JSON data from the response
+        json_data = response.json()
+
+        # check the status field in the JSON data
+        if json_data['status'] == 'success':
+            return True, json_data['message'] 
+        else:
+            error_msg = json_data['message']
+            return False, error_msg
+    else:
+        response_data = response.json()
+        message = response_data['message']
+        error_msg = f"Request failed with status code {response.status_code} and this message {message} "
+        return False, error_msg
+# --ends
+
+#-------------------------------------------------- PDF Generation ----------------------------------------------------------------
 #pdf invoice generator
 def generate_invoice_pdf(invoice):
     # Create an in-memory buffer to store the PDF
@@ -151,28 +388,6 @@ def generate_invoice_pdf(invoice):
     pdf_buffer.seek(0)
 
     return pdf_buffer 
-
-#send email with attachement
-def send_email_with_attachment(context, template_path, from_name, from_email, subject, recipient_email, replyto_email, attachment_path):
-    # Build the email message
-    from_name_email = f'{from_name} <{from_email}>'
-    template = render_to_string(template_path, context)
-    e_mail = EmailMessage(
-        subject,
-        template,
-        from_name_email,  # 'John Doe <john.doe@example.com>'
-        [recipient_email],
-        reply_to=[replyto_email, from_email],
-    )
-    
-    # Attach an attachment
-    e_mail.attach_file(attachment_path)
-
-    try:
-        e_mail.send(fail_silently=False)
-    except Exception as e:
-        # Handle email sending failure
-        print(f"Email sending failed: {str(e)}")
     
 #format phone number to 254706384073
 def format_phone_number(phone_no, phone_code):

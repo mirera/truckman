@@ -1,7 +1,7 @@
 from django.db.models.signals import pre_save
 from django.db.models.signals import post_save
 from django.dispatch import receiver
-from .models import CustomUser, Client, Preference
+from .models import CustomUser, Client, Preference, WhatsappSetting
 
 #setting the profile photo default to 'default.png'
 @receiver(pre_save, sender=CustomUser)
@@ -16,3 +16,8 @@ def create_client_preferences(sender, instance, created, **kwargs):
     if created:
         #create client preference object
         Preference.objects.create(company=instance)
+         #create client WhatsappSetting object
+        WhatsappSetting.objects.create(company=instance)
+
+
+

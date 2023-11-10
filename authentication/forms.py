@@ -2,7 +2,7 @@
 from django import forms
 from django.contrib.auth.models import Permission
 from django.core.exceptions import ValidationError  
-from .models import CustomUser, Client, Role
+from .models import CustomUser, Client, Role, WhatsappSetting
 from django.forms.widgets import CheckboxSelectMultiple
 from pytz import all_timezones
 from iso4217 import Currency
@@ -150,5 +150,14 @@ class RoleForm(forms.Form):
 
     def label_from_permission(self, obj):
         return obj.name
-
-   
+    
+#-------------------- Whatsapp settings form ---------------------------------------------
+class WhatsappForm(forms.ModelForm):
+    class Meta:
+        model = WhatsappSetting
+        fields = '__all__'
+        exclude = ['company']
+        
+        widgets = {
+            'access_token': forms.PasswordInput(attrs={'class': 'form-control', 'placeholder': 'enter your access token', 'required':'True'}),
+        }

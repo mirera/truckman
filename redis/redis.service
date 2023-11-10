@@ -5,7 +5,7 @@ Description=Redis Server
 After=network.target
 
 [Service]
-ExecStart=/usr/bin/redis-server /etc/redis/redis.conf
+ExecStart=/usr/bin/redis-server /etc/redis/redis.conf 
 ExecReload=/bin/kill -s HUP $MAINPID
 Type=notify
 User=redis

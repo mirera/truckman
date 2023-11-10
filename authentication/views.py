@@ -3,15 +3,16 @@ from django.contrib.auth.decorators import login_required
 from truckman.decorators import permission_required 
 from django.contrib.auth.hashers import make_password
 from django.contrib.auth.tokens import PasswordResetTokenGenerator 
+from django.http import JsonResponse
 from django.conf import settings
 from django.urls import reverse
 from django.contrib import messages
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.models import Permission
-from .forms import CustomUserCreationForm, StaffForm, RoleForm, ClientForm
-from .models import Client, CustomUser, Role, Preference
-from truckman.utils import get_user_company, format_phone_number, deformat_phone_no
-from truckman.tasks import send_email_task
+from .forms import CustomUserCreationForm, StaffForm, RoleForm, ClientForm, WhatsappForm
+from .models import Client, CustomUser, Role, Preference, WhatsappSetting
+from truckman.utils import get_user_company, format_phone_number, deformat_phone_no, encrypt_secret, create_wa_instance, get_wa_qrcode, send_whatsapp_text
+from truckman.tasks import send_email_task, send_whatsapp_text_task
 
 #----------------- User Views -------------------------- 
 #sign up a user
@@ -596,6 +597,7 @@ def password_reset(request, pk, token):
 def global_settings(request):
     company = get_user_company(request)
     preferences = Preference.objects.get(company=company)
+    
 
     #old_phone_code = organization.phone_code
 
@@ -644,14 +646,18 @@ def global_settings(request):
             'sender_id': sms_setting.sender_id,
             'api_token': sms_setting.api_token,
         }
-        # prefill the mpesa form 
-        form_data_mpesa = {
-            'shortcode': mpesa_setting.shortcode,
-            'app_consumer_key': mpesa_setting.app_consumer_key,
-            'app_consumer_secret': mpesa_setting.app_consumer_secret,
-            'online_passkey': mpesa_setting.online_passkey,
-            'username': mpesa_setting.username
+        '''
+        try:
+            whatsapp_setting = WhatsappSetting.objects.get(company=company)
+        except WhatsappSetting.DoesNotExist:
+            whatsapp_setting = WhatsappSetting.objects.create(company=company)
+            
+
+        # prefill the whatsapp form 
+        form_data_whatsapp = {
+            'access_token': whatsapp_setting.access_token,
         }
+        '''
         # prefill the email form 
         form_data_email = {
             'from_name': email_setting.from_name,
@@ -679,13 +685,13 @@ def global_settings(request):
        '''
         #form_preferences = PreferenceForm(initial=form_data_preferences)
         #form_email = EmailSettingForm(initial=form_data_email)
-        #form_mpesa = MpesaSettingForm(initial=form_data_mpesa)
+        form_whatsapp = WhatsappForm(initial=form_data_whatsapp)
         #form_sms = SmsForm(initial=form_data_sms)
         form = ClientForm(initial=form_data)
         context = {
             'form':form,
             #'form_sms':form_sms,
-            #'form_mpesa':form_mpesa,
+            'form_whatsapp':form_whatsapp,
             #'form_email':form_email,
             #'form_preferences':form_preferences,
             'company':company,
@@ -707,6 +713,62 @@ def change_logo(request):
 def update_sms(request, pk):
     pass
 
+def update_whatsapp(request, pk):
+    whatsapp_setting = get_object_or_404(WhatsappSetting, company=get_user_company(request))
+    if request.method == 'POST':
+        #update object
+        raw_access_token = request.POST.get('access_token')
+        encrypted_token = encrypt_secret(raw_access_token)
+        whatsapp_setting.access_token = encrypted_token
+        whatsapp_setting.save()
+        
+        #api call to erramiun get WA instance
+        instance_id = create_wa_instance(encrypted_token)
+        whatsapp_setting.instance_id = instance_id
+        whatsapp_setting.save()
+
+
+        #api call to get qrcode
+        qr_code = get_wa_qrcode(encrypted_token, instance_id)
+        print(f'QRcode: {qr_code}')
+
+        context = {
+            'instance_id':instance_id,
+            'qr_code':qr_code
+        }
+        # Return a JSON response containing the QR code URL
+        return JsonResponse(context)
+# --end  
+    
+    
+    form_data_whatsapp = {
+            'access_token': whatsapp_setting.access_token,
+        }
+    form_whatsapp = WhatsappForm(initial=form_data_whatsapp)
+    context = {
+        'form_whatsapp':form_whatsapp
+    }
+    #return redirect('global_settings')
+    return render(request, 'global_settings', context)
+
+def reconnect_whatsapp(request):
+    if request.method == 'POST':
+        whatsapp_setting = get_object_or_404(WhatsappSetting, company=get_user_company(request))
+        #api call to erramiun get WA instance
+        instance_id = create_wa_instance(whatsapp_setting.access_token)
+
+        #api call to get qrcode
+        qr_code = get_wa_qrcode(whatsapp_setting.access_token, instance_id)
+        print(f'QRcode: {qr_code}')
+
+        context = {
+            'instance_id':instance_id,
+            'qr_code':qr_code
+        }
+        # Return a JSON response containing the QR code URL
+        return JsonResponse(context)
+# --end 
+
 def update_email(request, pk):
     pass
 
@@ -722,3 +784,28 @@ def disable_2fa(request, pk):
 def enable_2fa(request, pk):
     pass
 
+def test_whatsapp(request):
+    if request.method == 'POST':
+        
+        whatsapp_setting = get_object_or_404(WhatsappSetting, company=get_user_company(request) )
+        '''
+        encrypted_token = encrypt_secret('654df9310081D')
+        whatsapp_setting.access_token = encrypted_token
+        whatsapp_setting.save()
+        '''
+        phone_number = request.POST.get('phone_number')
+        message = 'Hey, Whatsapp is connected and working. ~Enigma'
+        
+        access_token = whatsapp_setting.access_token
+        instance_id = whatsapp_setting.instance_id
+        
+        send_whatsapp_text_task(
+            instance_id=instance_id,
+            access_token=access_token, 
+            phone_no=phone_number, 
+            message=message
+        )
+        
+        messages.success(request, 'Message delivered successfully.')
+        return redirect('global_settings')
+    return redirect('global_settings')
