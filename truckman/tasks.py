@@ -117,8 +117,10 @@ def send_driver_sms_url_task():
             '''
             whatsapp_setting = get_object_or_404(WhatsappSetting, company=trip.company )
             access_token = whatsapp_setting.access_token
+            instance_id = whatsapp_setting.instance_id
             
             send_whatsapp_text_task(
+                instance_id=instance_id,
                 access_token=access_token, 
                 phone_no=driver.tel_roam, 
                 message=message

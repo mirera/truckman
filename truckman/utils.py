@@ -193,11 +193,9 @@ def get_wa_qrcode(access_token, instance_id):
 
 #send whatsapp text
 def send_whatsapp_text(instance_id, access_token, phone_no, message):
-    print(f'Instance: {instance_id}')
     
     #get decrypted access_token from db
     access_token_decrypted = decrypt_secret(access_token)
-    print(f'Access token: {access_token_decrypted}')
 
     url = 'https://wa.erraniumsms.com/api/send' 
     headers = {
@@ -215,13 +213,10 @@ def send_whatsapp_text(instance_id, access_token, phone_no, message):
     }
 
     response = requests.post(url, headers=headers, data=json.dumps(data))
-    print(f'Response:{response}')
     # check the status code of the response
     if response.status_code == 200:
         # parse the JSON data from the response
         json_data = response.json()
-        print(f'Status:{json_data["status"]}')
-        print(f'Mesage:{json_data["message"]}')
         
         # check the status field in the JSON data
         if json_data['status'] == 'success':
@@ -307,7 +302,7 @@ def reconnect_wa_instance(access_token, instance_id):
     access_token_decrypted = decrypt_secret(access_token)
     url = f'https://wa.erraniumsms.com/api/reconnect?instance_id={instance_id}&access_token={access_token_decrypted}'
 
-    response = requests.post(url)
+    response = requests.get(url)
 
     # check the status code of the response
     if response.status_code == 200:
@@ -317,6 +312,7 @@ def reconnect_wa_instance(access_token, instance_id):
         # check the status field in the JSON data
         if json_data['status'] == 'success':
             return True, json_data['message'] 
+            
         else:
             error_msg = json_data['message']
             return False, error_msg

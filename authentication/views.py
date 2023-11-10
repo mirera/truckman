@@ -12,7 +12,7 @@ from django.contrib.auth.models import Permission
 from .forms import CustomUserCreationForm, StaffForm, RoleForm, ClientForm, WhatsappForm
 from .models import Client, CustomUser, Role, Preference, WhatsappSetting
 from truckman.utils import get_user_company, format_phone_number, deformat_phone_no, encrypt_secret, create_wa_instance, get_wa_qrcode, send_whatsapp_text
-from truckman.tasks import send_email_task, send_whatsapp_text_task
+from truckman.tasks import send_email_task, send_whatsapp_text_task, reconnect_wa_instance_task
 
 #----------------- User Views -------------------------- 
 #sign up a user
@@ -713,7 +713,11 @@ def change_logo(request):
 def update_sms(request, pk):
     pass
 
-def update_whatsapp(request, pk):
+'''
+update_whatsapp() function basically connects whatsapp 
+after updating access token and instance id
+'''
+def update_whatsapp(request, pk): 
     whatsapp_setting = get_object_or_404(WhatsappSetting, company=get_user_company(request))
     if request.method == 'POST':
         #update object
@@ -727,10 +731,8 @@ def update_whatsapp(request, pk):
         whatsapp_setting.instance_id = instance_id
         whatsapp_setting.save()
 
-
         #api call to get qrcode
         qr_code = get_wa_qrcode(encrypted_token, instance_id)
-        print(f'QRcode: {qr_code}')
 
         context = {
             'instance_id':instance_id,
@@ -752,21 +754,15 @@ def update_whatsapp(request, pk):
     return render(request, 'global_settings', context)
 
 def reconnect_whatsapp(request):
-    if request.method == 'POST':
-        whatsapp_setting = get_object_or_404(WhatsappSetting, company=get_user_company(request))
-        #api call to erramiun get WA instance
-        instance_id = create_wa_instance(whatsapp_setting.access_token)
+    whatsapp_setting = get_object_or_404(WhatsappSetting, company=get_user_company(request))
+    #fetch access_token and instance_id
+    access_token = whatsapp_setting.access_token
+    instance_id = whatsapp_setting.instance_id
 
-        #api call to get qrcode
-        qr_code = get_wa_qrcode(whatsapp_setting.access_token, instance_id)
-        print(f'QRcode: {qr_code}')
-
-        context = {
-            'instance_id':instance_id,
-            'qr_code':qr_code
-        }
-        # Return a JSON response containing the QR code URL
-        return JsonResponse(context)
+    #api call to reconnect whatsapp
+    reconnect_wa_instance_task(access_token, instance_id)
+    messages.success(request, 'Whatsapp connection reinitiated successfully.')
+    return redirect('global_settings')
 # --end 
 
 def update_email(request, pk):
@@ -794,7 +790,7 @@ def test_whatsapp(request):
         whatsapp_setting.save()
         '''
         phone_number = request.POST.get('phone_number')
-        message = 'Hey, Whatsapp is connected and working. ~Enigma'
+        message = 'Hey, Whatsapp is connected with Truckman. ~Enigma'
         
         access_token = whatsapp_setting.access_token
         instance_id = whatsapp_setting.instance_id

@@ -116,8 +116,8 @@ class Driver(models.Model):
     first_name = models.CharField(max_length=12)
     last_name = models.CharField(max_length=12)
     id_no = models.CharField(max_length=12) 
-    tel_home = models.CharField(max_length=13)
-    tel_roam = models.CharField(max_length=13)
+    tel_home = models.CharField(max_length=12)
+    tel_roam = models.CharField(max_length=12)
     date_hired = models.DateField()
     date_terminated = models.DateField(null=True, blank=True)
     driver_photo = models.ImageField(upload_to='driver_photos/', null=True, blank=True)
@@ -345,12 +345,7 @@ class Estimate(models.Model):
     id = models.UUIDField(default=uuid.uuid4, unique=True, primary_key=True) 
     company = models.ForeignKey(Client, on_delete=models.CASCADE)
     customer = models.ForeignKey(Customer, on_delete=models.SET_NULL, null=True)
-    #route = models.ForeignKey(Route, on_delete=models.SET_NULL, null=True)
     estimate_id = models.CharField(max_length=7, unique=True, editable=False)
-    #item = models.CharField(max_length=20, default='Container', choices=ESTIMATE_ITEM_TYPE)
-    #trucks = models.IntegerField(default=0.00) #initially quantity
-    #rate = models.IntegerField(default=0.00) #initially unit_price
-    #description = models.CharField(max_length=100, null=True)
     sub_total = models.FloatField(default=0.00)
     tax = models.FloatField(default=0.00)
     discount = models.FloatField(default=0.00)

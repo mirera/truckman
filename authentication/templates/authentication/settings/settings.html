@@ -36,7 +36,7 @@
                                 <a class="nav-link" data-bs-toggle="tab" href="#email"><em class="icon ni ni-mail-fill"></em><span>Email</span> </a>
                             </li>
                             <li class="nav-item">
-                                <a class="nav-link" data-bs-toggle="tab" href="#whatsapp"><em class="icon ni ni-wallet"></em><span>Whatsapp</span></a>
+                                <a class="nav-link" data-bs-toggle="tab" href="#whatsapp"><em class="icon ni ni-whatsapp"></em><span>Whatsapp</span></a>
                             </li>
                             <li class="nav-item">
                                 <a class="nav-link" data-bs-toggle="tab" href="#sms"><em class="icon ni ni-emails"></em><span>SMS</span></a>
@@ -576,7 +576,7 @@
                                                     <!--<button type="submit" class="btn btn-lg btn-secondary">Connect</button>-->
                                                     <a data-bs-toggle="modal" href="#connectModal" class="btn btn-lg btn-secondary" id="connectButton">Connect</a>
                                                     {% if form_whatsapp.access_token %}
-                                                    <a href="#" class="btn btn-lg btn-danger">Reset</a>
+                                                    <a href="{% url 'reconnect_whatsapp' %}" class="btn btn-lg btn-primary">Reconnect</a>
                                                     <a data-bs-toggle="modal" href="#testModal" class="btn btn-lg btn-secondary" id="testButton">Test</a>
                                                     {% endif %}
                                                 </div>
@@ -878,7 +878,7 @@
                 // For demonstration purposes, I'm using a setTimeout to close the modal after 5000 milliseconds (5 seconds)
                 setTimeout(function () {
                     $("#connectModal").modal("hide");
-                }, 5000);
+                }, 6000);
             }, "json");
         });
     });

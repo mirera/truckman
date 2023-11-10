@@ -29,10 +29,11 @@ app.conf.beat_schedule = {
         ),
     },
     
+    
 } 
 '''
-'send_enigma_text_task()': {
-        'task': 'truckman.tasks.send_enigma_text_task',
+'send_driver_sms_url_task': {
+        'task': 'truckman.tasks.send_driver_sms_url_task',
         'schedule': crontab(minute='*'),
     }, 
 

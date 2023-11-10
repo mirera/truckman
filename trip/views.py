@@ -2370,10 +2370,10 @@ def add_estimate(request):
                 route=route,
                 trucks=int(item_data['trucks']),
                 rate=int(item_data['rate']),
-                amount=int(item_data['amount']),
+                amount=float(item_data['amount']),
             )
 
-            estimate.description = estimate_item.route.description,
+            estimate.description = estimate_item.route.description
             estimate.save()
             print(f'Each item description: {estimate.description}')
 
@@ -2471,8 +2471,8 @@ def list_estimates(request):
 @login_required(login_url='login')
 @permission_required('trip.view_estimate')
 def view_estimate(request, pk):
-    company=get_user_company(request)
-    estimate = Estimate.objects.get(id=pk, company=company)
+    estimate = get_object_or_404(Estimate, id=pk) 
+    estimate_items = EstimateItem.objects.filter(estimate=estimate)
 
     # check if invoice associated with the estimate exists
     #it will only exist is the estimate has been accepted.
@@ -2483,7 +2483,8 @@ def view_estimate(request, pk):
 
     context={
         'estimate':estimate,
-        'company':company, 
+        'estimate_items':estimate_items,
+        'company':get_user_company(request), 
         'invoice':invoice,
         }
     return render(request, 'trip/estimate/view-estimate.html', context)
