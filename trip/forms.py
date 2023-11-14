@@ -19,7 +19,8 @@ from .models import (
     Reminder,
     DailyRegister,
     TripIncident,
-    EstimateItem
+    EstimateItem,
+    Vehicle_Owner
 )
 
 
@@ -63,6 +64,7 @@ class VehicleForm(forms.ModelForm):
         super(VehicleForm, self).__init__(*args, **kwargs)
         self.fields['make'].queryset = Vehicle_Make.objects.filter(company=company)
         self.fields['model'].queryset = Vehicle_Model.objects.filter(company=company)
+        self.fields['owner'].queryset = Vehicle_Owner.objects.filter(company=company)
 
     class Meta:
         model = Vehicle

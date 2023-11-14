@@ -105,7 +105,8 @@ def send_driver_sms_url_task():
             domain = settings.PRODUCTION_DOMAIN #change this when pushing to production server
             full_url = f"{domain}{url}"
 
-            ready_url = shorten_url(full_url) #append the trip.id to url  
+            #ready_url = shorten_url(full_url) #this raises dns resolution error
+            ready_url = full_url
             message = f'Hello {driver.first_name} {driver.last_name}, click this link {ready_url} to mark daily register. Regards, {driver.company.name}'
             '''
             send_sms_task.delay(
