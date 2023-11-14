@@ -4,7 +4,7 @@ from django.conf import settings
 from django.urls import reverse
 #from django.contrib.sites.models import Site
 from django.shortcuts import get_object_or_404
-from trip.models import Trip, Driver
+from trip.models import Trip, Driver, Load
 from authentication.models import WhatsappSetting
 
 
@@ -94,10 +94,17 @@ driver to add a daily entry.
 @shared_task
 def send_driver_sms_url_task():
     trips = Trip.objects.filter(status='Dispatched') # from this we get driver and vehicle
+    
     for trip in trips:
-        vehicles = trip.load.assigned_trucks.all()
+        loads = Load.objects.filter(estimate=trip.estimate)
+        # Get all vehicles assigned to loads
+        vehicles = []
+        for load in loads:
+            if load.assigned_truck:
+                vehicles.append(load.assigned_truck)
+
         drivers = Driver.objects.filter(assigned_vehicle__in=vehicles)
-        for driver, vehicle in zip(drivers, vehicles):
+        for driver in drivers:
             trip_id = str(trip.id)
             url = reverse('add_register_entry', args=[trip_id]) 
             #current_site = Site.objects.get_current()
@@ -108,21 +115,13 @@ def send_driver_sms_url_task():
             #ready_url = shorten_url(full_url) #this raises dns resolution error
             ready_url = full_url
             message = f'Hello {driver.first_name} {driver.last_name}, click this link {ready_url} to mark daily register. Regards, {driver.company.name}'
-            '''
-            send_sms_task.delay(
-                sender_id=settings.SMS_SENDER_ID,
-                token=settings.SMS_API_TOKEN, 
-                phone_number=driver.tel_roam, 
-                message=message
-            )
-            '''
+            
             whatsapp_setting = get_object_or_404(WhatsappSetting, company=trip.company )
-            access_token = whatsapp_setting.access_token
-            instance_id = whatsapp_setting.instance_id
+            
             
             send_whatsapp_text_task(
-                instance_id=instance_id,
-                access_token=access_token, 
+                instance_id=whatsapp_setting.instance_id,
+                access_token=whatsapp_setting.access_token, 
                 phone_no=driver.tel_roam, 
                 message=message
             )

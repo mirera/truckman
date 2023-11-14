@@ -242,6 +242,7 @@ class LoadForm(forms.ModelForm):
                 'shipper': forms.Select(attrs={'class': 'form-select js-select2', 'id':'selectedShipper'}), 
                 'consignee': forms.Select(attrs={'class': 'form-select js-select2', 'id':'selectedConsignee'}),
                 'estimate': forms.Select(attrs={'class': 'form-select js-select2', 'id':'estimate'}),
+                'status': forms.Select(attrs={'class': 'form-select js-select2', 'id':'statusSelect'}),
                 #load details
                 'weight': forms.NumberInput(attrs={'class': 'form-control', 'placeholder':'7800, weigh in Tons'}),
                 'pickup_date': forms.DateInput(attrs={'class': 'form-control  date-picker', 'data-date-format':'yyyy-mm-dd', 'placeholder':'yyyy-mm-dd'}),

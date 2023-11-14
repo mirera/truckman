@@ -1106,6 +1106,7 @@ def update_load(request, pk):
         load.company = company
         load.shipper = shipper
         load.consignee = consignee
+        load.status = request.POST.get('status')
         load.pickup_date = request.POST.get('pickup_date')
         load.weight = request.POST.get('weight')
         load.delivery_date = request.POST.get('delivery_date')
@@ -1135,6 +1136,7 @@ def update_load(request, pk):
             'commodity': load.commodity,
             'legal_disclaimer': load.legal_disclaimer,
             'notes': load.notes,
+            'status': load.status
             
         }
 
@@ -1543,7 +1545,7 @@ def view_trip(request, pk):
     expenses = Expense.objects.filter(company=company, trip=trip)
     loads = Load.objects.filter(estimate=trip.estimate)
 
-    loaded_loads = loads.filter(status='On Transit').count()
+    loaded_loads = loads.filter(status__in=['On Transit', 'Delivered']).count()
     delivered_loads = loads.filter(status='Delivered').count()
     
     
@@ -2534,7 +2536,6 @@ def accept_estimate(request, pk):
         estimate = estimate
     )
 
-    
     estimate_items = EstimateItem.objects.filter(estimate=estimate)
     
     # Calculate the total number of trucks for all estimate items
@@ -2548,7 +2549,17 @@ def accept_estimate(request, pk):
         )
         total_trucks -= 1
 
-    #create a notification 
+    # send whatsapp notifications to indicate creation of Trip and loads. 
+    user = request.user
+    whatsapp_setting = get_object_or_404(WhatsappSetting, company=user.company )
+    trip_url = request.build_absolute_uri(reverse('view_trip', args=[trip.id]))
+    message = f'Hello {user.first_name} {user.last_name}, a trip {trip.trip_id} has been created. Click the link below to view and edit associated loads {trip_url}'
+    send_whatsapp_text_task.delay(
+        instance_id=whatsapp_setting.instance_id, 
+        access_token=whatsapp_setting.access_token, 
+        phone_no=user.phone, 
+        message=message
+    )
     #send email to admin notify them about 
     #the acceptance and assign trucks to the load link.
 
