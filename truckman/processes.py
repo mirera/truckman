@@ -33,14 +33,17 @@ def generate_invoice(estimate):
 #--ends
 
 '''
-This function is called when an estimate has been accepted
-by the customer. It creates a loading list 
+This function is called when a loas has been assigned a truck
+It creates a loading list 
 '''
 def generate_loading_list(estimate):
-        estimate = get_object_or_404(Estimate, id=estimate.id)
-        load = get_object_or_404(Load, estimate=estimate)
-        #check if the load is assigned vehicle
-        vehicles = load.assigned_trucks.all()
+        loads = Load.objects.filter(estimate=estimate)
+        
+        # Get all vehicles assigned to loads
+        vehicles = []
+        for load in loads:
+            if load.assigned_truck:
+                vehicles.append(load.assigned_truck)
 
         #create instance of a loading list
         loading_list = LoadingList.objects.create(

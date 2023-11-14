@@ -19,6 +19,7 @@ from PIL import Image
 import io
 from django.conf import settings
 from django.urls import reverse
+from django.db.models import Sum
 
 from . models import (
     CustomUser,
@@ -44,7 +45,8 @@ from . models import (
     LoadingList,
     LoadingListItem,
     TripIncident, 
-    EstimateItem
+    EstimateItem,
+    
 )
 
 from .forms import (
@@ -69,8 +71,9 @@ from .forms import (
 )
 
 from truckman.utils import get_user_company, generate_invoice_pdf, export_model_data, reverse_geocode, format_coordinates, get_location_data
-from truckman.tasks import send_email_task, send_email_with_attachment_task
+from truckman.tasks import send_email_task, send_email_with_attachment_task, send_whatsapp_text_task
 from truckman.processes import generate_invoice, generate_loading_list, create_daily_register
+from authentication.models import WhatsappSetting
 
 
 #---------------------------------- Partner Views------------------------------------------
@@ -333,8 +336,14 @@ def list_vehicles(request):
 @login_required(login_url='login')
 @permission_required('trip.view_vehicle')
 def view_vehicle(request, pk):
-    vehicle = Vehicle.objects.get(id=pk, company=get_user_company(request))
-    driver = get_object_or_404(Driver, assigned_vehicle=vehicle)
+    vehicle = Vehicle.objects.get(id=pk)
+    
+
+    try:
+        driver = Driver.objects.get(assigned_vehicle=vehicle)
+    except:
+        driver = None
+
     context={
         'vehicle':vehicle,
         'driver':driver
@@ -426,10 +435,10 @@ def add_driver(request):
 @permission_required('trip.change_driver')
 def update_driver(request, pk):
     company = get_user_company(request) #get request user company
-    driver = Driver.objects.get(id=pk, company=company)
+    driver = get_object_or_404(Driver, id=pk)
     if request.method == 'POST':
-        assigned_driver_id  = request.POST.get('assigned_vehicle')
-        assigned_vehicle = Vehicle.objects.get(id=assigned_driver_id, company=get_user_company(request))
+        assigned_vehicle_id  = request.POST.get('assigned_vehicle')
+        vehicle = get_object_or_404(Vehicle, id=assigned_vehicle_id)
         #update instance 
         driver.company=company
         driver.first_name = request.POST.get('first_name')
@@ -454,9 +463,12 @@ def update_driver(request, pk):
         driver.emergency_contact_person_three = request.POST.get('emergency_contact_person_three')
         driver.emergency_contact_person_three_rlshp = request.POST.get('emergency_contact_person_three_rlshp')
         driver.emergency_contact_no_three = request.POST.get('emergency_contact_no_three')
-
-        driver.assigned_vehicle = assigned_vehicle
         driver.status = request.POST.get('status')
+
+        driver.assigned_vehicle = vehicle
+        vehicle.is_assigned_driver = True
+        vehicle.save()
+        
 
         # Check if new images/files are provided
         if request.FILES.get('driver_photo'):
@@ -1197,71 +1209,34 @@ def load_export_to_csv(request):
     return response 
 #--ends
 
-#assign trucks to a load
+#assign truck to a load
 def assign_load_trucks(request, pk):
     load = get_object_or_404(Load, id=pk)
     if request.method == 'POST':
-         # Get a list of selected vehicle IDs from the form
-        vehicle_ids = request.POST.getlist('vehicles') 
+        vehicle_id = request.POST.get('selected_vehicle') 
+        vehicle = Vehicle.objects.get(pk=vehicle_id) 
 
-        # Convert the selected vehicle IDs to actual Vehicle objects
-        selected_vehicles = Vehicle.objects.filter(pk__in=vehicle_ids) 
+        # Assign the selected vehicle to the load
+        load.assigned_truck = vehicle
+        load.save()
 
-        # Assign the selected vehicles to the load
-        for vehicle in selected_vehicles:
-            load.assigned_trucks.add(vehicle)
+        #set loaded vehicle's available status to 'False'
+        vehicle.is_available = False
+        vehicle.save()
 
-        # Retrieve vehicles associated with a load
-        loaded_vehicles = load.assigned_trucks.all()
-
-        #set loaded vehicles' available status to 'False'
-        for vehicle in loaded_vehicles:
-            vehicle.is_available = False
-            vehicle.save()
-            # send sms notifications to drivers to load load data
-
-        #generate and send associated loading list to client
-        loading_list = generate_loading_list(load.estimate) 
-        #loading_list_pdf_path = '' #set it later
-
-        #generate asscoaited invoice & send to client
-        #invoice = generate_invoice(load.estimate)
-
-        #create a trip instance, to be used later.
-        trip = Trip.objects.create(
-           company = load.company,
-           load = load 
+        # send whatsapp notifications to drivers to load 
+        driver = get_object_or_404(Driver, assigned_vehicle=vehicle)
+        whatsapp_setting = get_object_or_404(WhatsappSetting, company=load.company )
+        
+        message = f'Hello {driver.first_name} {driver.last_name}, your truck {vehicle.plate_number} has been assigned a load {load.load_id} of this trip.'
+        send_whatsapp_text_task.delay(
+            instance_id=whatsapp_setting.instance_id, 
+            access_token=whatsapp_setting.access_token, 
+            phone_no=driver.tel_roam, 
+            message=message
         )
 
-        context = {
-            'company':load.company.name,
-            'customer':load.estimate.customer.name
-        }
-
-        send_email_with_attachment_task.delay(
-                context=context, 
-                template_path='trip/load/loading-list-email.html', 
-                from_name=load.company.name, 
-                from_email=settings.EMAIL_HOST_USER, 
-                subject=f'{load.load_id}:Loading List', 
-                recipient_email=load.estimate.company.email, 
-                replyto_email=settings.EMAIL_HOST_USER,
-                attachment_path=''
-            ) 
-        '''
-        send_email_with_attachment_task.delay(
-                context=context, 
-                template_path='trip/load/loading-list-email.html', 
-                from_name=load.company.name, 
-                from_email=settings.EMAIL_HOST_USER, 
-                subject=f'{load.load_id}:Invoice', 
-                recipient_email=load.estimate.company.email, 
-                replyto_email=settings.EMAIL_HOST_USER,
-                attachment_path=''
-            ) 
-        '''
-
-        messages.success(request, 'Load assigned vehicles successfully ')
+        messages.success(request, 'Load assigned a truck successfully ')
         return redirect('view_load', load.id)
 
     context = {
@@ -1270,6 +1245,24 @@ def assign_load_trucks(request, pk):
     
     return render(request, 'trip/load/loads-list.html' , context)
 #--ends
+
+def get_loading_list(request, pk):
+    trip = get_object_or_404(Trip, id=pk)  
+    print(f'Trip:{trip}')
+    estimate = trip.estimate
+    print(f'Estimate:{estimate}')
+    # Get all the estimate/trip related loads
+    loads = Load.objects.filter(estimate=estimate)
+    print(f'Count:{loads.count()}')
+    # Check if all the loads are assigned trucks
+    if all(load.assigned_truck for load in loads):
+        # Generate loading list here using `generate_loading_list` function 
+        loading_list = generate_loading_list(estimate)
+        messages.success(request, 'Loading List generated successfully')
+        return redirect('view_trip', trip.id)
+    else:
+        messages.error(request, 'One or more loads have not been assigned a truck/vehicle. Assign trucks to all trip loads then generate loading list.')
+        return redirect('view_trip', trip.id)
 
 #view loading list
 def view_loading_list(request, pk):
@@ -1498,14 +1491,9 @@ def update_trip(request, pk):
     trip = Trip.objects.get(id=pk, company=company)
     if request.method == 'POST':
 
-        load_id = request.POST.get('load')
-        load = Load.objects.get(company=company, id=load_id)
-
         #update instance 
-        trip.company = company
-        trip.load = load
         trip.driver_accesory_pay = request.POST.get('driver_accesory_pay')
-        trip.vehicle_odemeter = request.POST.get('vehicle_odemeter')
+        
         trip.driver_advance = request.POST.get('driver_advance')
         trip.driver_milage = request.POST.get('driver_milage')
         trip.save()
@@ -1515,9 +1503,9 @@ def update_trip(request, pk):
     else:
         # prepopulate the form with existing data
         form_data = {
-            'load': trip.load,
+
             'driver_accesory_pay': trip.driver_accesory_pay,
-            'vehicle_odemeter': trip.vehicle_odemeter,
+            
             'driver_advance': trip.driver_advance,
             'driver_milage': trip.driver_milage,
         }
@@ -1549,21 +1537,29 @@ def list_trips(request):
 def view_trip(request, pk):
     company=get_user_company(request)
     trip = get_object_or_404(Trip, id=pk)
+
+    loading_list = LoadingList.objects.get(estimate=trip.estimate)
+    loading_list_items = loading_list.loadinglistitem_set.all()
+    expenses = Expense.objects.filter(company=company, trip=trip)
+    loads = Load.objects.filter(estimate=trip.estimate)
+
+    loaded_loads = loads.filter(status='On Transit').count()
+    delivered_loads = loads.filter(status='Delivered').count()
+    
     
     try:
-        expenses = Expense.objects.filter(company=company, trip=trip)
-        invoice = Invoice.objects.get(estimate=trip.load.estimate)
+        invoice = Invoice.objects.get(estimate=trip.estimate)
         payments = Payment.objects.filter(company=company, invoice=invoice) #invoice in invoices associated with the trip 
         documents = ''
+        loading_list = LoadingList.objects.get(estimate=trip.estimate)
+        loading_list_items = loading_list.loadinglistitem_set.all()
     except:
         expenses, invoice, payments, documents = None, None, None, None
 
     form = ExpenseForm(request.POST, company=company) # for expense modal
     category_form = ExpenseCategoryForm(request.POST) # for expense category modal
     payment_form = PaymentForm(request.POST, company=company) # for payment modal
-    #vehicle = trip.vehicle
-    #if vehicle.is_assigned_driver:
-    #driver = Driver.objects.get(assigned_vehicle=vehicle) 
+    
     trip_incidents = TripIncident.objects.filter(trip=trip) 
     incident_form = TripIncidentForm(request.POST, company=company)    
     context={
@@ -1577,7 +1573,13 @@ def view_trip(request, pk):
         'payment_form':payment_form,
         'documents':documents,
         'trip_incidents':trip_incidents,
-        'incident_form':incident_form
+        'incident_form':incident_form,
+        'loading_list':loading_list,
+        'loading_list_items':loading_list_items,
+        'loads':loads,
+        'loaded_loads':loaded_loads,
+        'delivered_loads':delivered_loads
+
     }
     return render(request, 'trip/trip/view-trip.html', context)
 #--ends
@@ -2526,11 +2528,26 @@ def accept_estimate(request, pk):
     estimate.status = 'Accepted'
     estimate.save()
 
-    # instatiate a load
-    load = Load.objects.create(
+    #create a trip instance, to be used later.
+    trip = Trip.objects.create(
         company = estimate.company,
         estimate = estimate
-     )
+    )
+
+    
+    estimate_items = EstimateItem.objects.filter(estimate=estimate)
+    
+    # Calculate the total number of trucks for all estimate items
+    total_trucks = estimate_items.aggregate(total_trucks=Sum('trucks'))['total_trucks'] or 0
+    
+    # instatiate load instances based on the number of trucks 
+    while int(total_trucks) > 0:
+        Load.objects.create(
+            company = estimate.company,
+            estimate = estimate
+        )
+        total_trucks -= 1
+
     #create a notification 
     #send email to admin notify them about 
     #the acceptance and assign trucks to the load link.
@@ -2538,8 +2555,8 @@ def accept_estimate(request, pk):
     estimate_url = request.build_absolute_uri(reverse('view_estimate', args=[pk]))
     context = {
         'estimate':estimate.id,
-        'estimate_url' : estimate_url, 
-        #'load':load
+        'estimate_url' : estimate_url,
+        'trip':trip 
     }
     
     send_email_task.delay(

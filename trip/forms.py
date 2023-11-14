@@ -140,7 +140,7 @@ class DriverForm(forms.ModelForm):
                 'emergency_contact_person_three_rlshp': forms.Select(attrs={'class': 'form-select js-select2'}),
                 'emergency_contact_no_three': forms.TextInput(attrs={'class': 'form-control', 'placeholder':'254700000000', 'minlength':'12', 'maxlength':'12'}),
                 #vehicle data
-                'assigned_vehicle': forms.Select(attrs={'class': 'form-select js-select2'}),
+                'assigned_vehicle': forms.Select(attrs={'class': 'form-select js-select2', 'required':'True'}),
                 'status': forms.Select(attrs={'class': 'form-select js-select2'}),
             } 
         
@@ -259,7 +259,7 @@ class TripForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         company = kwargs.pop('company')# Get the company from kwargs
         super(TripForm, self).__init__(*args, **kwargs)
-        self.fields['load'].queryset = Load.objects.filter(company=company) 
+        self.fields['estimate'].queryset = Estimate.objects.filter(company=company) 
     
     class Meta:
         model = Trip
@@ -267,7 +267,7 @@ class TripForm(forms.ModelForm):
         exclude =['company', 'trip_id', 'date_added']
 
         widgets = {
-                'load': forms.Select(attrs={'class': 'form-select js-select2', 'id':'load'}),
+                #'load': forms.Select(attrs={'class': 'form-select js-select2', 'id':'load'}),
                 #'vehicle_odemeter': forms.NumberInput(attrs={'class': 'form-control', 'placeholder':'67800'}),
                 'driver_milage': forms.NumberInput(attrs={'class': 'form-control', 'placeholder':'67800'}),
                 'driver_accesory_pay': forms.NumberInput(attrs={'class': 'form-control', 'placeholder':'67800'}),

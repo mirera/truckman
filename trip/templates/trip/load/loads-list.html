@@ -267,7 +267,7 @@
                                                 <div class="nk-tb-col tb-col-md">
                                                     <a href="{% url 'view_estimate' load.estimate.id  %}"><span>{{ load.estimate }}</span></a>
                                                 </div>
-                                                {% if not load.assigned_trucks.all %}
+                                                {% if not load.assigned_truck %}
                                                 <div class="nk-tb-col tb-col-mb">
                                                     <a  data-bs-toggle="modal" class="assigntruck-button btn btn-primary btn-sm" href="#assignLoadTrucks" data-pk="{{ load.id }}"> <span>Assign Trucks</span></a>
                                                 </div>  
@@ -360,24 +360,23 @@
         <div class="modal-content">
             <a href="#" class="close" data-bs-dismiss="modal"><em class="icon ni ni-cross-sm"></em></a>
             <div class="modal-body modal-body-md">
-                <h5 class="modal-title">Assign Load Trucks</h5>
+                <h5 class="modal-title">Assign Truck </h5>
                 <form action="" class="mt-4" method="POST" id="assignLoadTrucksForm">
                     {% csrf_token %}
                     <div class="row g-gs">
                         <div class="col-md-6">
                                 <ul class="preview-list">
                                     <li class="preview-item">
-                                        <span class="preview-title overline-title">Trucks/Vehicles</span>
                                         <ul class="d-flex g-3">
                                             <li>
                                                 <div class="dropdown">
-                                                    <a href="#" class="dropdown-toggle btn btn-light" data-bs-toggle="dropdown">Select Vehicles<em class="icon ni ni-chevron-down"></em></a>
+                                                    <a href="#" class="dropdown-toggle btn btn-light" data-bs-toggle="dropdown">Select Truck<em class="icon ni ni-chevron-down"></em></a>
                                                     <div class="dropdown-menu">
                                                         {% for vehicle in vehicles %} <!-- form.permissions.field.queryset -->
                                                         <ul class="link-tidy">
                                                             <li>
-                                                                <div class="custom-control custom-control-sm custom-checkbox">
-                                                                    <input type="checkbox" class="custom-control-input" id="{{ vehicle.plate_number }}" name="vehicles" value="{{ vehicle.id }}" {% if vehicle in load.assigned_trucks.all %}checked{% endif %}>
+                                                                <div class="custom-control custom-control-sm custom-radio">
+                                                                    <input type="radio" class="custom-control-input" id="{{ vehicle.plate_number }}" name="selected_vehicle" value="{{ vehicle.id }}" {% if vehicle in load.assigned_trucks.all %}checked{% endif %}>
                                                                     <label class="custom-control-label" for="{{ vehicle.plate_number }}">{{ vehicle.plate_number }}</label>
                                                                 </div>
                                                             </li>

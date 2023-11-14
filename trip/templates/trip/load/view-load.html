@@ -117,10 +117,12 @@
                                                 <div class="profile-ud-list">
                                                     <div class="profile-ud-item">
                                                         <div class="profile-ud wider">
-                                                            <span class="profile-ud-label">Assigned Vehicles</span>
-                                                            {% for vehicle in load.assigned_trucks.all %}
-                                                            <span class="profile-ud-value"><a href="{% url 'view_vehicle' vehicle.id %}">{{ vehicle.plate_number }}</a></span>
-                                                            {% endfor %}
+                                                            <span class="profile-ud-label">Assigned Truck</span>
+                                                            {% if load.assigned_truck %}
+                                                            <span class="profile-ud-value"><a href="{% url 'view_vehicle' load.assigned_truck.id %}">{{ load.assigned_truck.plate_number }}</a></span>
+                                                            {% else %}
+                                                            <span class="profile-ud-value"><a href="{% url 'assign_load_trucks' load.id %}"> Assign Truck?</a> No truck assigned!</span>
+                                                            {% endif %}
                                                         </div>
                                                     </div>
                                                 </div><!-- .profile-ud-list -->

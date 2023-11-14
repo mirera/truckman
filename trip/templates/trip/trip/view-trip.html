@@ -38,6 +38,12 @@
                                         <a class="nav-link active" data-bs-toggle="tab" href="#tabItem1"><em class="icon ni ni-user-circle-fill"></em><span>Overview</span></a>
                                     </li>
                                     <li class="nav-item">
+                                        <a class="nav-link" data-bs-toggle="tab" href="#loads"><em class="icon ni ni-reports"></em><span>Loads</span></a>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a class="nav-link" data-bs-toggle="tab" href="#loadinglist"><em class="icon ni ni-reports"></em><span>Loading List</span></a>
+                                    </li>
+                                    <li class="nav-item">
                                         <a class="nav-link" data-bs-toggle="tab" href="#tabItem2"><em class="icon ni ni-property"></em><span>Documents</span></a>
                                     </li>
                                     <li class="nav-item">
@@ -69,20 +75,7 @@
                                                     <div class="profile-ud-item">
                                                         <div class="profile-ud wider">
                                                             <span class="profile-ud-label">Customer:</span>
-                                                            <span class="profile-ud-value">{{ trip.load.estimate.customer.name }}</span>
-                                                        </div>
-                                                    </div>
-                                                    <div class="profile-ud-item">
-                                                        <div class="profile-ud wider">
-                                                            <span class="profile-ud-label">No. Trucks Assigned:</span>
-                                                            <span class="profile-ud-value">{{ trip.load.assigned_trucks.all.count }}</span>
-                                                        </div>
-                                                    </div>
-                                                   
-                                                    <div class="profile-ud-item">
-                                                        <div class="profile-ud wider">
-                                                            <span class="profile-ud-label">Route:</span>
-                                                            <span class="profile-ud-value">{{ trip.load.estimate.route }}</span>
+                                                            <span class="profile-ud-value">{{ trip.estimate.customer.name }}</span>
                                                         </div>
                                                     </div>
                                                     <div class="profile-ud-item">
@@ -91,6 +84,8 @@
                                                             <span class="profile-ud-value">{{ trip.status }}</span>
                                                         </div>
                                                     </div>
+                                                    
+                                                    
                                                 </div><!-- .profile-ud-list -->
                                             </div><!-- .nk-block -->
                                             <div class="nk-block">
@@ -100,14 +95,14 @@
                                                 <div class="profile-ud-list">
                                                     <div class="profile-ud-item">
                                                         <div class="profile-ud wider">
-                                                            <span class="profile-ud-label">Shipper:</span>
-                                                            <span class="profile-ud-value">{{trip.load.shipper.name }}</span>
+                                                            <span class="profile-ud-label">Loaded loads:</span>
+                                                            <span class="profile-ud-value">{{ loaded_loads }} of {{ loads.count }} </span>
                                                         </div>
                                                     </div>
                                                     <div class="profile-ud-item">
                                                         <div class="profile-ud wider">
-                                                            <span class="profile-ud-label">Consignee:</span>
-                                                            <span class="profile-ud-value">{{ trip.load.consignee.name }}</span>
+                                                            <span class="profile-ud-label">Delivered loads:</span>
+                                                            <span class="profile-ud-value">{{ delivered_loads }} of {{ loads.count }}</span>
                                                         </div>
                                                     </div>
                                                     
@@ -144,6 +139,105 @@
                                                 {% endif %}
                                             </div><!-- .nk-block -->
                                         </div><!-- tab pane -->
+
+                                        <div class="tab-pane" id="loads">
+                                            {% if loads %}
+                                            <div class="nk-block nk-block-between">
+                                                <div class="nk-block-head">
+                                                    <h6 class="title">Load(s)</h6>
+                                                </div><!-- .nk-block-head -->
+                                            </div><!-- .nk-block-between  -->
+                                            <div class="nk-block">
+                                                <div class="card">
+                                                    <table class="table">
+                                                        <thead class="table-light">
+                                                          <tr>
+                                                            <th scope="col">#</th>
+                                                            <th scope="col">Load ID</th>
+                                                            <th scope="col">Commodity</th>
+                                                            <th scope="col">Assigned Vehicle</th>
+                                                            <th scope="col">Load Status</th>
+                                                          </tr>
+                                                        </thead>
+                                                        <tbody>
+                                                            {% for load in loads %}
+                                                          <tr>
+                                                            <th scope="row">{{ forloop.counter }}</th>
+                                                            <td><a href="{% url 'view_load' load.id %}">{{ load.load_id }}</a></td>
+                                                            <td>{{ load.commodity }}</td>
+                                                            <td>{{ load.assigned_truck }}</td>
+                                                            <td>{{ load.status }}</td>
+                                                            
+                                                          </tr>
+                                                          {% endfor %}
+                                                        </tbody>
+                                                    </table>
+                                                </div><!-- .card -->
+                                            </div><!-- .nk-block -->
+                                            {% else %}
+                                            <div class="nk-block nk-block-between">
+                                                <div class="nk-block-head">
+                                                    <p>Load Data Not Available.</p>
+                                                    <a href="{% url 'get_loading_list' trip.id %}" class="btn btn-primary d-none d-md-inline-flex"><span>Generate Loading List</span></a>
+                                                </div><!-- .nk-block-head -->
+                                            </div><!-- .nk-block-between  -->
+                                            {% endif %}
+                                        </div><!--tab pane-->
+
+                                        <div class="tab-pane" id="loadinglist">
+                                            {% if loading_list %}
+                                            <div class="nk-block nk-block-between">
+                                                <div class="nk-block-head">
+                                                    <h6 class="title">Loading List</h6>
+                                                    <p>Assigned trucks(s)/vehicle(s)</p>
+                                                </div><!-- .nk-block-head -->
+                                                <div class="nk-block">
+                                                    <a class="btn btn-icon btn-primary" href="#">
+                                                        <em class="icon ni ni-send"></em>
+                                                    </a>
+                                                </div>
+                                            </div><!-- .nk-block-between  -->
+                                            <div class="nk-block">
+                                                <div class="card">
+                                                    <table class="table">
+                                                        <thead class="table-light">
+                                                          <tr>
+                                                            <th scope="col">#</th>
+                                                            <th scope="col">Truck Plate Number</th>
+                                                            <th scope="col">Trailer Plate Number</th>
+                                                            <th scope="col">Driver Name</th>
+                                                            <th scope="col">Driver Mobile No.</th>
+                                                            <th scope="col">Driver Passport No.</th>
+                                                            <th scope="col">Driver Driving Licence</th>
+                                                            <th scope="col">Tonnage</th>
+                                                          </tr>
+                                                        </thead>
+                                                        <tbody>
+                                                            {% for item in loading_list_items %}
+                                                          <tr>
+                                                            <th scope="row">{{ forloop.counter }}</th>
+                                                            <td>{{ item.vehicle.plate_number }}</td>
+                                                            <td>{{ item.vehicle.trailer_number }}</td>
+                                                            <td>{{ item.driver.first_name }} {{ driver.last_name }}</td>
+                                                            <td>{{ item.driver.tel_roam}}</td>
+                                                            <td>{{ item.driver.passport_number}}</td>
+                                                            <td>{{ item.driver.dl_no}}</td>
+                                                            <td>{{ item.vehicle.tonnage }}</td>
+                                                          </tr>
+                                                          {% endfor %}
+                                                        </tbody>
+                                                    </table>
+                                                </div><!-- .card -->
+                                            </div><!-- .nk-block -->
+                                            {% else %}
+                                            <div class="nk-block nk-block-between">
+                                                <div class="nk-block-head">
+                                                    <p>Loading List Data Not Available.</p>
+                                                    <a href="{% url 'get_loading_list' trip.id %}" class="btn btn-primary d-none d-md-inline-flex"><span>Generate Loading List</span></a>
+                                                </div><!-- .nk-block-head -->
+                                            </div><!-- .nk-block-between  -->
+                                            {% endif %}
+                                        </div><!--tab pane-->
 
                                         <div class="tab-pane" id="tabItem2">
                                             {% if documents %}
