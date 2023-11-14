@@ -355,6 +355,7 @@ class Estimate(models.Model):
     note = models.TextField(null=True)
     status = models.CharField(max_length=20, choices=ESTIMATE_STATUS, default='Waiting')
     is_sent = models.BooleanField(default=False)
+    
 
     #generate estimate_id 
     def save(self, *args, **kwargs):
@@ -396,70 +397,8 @@ class EstimateItem(models.Model):
 
     def __str__(self):
         return f"Loading List Item {self.id}"
+    
 #---------------------------------- Trip & Load Modules -----------------------------------------------
-
-#Load model
-FEE_TYPE = (
-    ('FLAT FEE','Flat Fee'),
-    ('PER MILE','Per Mile'),
-    ('PER HUNDRED WEIGHT','Per Hundred Weight'),
-    ('PER TON','Per Ton'),
-    ('PER QUANTITY','Per Quantity'),
-) 
-
-QUANTITY_TYPE = (
-    ('BARREL','Barrel'),
-    ('BOXES','Boxes'),
-    ('BUSHELS','Bushels'),
-    ('CASES','Cases'),
-    ('CRATES','Crates'),
-    ('GALLONS','Gallons'),
-    ('PALLETS','Pallets'),
-    ('PIECES','Pieces'),
-) 
-
-
-class Load(models.Model):
-    id = models.UUIDField(default=uuid.uuid4, unique=True, primary_key=True) 
-    company = models.ForeignKey(Client, on_delete=models.CASCADE)
-    load_id = models.CharField(max_length=7, unique=True, editable=False)
-    shipper = models.ForeignKey(Shipper, on_delete=models.SET_NULL, null=True)
-    consignee = models.ForeignKey(Consignee, on_delete=models.SET_NULL, null=True)
-    #load details
-    quantity = models.CharField(max_length=20, choices=QUANTITY_TYPE, default='Barrel')
-    quantity_type = models.CharField(max_length=20, choices=QUANTITY_TYPE, default='Barrel')
-    weight =  models.IntegerField(null=True, blank=True)
-    commodity = models.CharField(max_length=155, null=True)
-    pickup_date = models.DateField(null=True)
-    delivery_date = models.DateField(null=True)
-    driver_instructions = models.TextField(null=True, blank=True)
-    #--primary fee--
-    estimate = models.ForeignKey(Estimate, on_delete=models.SET_NULL, null=True)
-    quote_amount = models.FloatField(null=True)
-    #others
-    legal_disclaimer = models.TextField(null=True, blank=True)
-    notes = models.TextField(null=True, blank=True)
-    date_added = models.DateTimeField(auto_now_add=True)
-    assigned_trucks = models.ManyToManyField(Vehicle)
-
-    #generate customer_id 
-    def save(self, *args, **kwargs):
-        if not self.load_id:
-            prefix = 'LO'
-            # Averting race condition using 'select_for_update()'
-            with transaction.atomic():
-                last_load = Load.objects.select_for_update().filter(load_id__startswith=prefix).order_by('-load_id').first()
-                if last_load:
-                    last_id = last_load.load_id[2:]  # Remove prefix
-                    next_id = str(int(last_id) + 1).zfill(4)
-                    self.load_id = prefix + next_id
-                else:
-                    self.load_id = prefix + '0001'
-        super().save(*args, **kwargs)
-
-    def __str__(self):
-        return self.load_id
-
 # trip model
 TRIP_STATUS = (
     ('NOT STARTED ','Not Started'),
@@ -470,7 +409,7 @@ class Trip(models.Model):
     id = models.UUIDField(default=uuid.uuid4, unique=True, primary_key=True) 
     company = models.ForeignKey(Client, on_delete=models.CASCADE)
     trip_id = models.CharField(max_length=7, unique=True, editable=False)
-    load = models.ForeignKey(Load, on_delete=models.SET_NULL , null=True)
+    estimate = models.ForeignKey(Estimate, on_delete=models.SET_NULL , null=True)
     #consider using google maps later
     pick_up_location = models.CharField(null=True, max_length=150)
     drop_off_location = models.CharField(null=True, max_length=150)
@@ -500,6 +439,75 @@ class Trip(models.Model):
 
     def __str__(self):
         return self.trip_id
+
+#Load model
+FEE_TYPE = (
+    ('FLAT FEE','Flat Fee'),
+    ('PER MILE','Per Mile'),
+    ('PER HUNDRED WEIGHT','Per Hundred Weight'),
+    ('PER TON','Per Ton'),
+    ('PER QUANTITY','Per Quantity'),
+) 
+
+QUANTITY_TYPE = (
+    ('BARREL','Barrel'),
+    ('BOXES','Boxes'),
+    ('BUSHELS','Bushels'),
+    ('CASES','Cases'),
+    ('CRATES','Crates'),
+    ('GALLONS','Gallons'),
+    ('PALLETS','Pallets'),
+    ('PIECES','Pieces'),
+) 
+
+LOAD_STATUS = (
+    ('Not Loaded','Not Loaded'),
+    ('On Transit','On Transit'),
+    ('Delivered','Delivered'),
+)
+
+
+class Load(models.Model):
+    id = models.UUIDField(default=uuid.uuid4, unique=True, primary_key=True) 
+    company = models.ForeignKey(Client, on_delete=models.CASCADE)
+    load_id = models.CharField(max_length=7, unique=True, editable=False)
+    shipper = models.ForeignKey(Shipper, on_delete=models.SET_NULL, null=True)
+    consignee = models.ForeignKey(Consignee, on_delete=models.SET_NULL, null=True)
+    #load details
+    quantity = models.CharField(max_length=20, choices=QUANTITY_TYPE, default='Barrel')
+    quantity_type = models.CharField(max_length=20, choices=QUANTITY_TYPE, default='Barrel')
+    weight =  models.IntegerField(null=True, blank=True)
+    commodity = models.CharField(max_length=155, null=True)
+    pickup_date = models.DateField(null=True)
+    delivery_date = models.DateField(null=True)
+    driver_instructions = models.TextField(null=True, blank=True)
+    #--primary fee--
+    estimate = models.ForeignKey(Estimate, on_delete=models.SET_NULL, null=True)
+    quote_amount = models.FloatField(null=True)
+    #others
+    legal_disclaimer = models.TextField(null=True, blank=True)
+    notes = models.TextField(null=True, blank=True)
+    date_added = models.DateTimeField(auto_now_add=True)
+    assigned_truck = models.ForeignKey(Vehicle, on_delete=models.SET_NULL, null=True)
+    status = models.CharField(max_length=50, choices=LOAD_STATUS, default='Not Loaded')
+
+    #generate customer_id 
+    def save(self, *args, **kwargs):
+        if not self.load_id:
+            prefix = 'LO'
+            # Averting race condition using 'select_for_update()'
+            with transaction.atomic():
+                last_load = Load.objects.select_for_update().filter(load_id__startswith=prefix).order_by('-load_id').first()
+                if last_load:
+                    last_id = last_load.load_id[2:]  # Remove prefix
+                    next_id = str(int(last_id) + 1).zfill(4)
+                    self.load_id = prefix + next_id
+                else:
+                    self.load_id = prefix + '0001'
+        super().save(*args, **kwargs)
+
+    def __str__(self):
+        return self.load_id
 
 
 #---------------------------------- Invoice Modules -----------------------------------------------

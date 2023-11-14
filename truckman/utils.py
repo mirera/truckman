@@ -349,6 +349,31 @@ def reboot_wa_instance(access_token, instance_id):
         return False, error_msg
 # --ends
 
+# receiving webhook 
+def receiving_webhook(access_token, instance_id, webhook_url):
+    #get decrypted access_token from db
+    access_token_decrypted = decrypt_secret(access_token)
+    url = f'https://wa.erraniumsms.com/api/set_webhook?webhook_url={webhook_url}&enable=true&instance_id={instance_id}&access_token={access_token}'
+    response = requests.post(url)
+    # check the status code of the response
+    if response.status_code == 200:
+        # parse the JSON data from the response
+        json_data = response.json()
+
+        # check the status field in the JSON data
+        if json_data['status'] == 'success':
+            #return True, json_data['instance_id']
+            return json_data['instance_id']
+        else:
+            error_msg = json_data['message']
+            return False, error_msg
+    else:
+        response_data = response.json()
+        message = response_data['message']
+        error_msg = f"Request failed with status code {response.status_code} and this message {message} "
+        return False, error_msg
+
+
 #-------------------------------------------------- PDF Generation ----------------------------------------------------------------
 #pdf invoice generator
 def generate_invoice_pdf(invoice):
@@ -796,3 +821,5 @@ phone_codes = [
     ('+263', 'ZW +263')
 ]
       
+
+#https://wa.erraniumsms.com/api/set_webhook?webhook_url=https://webhook.site/22e6def0-43fa-42b7-a216-9540a6abffbe&enable=true&instance_id=654F41322D6E3&access_token=654ca4132030a      

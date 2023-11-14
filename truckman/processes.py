@@ -1,8 +1,9 @@
 from django.utils import timezone
 from datetime import timedelta
-from trip.models import Estimate, Invoice, LoadingList, LoadingListItem, DailyRegister, Load, DailyRegister, Driver
+from trip.models import Estimate, Invoice, LoadingList, LoadingListItem, DailyRegister, Load, DailyRegister, Driver, Trip
 from django.shortcuts import get_object_or_404
 from truckman.utils import get_location_data
+from django.db.models import F
 
 '''
 This function is called when a trip has been started
@@ -33,14 +34,17 @@ def generate_invoice(estimate):
 #--ends
 
 '''
-This function is called when an estimate has been accepted
-by the customer. It creates a loading list 
+This function is called when a loas has been assigned a truck
+It creates a loading list 
 '''
 def generate_loading_list(estimate):
-        estimate = get_object_or_404(Estimate, id=estimate.id)
-        load = get_object_or_404(Load, estimate=estimate)
-        #check if the load is assigned vehicle
-        vehicles = load.assigned_trucks.all()
+        loads = Load.objects.filter(estimate=estimate)
+        
+        # Get all vehicles assigned to loads
+        vehicles = []
+        for load in loads:
+            if load.assigned_truck:
+                vehicles.append(load.assigned_truck)
 
         #create instance of a loading list
         loading_list = LoadingList.objects.create(
@@ -99,7 +103,38 @@ def get_driver_day_entries(trip, driver, target_date):
         submission_time__date=target_date
     )
     return day_entries
+#--ends
 
 
 
+def update_trip_status(load):
+    trip = Trip.objects.get(estimate=load.estimate)
+    
+    if trip:
+        # Retrieve all loads associated with the trip
+        associated_loads = Load.objects.filter(estimate=load.estimate)
+        
+        # Check if any load status is 'On Transit'
+        if associated_loads.filter(status='On Transit').exists():
+            trip.status = 'Dispatched'
+            trip.save()
+        
+        # Check if all loads' status are 'Delivered'
+        if associated_loads.exclude(status='Delivered').exists():
+            # Not all loads are delivered
+            return
+        
+        # All loads are delivered
+        trip.status = 'Completed'
+        trip.save()
 
+        # Change all vehicle is_available to True
+        vehicles = []
+        for load in associated_loads:
+            if load.assigned_truck:
+                vehicles.append(load.assigned_truck)
+
+        for vehicle in vehicles:
+            vehicle.is_available = True
+            vehicle.save()
+#--ends

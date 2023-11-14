@@ -101,6 +101,7 @@ urlpatterns = [
     path('view_trip/add_payment/<str:pk>', views.add_payment_trip, name='add_payment_trip'),
     path('view_trip/add_expense/<str:pk>', views.add_expense_trip, name='add_expense_trip'),
     path('start_trip/<str:pk>', views.start_trip, name='start_trip'),
+    path('get_loading_list/<str:pk>', views.get_loading_list, name='get_loading_list'),
 
     #send trip doc to shipper url
     path('view_trip/<str:pk>/send_to_shipper', views.send_to_shipper, name='send_to_shipper'),
