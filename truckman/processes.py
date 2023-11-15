@@ -1,26 +1,54 @@
 from django.utils import timezone
 from datetime import timedelta
-from trip.models import Estimate, Invoice, LoadingList, LoadingListItem, DailyRegister, Load, DailyRegister, Driver, Trip
+from trip.models import Estimate, Invoice, LoadingList, LoadingListItem, DailyRegister, Load, DailyRegister, Driver, Trip, EstimateItem, InvoiceItem
 from django.shortcuts import get_object_or_404
 from truckman.utils import get_location_data
 from django.db.models import F
 
+
+
+#helper function to calculate due date 
+# of an invoice based on the customer
+
+def get_invoice_due_date(customer, trip):
+    payment_terms = {
+        '2 Days': 2,
+        '7 Days': 7,
+        '10 Days': 10,
+        '15 Days': 15,
+        '30 Days': 30,
+        'Cash on Delivery': None,  # No need to calculate a due date for Cash on Delivery
+    }
+
+    payment_term = customer.payment_term
+    if payment_term in payment_terms:
+        days = payment_terms[payment_term]
+        if days is not None:
+            due_date = trip.start_time.date() + timedelta(days=days)
+        else:
+            due_date = trip.end_time.date()  # For 'Cash on Delivery'
+    else:
+        # Handle cases where payment term is not recognized
+        due_date = None  
+
+    return due_date
+
 '''
-This function is called when a trip has been started
-by admin/office. You can also use it to re-generate an 
+This function is called when a estimate has been acceptes
+by client. You can also use it to re-generate an 
 invoice for a given estimate.
 '''
 def generate_invoice(estimate): 
-        due_date = timezone.now().date() + timedelta(days=30)
-        #create instance of a invoice
+        trip = Trip.objects.get(estimate=estimate)
+        due_date = get_invoice_due_date(estimate.customer, trip)
+
+        #get estimate items
+        estimate_items = EstimateItem.objects.filter(estimate=estimate)
+
+        #create invoice instance from estimate data
         invoice = Invoice.objects.create(
             company=estimate.company,
             estimate = estimate,
-            route = estimate.route,
-            item = estimate.item,
-            trucks = estimate.trucks,
-            rate = estimate.rate,
-            description = estimate.description,
             sub_total = estimate.sub_total,
             discount = estimate.discount,
             tax = estimate.tax,
@@ -30,7 +58,25 @@ def generate_invoice(estimate):
             due_date = due_date,
             note = estimate.company.invoice_payment_details,
         )
-        return invoice  #should return a path to the pdf of the invoice
+
+        #create invoice items from estimate items
+        invoice_items = []
+
+        for item in estimate_items:
+            invoice_item = InvoiceItem.objects.create(
+                    company=estimate.company,
+                    invoice=invoice,
+                    route = item.route,
+                    item_type = item.item_type,
+                    trucks = item.trucks,
+                    rate = item.rate,
+                    amount = item.amount,
+                    description = item.description,
+                )
+            invoice_items.append(invoice_item)
+    
+        return invoice  
+        
 #--ends
 
 '''
@@ -117,6 +163,7 @@ def update_trip_status(load):
         # Check if any load status is 'On Transit'
         if associated_loads.filter(status='On Transit').exists():
             trip.status = 'Dispatched'
+            trip.start_time = timezone.now()
             trip.save()
         
         # Check if all loads' status are 'Delivered'
@@ -126,6 +173,7 @@ def update_trip_status(load):
         
         # All loads are delivered
         trip.status = 'Completed'
+        trip.end_time = timezone.now()
         trip.save()
 
         # Change all vehicle is_available to True

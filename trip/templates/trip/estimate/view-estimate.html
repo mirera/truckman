@@ -30,12 +30,8 @@
                             <div class="dropdown-menu dropdown-menu-end dropdown-menu-auto mt-1">
                                 <ul class="link-list-plain">
                                     <li><a href="#">Download</a></li>
-                                    <li><a href="{% url 'update_estimate' estimate.id %}">Update</a></li>
+                                    <!-- <li><a href="{% url 'update_estimate' estimate.id %}">Update</a></li> -->
                                     <li><a href="{% url 'send_estimate' estimate.id %}">Send to Customer</a></li>
-                                    <li><a href="{% url 'add_trip' %}">Start Trip</a></li>
-                                    {% if estimate.status == 'Accepted' %}
-                                    <li><a href="{% url 'add_trip' %}">Loading List</a></li>
-                                    {% endif %}
                                 </ul>
                             </div>
                         </div>
@@ -110,7 +106,7 @@
                                             <tr>
                                                 <th class="w-150px">Item </th>
                                                 <th class="w-150px">Route </th>
-                                                <th class="w-60">Description</th>
+                                                <th class="w-60">Description</th> 
                                                 <th>Rate</th>
                                                 <th>Trucks</th>
                                                 <th>Amount</th>

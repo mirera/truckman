@@ -9,7 +9,7 @@ class Client(models.Model):
     id = models.UUIDField(default=uuid.uuid4, unique=True, primary_key=True) 
     name = models.CharField(max_length=100, unique=True)
     email = models.EmailField(unique=True)
-    phone_no = models.CharField(max_length=12, null=True, blank=True)
+    phone_no = models.CharField(max_length=14, null=True, blank=True)
     logo = models.ImageField(null=True, blank=True, upload_to='companies_logo/')
     date_joined = models.DateTimeField(auto_now_add=True)
     address = models.CharField(max_length=100, null=True, blank=True)

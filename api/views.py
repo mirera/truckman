@@ -2,7 +2,7 @@ from django.http import JsonResponse
 from datetime import timedelta, datetime
 from django.shortcuts import render
 from truckman.processes import get_driver_day_entries
-from trip.models import Driver, Trip
+from trip.models import Driver, Trip, Load
 from django.forms.models import model_to_dict
 import pytz
 
@@ -12,12 +12,21 @@ def get_entries_for_day(request, trip_id, day_number):
     # Create a list to accumulate results for each driver
     driver_results = []
     trip = Trip.objects.get(id=trip_id)
-    vehicles = trip.load.assigned_trucks.all()
+
+    loads = Load.objects.filter(estimate=trip.estimate)
+    vehicles = []
+
+    for load in loads:
+        if load.assigned_truck:
+            vehicle = load.assigned_truck
+            vehicles.append(vehicle)
+
     drivers = Driver.objects.filter(assigned_vehicle__in=vehicles)
 
     for driver in drivers:
         # Calculate the target date
-        target_date = trip.date_added + timedelta(days=int(day_number) - 1)
+        #target_date = trip.date_added + timedelta(days=int(day_number) - 1)
+        target_date = trip.start_time.date()
         entries = get_driver_day_entries(trip, driver, target_date)
         morning_entry = None
         midday_entry = None
@@ -25,6 +34,8 @@ def get_entries_for_day(request, trip_id, day_number):
         sub_time = None
         mid_sub_time = None
         evening_sub_time = None
+        
+        
 
         # Split the entries into morning, midday, and evening based on submission times
         for entry in entries:
@@ -36,7 +47,7 @@ def get_entries_for_day(request, trip_id, day_number):
 
             # Convert UTC time to the user's local time
             submission_time = entry.submission_time.astimezone(user_tz) 
-            print(f'after localizing time:{submission_time}')
+            
 
             if 5 <= submission_time.hour < 11:
                 # Convert sub_time UTC time to the user's local time format to HMS
@@ -49,14 +60,12 @@ def get_entries_for_day(request, trip_id, day_number):
                 evening_sub_time = entry.submission_time.astimezone(user_tz).strftime('%H:%M:%S')
                 evening_entry = model_to_dict(entry)
              
-            
-        # Fetch additional information based on the selected day
-        distance_covered = (evening_entry.evening_odometer_reading - morning_entry.morning_odometer_reading) if evening_entry and morning_entry else None
-        sleeping_location = evening_entry.evening_location if evening_entry else None
-        trip_status = evening_entry.vehicle_status if evening_entry else None
 
-        # Render the entries in an HTML table
-        #rendered_table = render(request, 'your_app/entry_table.html', {'entries': entries})
+
+        distance_covered = (evening_entry['evening_odometer_reading'] - morning_entry['morning_odometer_reading']) if evening_entry and morning_entry else None
+        sleeping_location = evening_entry['evening_location'] if evening_entry else None
+        trip_status = evening_entry['vehicle_status'] if evening_entry else None
+
 
         # Accumulate the results for this driver
         driver_results.append({

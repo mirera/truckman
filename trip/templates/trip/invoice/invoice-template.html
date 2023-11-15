@@ -40,11 +40,11 @@
                                         <div class="invoice-contact">
                                             <span class="overline-title">Invoice To</span>
                                             <div class="invoice-contact-info">
-                                                <h4 class="title">{{ invoice.trip.load.estimate.customer.name }}</h4>
+                                                <h4 class="title">{{ invoice.estimate.customer.name }}</h4>
                                                 <ul class="list-plain">
-                                                    <li><em class="icon ni ni-map-pin-fill"></em><span>{{ invoice.trip.load.estimate.customer.address_one }}, {{ invoice.trip.load.estimate.customer.city }}, {{ invoice.trip.load.estimate.customer.country }} </span></li>
-                                                    <li><em class="icon ni ni-mail"></em><span>{{ invoice.trip.load.estimate.customer.email }}</span></li>
-                                                    <li><em class="icon ni ni-call-fill"></em><span>{{ invoice.trip.load.estimate.customer.phone }}</span></li>
+                                                    <li><em class="icon ni ni-map-pin-fill"></em><span>{{ invoice.estimate.customer.address_one }}, {{ invoice.estimate.customer.city }}, {{ invoice.estimate.customer.country }} </span></li>
+                                                    <li><em class="icon ni ni-mail"></em><span>{{ invoice.estimate.customer.email }}</span></li>
+                                                    <li><em class="icon ni ni-call-fill"></em><span>{{ invoice.estimate.customer.phone }}</span></li>
                                                 </ul>
                                             </div>
                                         </div>
@@ -75,22 +75,25 @@
                                     <table class="table table-striped">
                                         <thead>
                                             <tr>
-                                                <th class="w-150px">Item ID</th>
+                                                <th class="w-150px">Item </th>
+                                                <th class="w-150px">Route </th>
                                                 <th class="w-60">Description</th>
-                                                <th>Price</th>
-                                                <th>Qty</th>
+                                                <th>Rate</th>
+                                                <th>Trucks</th>
                                                 <th>Amount</th>
                                             </tr>
                                         </thead>
                                         <tbody>
-                                            
+                                            {% for item in invoice_items %}
                                             <tr>
-                                                <td>{{ invoice.item }}</td>
-                                                <td>{{ invoice.description }}</td>
-                                                <td>${{ invoice.unit_price }}</td>
-                                                <td>{{ invoice.quantity}}</td>
-                                                <td>${{ invoice.sub_total }}</td>
+                                                <td>{{ item.item_type }}</td>
+                                                <td>{{ item.route }}</td>
+                                                <td>{{ item.description }}</td>
+                                                <td>${{ item.rate }}</td>
+                                                <td>{{ item.trucks}}</td>
+                                                <td>${{ item.amount }}</td>
                                             </tr>
+                                            {% endfor %}
                                         </tbody>
                                         <tfoot>
                                             <tr>

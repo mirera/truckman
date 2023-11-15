@@ -41,7 +41,7 @@ class ClientForm(forms.ModelForm):
         widgets = {
                 'name': forms.TextInput(attrs={'class': 'form-control', 'placeholder':'Enigma Trucks'}),
                 'email': forms.EmailInput(attrs={'class': 'form-control', 'placeholder':'info@loginit.co.ke'}),
-                'phone_no': forms.TextInput(attrs={'class': 'form-control', 'placeholder':'0731733333'}),
+                'phone_no': forms.TextInput(attrs={'class': 'form-control', 'placeholder':'0731733333', 'minlength':'9', 'maxlength':'10'}),
                 'date_joined': forms.DateInput(attrs={'class': 'form-control  date-picker', 'data-date-format':'yyyy-mm-dd', 'placeholder':'yyyy-mm-dd'}),
                 'address': forms.TextInput(attrs={'class': 'form-control', 'placeholder':'Some address'}),
                 'city': forms.TextInput(attrs={'class': 'form-control', 'placeholder':'Sesom'}),
@@ -107,7 +107,7 @@ class StaffForm(forms.ModelForm):
                 'email': forms.EmailInput(attrs={'class': 'form-control', 'placeholder':'info@loginit.co.ke'}),
                 'password': forms.PasswordInput(attrs={'class': 'form-control'}),
                 'role': forms.Select(attrs={'class': 'form-select js-select2'}), 
-                'phone': forms.NumberInput(attrs={'class': 'form-control', 'placeholder':'254706000000'}),
+                'phone': forms.NumberInput(attrs={'class': 'form-control', 'placeholder':'254706000000', 'minlength':'12', 'maxlength':'12'}), 
                 'date_joined': forms.DateInput(attrs={'class': 'form-control  date-picker', 'data-date-format':'yyyy-mm-dd', 'placeholder':'yyyy-mm-dd'}),
                 'department': forms.TextInput(attrs={'class': 'form-control', 'placeholder':'Enigma'}),
                 'designation': forms.TextInput(attrs={'class': 'form-control', 'placeholder':'Sesom'}),

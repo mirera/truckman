@@ -143,6 +143,7 @@ urlpatterns = [
 
     path('send_trip_invoice/<str:pk>', views.send_trip_invoice, name='send_trip_invoice'),
     path('generate_invoice_pdf/<str:pk>', views.generate_invoice_pdf, name='generate_invoice_pdf'),
+    path('get_invoice/<str:pk>', views.get_invoice, name='get_invoice'),
 
     #--ends
 

@@ -96,22 +96,25 @@
                                     <table class="table table-striped">
                                         <thead>
                                             <tr>
-                                                <th class="w-150px">Item</th>
-                                                <th class="w-60">Route</th>
+                                                <th class="w-150px">Item </th>
+                                                <th class="w-150px">Route </th>
+                                                <th class="w-60">Description</th>
                                                 <th>Rate</th>
                                                 <th>Trucks</th>
                                                 <th>Amount</th>
                                             </tr>
                                         </thead>
                                         <tbody>
-                                            
+                                            {% for item in invoice_items %}
                                             <tr>
-                                                <td>{{ invoice.item }}</td>
-                                                <td>{{ invoice.description }}</td>
-                                                <td>${{ invoice.rate }}</td>
-                                                <td>{{ invoice.trucks}}</td>
-                                                <td>${{ invoice.sub_total }}</td>
+                                                <td>{{ item.item_type }}</td>
+                                                <td>{{ item.route }}</td>
+                                                <td>{{ item.description }}</td>
+                                                <td>${{ item.rate }}</td>
+                                                <td>{{ item.trucks}}</td>
+                                                <td>${{ item.amount }}</td>
                                             </tr>
+                                            {% endfor %}
                                         </tbody>
                                         <tfoot>
                                             <tr>
@@ -137,7 +140,7 @@
                                             <tr>
                                                 <td colspan="2"></td>
                                                 <td colspan="2">Amount Paid</td>
-                                                <td>${{ invoice.amount_paid }}</td>
+                                                <td>${{ invoice.amount_paid }}</td> 
                                             </tr>
                                             <tr>
                                                 <td colspan="2"></td>

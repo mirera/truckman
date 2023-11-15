@@ -7,8 +7,8 @@ from truckman.processes import update_trip_status
 #setting the passport photo default to 'default.png'
 @receiver(pre_save, sender=Driver)
 def set_default_passport_photo(sender, instance, **kwargs):
-    if not instance.passport_photo:
-        instance.passport_photo = 'default.png'
+    if not instance.driver_photo:
+        instance.driver_photo = 'default.png'
 # --ends
 
 #update trip status when load is saved
