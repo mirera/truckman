@@ -65,50 +65,50 @@
 <div class="modal fade" tabindex="-1" id="dayReport">
     <div class="modal-dialog modal-lg" role="document">
         <div class="modal-content">
-            <a href="#" class="close" data-dismiss="modal" aria-label="Close">
-                <em class="icon ni ni-cross"></em>
-            </a>
-            <div class="modal-header">
-                <h5 class="modal-title">Day Entries</h5>
-            </div>
-            <div class="nk-block nk-block-lg">
-                <table class="table">
-                    <thead class="table-light">
-                      <tr>
-                        <th scope="col">#</th>
-                        <th scope="col">Morning</th>
-                        <th scope="col">Midday</th>
-                        <th scope="col">Evening</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      <tr>
-                        <th scope="row">Submission Time:</th>
-                        <td id="morning-submission-time">{% timezone request.session.user_timezone  %} {% endtimezone %}</td>
-                        <td id="midday-submission-time"></td>
-                        <td id="evening-submission-time"></td>
-                      </tr>
-                      <tr>
-                        <th scope="row">Location:</th>
-                        <td id="morning-location"></td>
-                        <td id="midday-location"></td>
-                        <td id="evening-location"></td>
-                      </tr>
-                      <tr>
-                        <th scope="row">Odometer Reading:</th>
-                        <td id="morning-odometer-reading"></td>
-                        <td id="midday-odometer-reading"></td>
-                        <td id="evening-odometer-reading"></td>
-                      </tr>
-                    </tbody>
-                </table>
-            </div><!-- nk-block -->
-            <div class="modal-footer bg-light">
-                <span class="sub-text">Driver: <span id="driver"></span></span>
-                <span class="sub-text">Distance covered: <span id="distance-covered"></span></span> <br>
-                <span class="sub-text">Sleeping location: <span id="sleeping-location"></span></span> <br>
-                <span class="sub-text">Trip Status: <span id="trip-status"></span></span> <br>
-            </div>
+            <a href="#" class="close" data-bs-dismiss="modal"><em class="icon ni ni-cross-sm"></em></a>
+            <div class="modal-body modal-body-md"></div>
+                <div class="modal-header">
+                    <h5 class="modal-title">Day Entries</h5>
+                </div>
+                <div class="nk-block nk-block-lg">
+                    <table class="table">
+                        <thead class="table-light">
+                        <tr>
+                            <th scope="col">#</th>
+                            <th scope="col">Morning</th>
+                            <th scope="col">Midday</th>
+                            <th scope="col">Evening</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr>
+                            <th scope="row">Submission Time:</th>
+                            <td id="morning-submission-time">{% timezone request.session.user_timezone  %} {% endtimezone %}</td>
+                            <td id="midday-submission-time"></td>
+                            <td id="evening-submission-time"></td>
+                        </tr>
+                        <tr>
+                            <th scope="row">Location:</th>
+                            <td id="morning-location"></td>
+                            <td id="midday-location"></td>
+                            <td id="evening-location"></td>
+                        </tr>
+                        <tr>
+                            <th scope="row">Odometer Reading:</th>
+                            <td id="morning-odometer-reading"></td>
+                            <td id="midday-odometer-reading"></td>
+                            <td id="evening-odometer-reading"></td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div><!-- nk-block -->
+                <div class="modal-footer bg-light">
+                    <span class="sub-text">Driver: <span id="driver"></span></span>
+                    <span class="sub-text">Distance covered: <span id="distance-covered"></span></span> <br>
+                    <span class="sub-text">Sleeping location: <span id="sleeping-location"></span></span> <br>
+                    <span class="sub-text">Trip Status: <span id="trip-status"></span></span> <br>
+                </div>
+            </div> <!-- modal body-->
         </div>
     </div>
 </div>
@@ -167,6 +167,7 @@
                     $('#evening-submission-time').text(driverData.evening_sub_time);
                     $('#evening-location').text(eveningData.evening_location);
                     $('#evening-odometer-reading').text(eveningData.evening_odometer_reading);
+                    console.log('Odemeter Reading',eveningData.evening_odometer_reading);
                     } else {
                         $('#evening-submission-time').text('N/A');
                         $('#evening-location').text('N/A');
@@ -184,6 +185,7 @@
         },
         error: function() {
             // Handle errors if the request fails
+            console.log('Drivers not avilane')
         }
     });
 });

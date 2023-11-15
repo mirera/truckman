@@ -120,7 +120,7 @@ class Driver(models.Model):
     tel_roam = models.CharField(max_length=12)
     date_hired = models.DateField()
     date_terminated = models.DateField(null=True, blank=True)
-    driver_photo = models.ImageField(upload_to='driver_photos/', null=True, blank=True)
+    driver_photo = models.ImageField(upload_to='driver_photos/', null=True, blank=True) 
     id_img = models.ImageField(upload_to='driver_photos/', null=True, blank=True)
     #dl and passport data
     dl_no = models.CharField(max_length=12)
@@ -153,11 +153,11 @@ class Driver(models.Model):
 #---------------------------------- Customer Modules -------------------------------------------
 
 PAYMENT_TERM = (
-    ('2 DAYS','2 Days'),
-    ('7 DAYS','7 Days'),
-    ('10 DAYS','10 Days'),
-    ('15 DAYS','15 Days'),
-    ('30 DAYS','30 Days'),
+    ('2 Days','2 Days'),
+    ('7 Days','7 Days'),
+    ('10 Days','10 Days'),
+    ('15 Days','15 Days'),
+    ('30 Days','30 Days'),
     ('Cash on Delivery','Cash on Delivery'),
 ) 
 
@@ -341,7 +341,7 @@ ESTIMATE_ITEM_TYPE = (
     ('Container','Container'),
     ('Loose Cargo','Loose Cargo'),
 )
-class Estimate(models.Model):
+class Estimate(models.Model): 
     id = models.UUIDField(default=uuid.uuid4, unique=True, primary_key=True) 
     company = models.ForeignKey(Client, on_delete=models.CASCADE)
     customer = models.ForeignKey(Customer, on_delete=models.SET_NULL, null=True)
@@ -401,9 +401,9 @@ class EstimateItem(models.Model):
 #---------------------------------- Trip & Load Modules -----------------------------------------------
 # trip model
 TRIP_STATUS = (
-    ('NOT STARTED ','Not Started'),
-    ('DISPATCHED','Dispatched'),
-    ('COMPLETED','Completed')
+    ('Not Started','Not Started'),
+    ('Dispatched','Dispatched'),
+    ('Completed','Completed')
 ) 
 class Trip(models.Model):
     id = models.UUIDField(default=uuid.uuid4, unique=True, primary_key=True) 
@@ -411,12 +411,6 @@ class Trip(models.Model):
     trip_id = models.CharField(max_length=7, unique=True, editable=False)
     estimate = models.ForeignKey(Estimate, on_delete=models.SET_NULL , null=True)
     #consider using google maps later
-    pick_up_location = models.CharField(null=True, max_length=150)
-    drop_off_location = models.CharField(null=True, max_length=150)
-    distance = models.FloatField(null=True)
-    driver_accesory_pay = models.IntegerField(null=True)
-    driver_advance = models.IntegerField(null=True)
-    driver_milage = models.FloatField(null=True)
     date_added = models.DateTimeField(auto_now_add=True)
     start_time = models.DateTimeField(null=True)
     end_time = models.DateTimeField(null=True)
@@ -483,13 +477,20 @@ class Load(models.Model):
     driver_instructions = models.TextField(null=True, blank=True)
     #--primary fee--
     estimate = models.ForeignKey(Estimate, on_delete=models.SET_NULL, null=True)
-    quote_amount = models.FloatField(null=True)
+    #quote_amount = models.FloatField(null=True)
     #others
     legal_disclaimer = models.TextField(null=True, blank=True)
     notes = models.TextField(null=True, blank=True)
     date_added = models.DateTimeField(auto_now_add=True)
     assigned_truck = models.ForeignKey(Vehicle, on_delete=models.SET_NULL, null=True)
     status = models.CharField(max_length=50, choices=LOAD_STATUS, default='Not Loaded')
+
+    pick_up_location = models.CharField(null=True, max_length=150)
+    drop_off_location = models.CharField(null=True, max_length=150)
+    distance = models.FloatField(null=True)
+    driver_accesory_pay = models.IntegerField(null=True)
+    driver_advance = models.IntegerField(null=True)
+    driver_milage = models.FloatField(null=True)
 
     #generate customer_id 
     def save(self, *args, **kwargs):
@@ -526,16 +527,11 @@ class Invoice(models.Model):
     company = models.ForeignKey(Client, on_delete=models.CASCADE)
     estimate = models.ForeignKey(Estimate, on_delete=models.SET_NULL, null=True)
     invoice_id = models.CharField(max_length=7, unique=True, editable=False)
-    route = models.ForeignKey(Route, on_delete=models.SET_NULL, null=True)
-    item = models.CharField(max_length=20, default='Container', choices=INVOICE_ITEM_TYPE)
-    trucks = models.IntegerField(default=0.00)
-    rate = models.IntegerField(default=0.00)
-    description = models.CharField(max_length=100, null=True)
-    sub_total = models.FloatField(default=0.00)
-    tax = models.FloatField(default=0.00)
-    discount = models.FloatField(default=0.00)
-    total = models.FloatField(default=0.00)
-    balance = models.FloatField(default=0.00)
+    sub_total = models.FloatField()
+    tax = models.FloatField()
+    discount = models.FloatField()
+    total = models.FloatField()
+    balance = models.FloatField(null=True)
     invoice_date = models.DateField()
     due_date = models.DateField()
     note = models.TextField(null=True)
@@ -573,7 +569,27 @@ class Invoice(models.Model):
 
     def __str__(self):
         return self.invoice_id
+
+
+# invoice item
+INVOICE_ITEM_TYPE = (
+('Container','Container'),
+('Loose Cargo','Loose Cargo'),
+) 
+class InvoiceItem(models.Model):
+    id = models.UUIDField(default=uuid.uuid4, unique=True, primary_key=True) 
+    company = models.ForeignKey(Client, on_delete=models.CASCADE)
+    invoice = models.ForeignKey(Invoice, on_delete=models.CASCADE)
+    item_type = models.CharField(max_length=20, default='Container', choices=INVOICE_ITEM_TYPE)
+    route = models.ForeignKey(Route, on_delete=models.SET_NULL, null=True)
+    trucks = models.DecimalField(max_digits=10, decimal_places=2)
+    rate = models.DecimalField(max_digits=10, decimal_places=2)
+    amount = models.DecimalField(max_digits=10, decimal_places=2)
+    description = models.CharField(max_length=100, null=True)
     
+
+    def __str__(self):
+        return f"Invoice Item {self.id}"
     
 #---------------------------------- Payment Modules -----------------------------------------------
 # payment model

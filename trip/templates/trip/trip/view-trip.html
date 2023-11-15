@@ -23,7 +23,7 @@
                         {% if trip.status == 'Not Started' %}
                         <div class="nk-block-head-content">
                             <a href="{% url 'start_trip' trip.id %}" class="btn btn-icon btn-primary d-md-none"></a>
-                            <a href="{% url 'start_trip' trip.id %}" class="btn btn-primary d-none d-md-inline-flex"><span>Start This Trip</span></a>
+                            <!-- <a href="{% url 'start_trip' trip.id %}" class="btn btn-primary d-none d-md-inline-flex"><span>Start This Trip</span></a> -->
                         </div><!-- .nk-block-head-content -->
                         {% endif %}
                     </div><!-- .nk-block-between -->
@@ -360,22 +360,25 @@
                                                                 <table class="table table-striped">
                                                                     <thead>
                                                                         <tr>
-                                                                            <th class="w-150px">Item</th>
-                                                                            <th class="w-60">Route</th>
+                                                                            <th class="w-150px">Item </th>
+                                                                            <th class="w-150px">Route </th>
+                                                                            <th class="w-60">Description</th>
                                                                             <th>Rate</th>
                                                                             <th>Trucks</th>
                                                                             <th>Amount</th>
                                                                         </tr>
                                                                     </thead>
                                                                     <tbody>
-                                                                        
+                                                                        {% for item in invoice_items %}
                                                                         <tr>
-                                                                            <td>{{ invoice.item }}</td>
-                                                                            <td>{{ invoice.description }}</td>
-                                                                            <td>${{ invoice.rate }}</td>
-                                                                            <td>{{ invoice.trucks}}</td>
-                                                                            <td>${{ invoice.sub_total }}</td>
+                                                                            <td>{{ item.item_type }}</td>
+                                                                            <td>{{ item.route }}</td>
+                                                                            <td>{{ item.description }}</td>
+                                                                            <td>${{ item.rate }}</td>
+                                                                            <td>{{ item.trucks}}</td>
+                                                                            <td>${{ item.amount }}</td>
                                                                         </tr>
+                                                                        {% endfor %}
                                                                     </tbody>
                                                                     <tfoot>
                                                                         <tr>
@@ -423,6 +426,7 @@
                                             {% else %}
                                             <div class="nk-block-head">
                                                 <p class="title">Invoice data not available.</p>
+                                                <a href="{% url 'get_invoice' trip.id %}" class="btn btn-primary d-none d-md-inline-flex"><span>Generate Invoice</span></a>
                                             </div><!-- .nk-block-head -->
                                             {% endif %}
                                         </div><!--tab pane-->

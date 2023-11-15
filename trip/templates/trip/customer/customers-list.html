@@ -166,12 +166,12 @@
                                             </div>
                                         </div>
                                         <div class="nk-tb-col"><span class="sub-text">Customer</span></div>
-                                        <div class="nk-tb-col tb-col-md"><span class="sub-text">ID</span></div>
+                                        <div class="nk-tb-col tb-col-md"><span class="sub-text">C.Person</span></div>
                                         <div class="nk-tb-col tb-col-md"><span class="sub-text">Phone</span></div>
-                                        <div class="nk-tb-col tb-col-xxl"><span class="sub-text">Address</span></div>
-                                        <div class="nk-tb-col tb-col-lg"><span class="sub-text">Trip Details</span></div>
-                                        <div class="nk-tb-col tb-col-sm"><span class="sub-text">Balance</span></div>
-                                        <div class="nk-tb-col tb-col-md"><span class="sub-text">Status</span></div>
+                                        <div class="nk-tb-col tb-col-md"><span class="sub-text">BRN</span></div>
+                                        <div class="nk-tb-col tb-col-md"><span class="sub-text">TIN</span></div>
+                                        <div class="nk-tb-col tb-col-sm"><span class="sub-text">P.Term</span></div>
+                                        <div class="nk-tb-col tb-col-md"><span class="sub-text">C.Limit</span></div>
                                         <div class="nk-tb-col nk-tb-col-tools">
                                             <ul class="nk-tb-actions gx-1 my-n1">
                                                 <li>
@@ -193,18 +193,15 @@
                                     <div class="nk-tb-item">
                                         <div class="nk-tb-col nk-tb-col-check">
                                             <div class="custom-control custom-control-sm custom-checkbox notext">
-                                                <input type="checkbox" class="custom-control-input" id="uid1">
-                                                <label class="custom-control-label" for="uid1"></label>
+                                                <input type="checkbox" class="custom-control-input" id="{{ customer.customer_id }}">
+                                                <label class="custom-control-label" for="{{ customer.customer_id }}"></label>
                                             </div>
                                         </div>
                                         <div class="nk-tb-col">
                                             <a href="#">
                                                 <div class="user-card">
-                                                    <div class="user-avatar bg-primary-dim">
-                                                        <span>AB</span>
-                                                    </div>
                                                     <div class="user-info">
-                                                        <span class="tb-lead">{{customer.name}} <span class="dot dot-warning d-md-none ms-1"></span></span>
+                                                        <span class="tb-lead"><a href="{% url 'view_customer' customer.id %}">{{customer.name}}</a> <span class="dot dot-warning d-md-none ms-1"></span></span>
                                                         <span>{{customer.email}}</span>
                                                     </div>
                                                 </div>
@@ -212,35 +209,33 @@
                                         </div>
                                         <div class="nk-tb-col tb-col-md">
                                             <a href="#">
-                                                <span class="fw-medium">#{{customer.customer_id}}</span>
+                                                <span class="fw-medium">{{customer.contact_person}}</span>
                                             </a>
                                         </div>
                                         <div class="nk-tb-col tb-col-md">
                                             <span>{{customer.phone}}</span>
                                         </div>
-                                        <div class="nk-tb-col tb-col-xxl">
-                                            <span>{{customer.address_one}}</span>
+                                        <div class="nk-tb-col tb-col-md">
+                                            <span>{{customer.brn}}</span>
                                         </div>
-                                        <div class="nk-tb-col tb-col-lg">
+                                        <div class="nk-tb-col tb-col-md">
                                             <div>
-                                                <span>Item: Omidon10mg</span>
-                                            </div>
-                                            <div>
-                                                <span>Quantity: 10pcs</span>
+                                                <span>{{ customer.tin }}</span>
                                             </div>
                                         </div>
                                         <div class="nk-tb-col tb-col-sm">
-                                            <span class="tb-amount">78.55 <span class="currency">USD</span></span>
+                                            <span class="tb-amount">{{ customer.payment_term }}</span>
                                         </div>
-                                        <div class="nk-tb-col tb-col-md">
-                                            <span class="tb-status text-warning">Inactive</span>
+                                        <div class="nk-tb-col tb-col-sm">
+                                            <span class="tb-amount">{{ customer.credit_limit }} </span>
                                         </div>
+                                        
                                         <div class="nk-tb-col nk-tb-col-tools">
                                             <ul class="nk-tb-actions gx-1">
                                                 <li class="nk-tb-action-hidden">
-                                                    <a href="#" class="btn btn-trigger btn-icon" data-bs-toggle="tooltip" data-bs-placement="top" title="Send Email">
+                                                    <!--<a href="#" class="btn btn-trigger btn-icon" data-bs-toggle="tooltip" data-bs-placement="top" title="Send Email">
                                                         <em class="icon ni ni-mail-fill"></em>
-                                                    </a>
+                                                    </a> -->
                                                 </li>
                                                 <li>
                                                     <div class="drodown">

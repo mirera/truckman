@@ -20,7 +20,8 @@ from .models import (
     DailyRegister,
     TripIncident,
     EstimateItem,
-    Vehicle_Owner
+    Vehicle_Owner,
+    Route
 )
 
 
@@ -302,6 +303,7 @@ class EstimateForm(forms.ModelForm):
         company = kwargs.pop('company')# Get the company from kwargs
         super(EstimateForm, self).__init__(*args, **kwargs)
         self.fields['customer'].queryset = Customer.objects.filter(company=company) 
+         
     
     class Meta:
         model = Estimate
@@ -310,15 +312,7 @@ class EstimateForm(forms.ModelForm):
 
         widgets = {
                 'customer': forms.Select(attrs={'class': 'form-select js-select2', 'id':'customerSelect'}),
-                #'item': forms.Select(attrs={'class': 'form-select js-select2', 'id':'itemSelect'}), 
-                #'route': forms.Select(attrs={'class': 'form-select js-select2', 'id':'routeSelect'}),
-                #'rate': forms.NumberInput(attrs={'class': 'form-control', 'placeholder':'7800', 'id':'rate'}),
-                #'trucks': forms.NumberInput(attrs={'class': 'form-control', 'placeholder':'7800', 'id':'trucks'}),
                 'description': forms.TextInput(attrs={'class': 'form-control', 'placeholder':'Some descriptions.'}),
-                #'sub_total': forms.NumberInput(attrs={'class': 'form-control', 'placeholder':'7800'}),
-                #'tax': forms.NumberInput(attrs={'class': 'form-control', 'placeholder':'7800'}),
-                #'discount': forms.NumberInput(attrs={'class': 'form-control', 'placeholder':'10'}),
-                #'total': forms.NumberInput(attrs={'class': 'form-control', 'placeholder':'10'}),
                 'valid_till': forms.DateInput(attrs={'class': 'form-control  date-picker', 'data-date-format':'yyyy-mm-dd', 'placeholder':'yyyy-mm-dd'}),
                 'note': forms.Textarea(attrs={'class': 'form-control', 'placeholder':'Note some terms/remarks here.'}),
                 'status': forms.Select(attrs={'class': 'form-select js-select2'}), #for updating estimate.
@@ -326,6 +320,10 @@ class EstimateForm(forms.ModelForm):
 
 #---------------------------------- Estimate forms -----------------------------------------------
 class EstimateItemForm(forms.ModelForm):
+    def __init__(self, *args, **kwargs):
+        company = kwargs.pop('company')# Get the company from kwargs
+        super(EstimateItemForm, self).__init__(*args, **kwargs)
+        self.fields['route'].queryset = Route.objects.filter(company=company) 
     
     class Meta:
         model = EstimateItem
@@ -456,6 +454,12 @@ class ReminderForm(forms.ModelForm):
 #---------------------------------- Daily Register forms --------------------------------------
 
 class DailyRegisterForm(forms.ModelForm):
+
+    def __init__(self, *args, **kwargs):
+        company = kwargs.pop('company')# Get the company from kwargs
+        super(DailyRegisterForm, self).__init__(*args, **kwargs)
+        self.fields['trip'].queryset = Trip.objects.filter(company=company).filter(status__in=['Dispatched', 'Completed'])
+        
      
     class Meta:
         model = DailyRegister

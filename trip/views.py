@@ -46,6 +46,7 @@ from . models import (
     LoadingListItem,
     TripIncident, 
     EstimateItem,
+    InvoiceItem
     
 )
 
@@ -770,8 +771,8 @@ def add_consignee(request):
             logo = request.FILES.get('logo'),
         )
 
-        messages.success(request, f'Consignee was added successfully. You can now add a load here.')
-        return redirect('add_load') #redirect a user to add load
+        messages.success(request, f'Consignee was added successfully.')
+        return redirect('list_consignees') #redirect a user to add load
 
     context= {'form':form}
     return render(request, 'trip/consignee/add-consignee.html', context)
@@ -920,8 +921,8 @@ def add_shipper(request):
             logo = request.FILES.get('logo'),
         )
 
-        messages.success(request, f'Shipper was added successfully. You can now add a Consignee here.')
-        return redirect('add_consignee') #redirect a user to add consignee
+        messages.success(request, f'Shipper was added successfully.')
+        return redirect('list_shippers') #redirect a user to add consignee
 
     context= {'form':form}
     return render(request, 'trip/shipper/add-shipper.html', context)
@@ -1525,10 +1526,17 @@ def update_trip(request, pk):
 @permission_required('trip.view_trip')
 def list_trips(request):
     trips = Trip.objects.filter(company=get_user_company(request))
-    number_of_trips = trips.count()
+    total_trips = trips.count()
+    completed_trips = trips.filter(status='Completed').count()
+    trips_on_transit = trips.filter(status='Dispatched').count()
+    trip_not_started = trips.filter(status='Not Started').count()
+
     context = {
         'trips':trips,
-        'number_of_trips':number_of_trips
+        'total_trips':total_trips,
+        'completed_trips':completed_trips,
+        'trips_on_transit':trips_on_transit,
+        'trip_not_started':trip_not_started
     }
     return render(request, 'trip/trip/trips-list.html', context)
 #--ends
@@ -1540,23 +1548,31 @@ def view_trip(request, pk):
     company=get_user_company(request)
     trip = get_object_or_404(Trip, id=pk)
 
-    loading_list = LoadingList.objects.get(estimate=trip.estimate)
-    loading_list_items = loading_list.loadinglistitem_set.all()
     expenses = Expense.objects.filter(company=company, trip=trip)
     loads = Load.objects.filter(estimate=trip.estimate)
 
     loaded_loads = loads.filter(status__in=['On Transit', 'Delivered']).count()
     delivered_loads = loads.filter(status='Delivered').count()
-    
-    
+
     try:
-        invoice = Invoice.objects.get(estimate=trip.estimate)
-        payments = Payment.objects.filter(company=company, invoice=invoice) #invoice in invoices associated with the trip 
-        documents = ''
         loading_list = LoadingList.objects.get(estimate=trip.estimate)
         loading_list_items = loading_list.loadinglistitem_set.all()
     except:
-        expenses, invoice, payments, documents = None, None, None, None
+        loading_list, loading_list_items = None, None
+
+    try:
+        invoice = Invoice.objects.get(estimate=trip.estimate)
+    except:
+        invoice = None
+
+    invoice_items = InvoiceItem.objects.filter(invoice=invoice)
+    
+
+    try:
+        payments = Payment.objects.filter(company=company, invoice=invoice) #invoice in invoices associated with the trip 
+        documents = ''
+    except:
+        payments, documents = None, None
 
     form = ExpenseForm(request.POST, company=company) # for expense modal
     category_form = ExpenseCategoryForm(request.POST) # for expense category modal
@@ -1569,6 +1585,7 @@ def view_trip(request, pk):
         'trip':trip,
         'expenses':expenses,
         'invoice':invoice,
+        'invoice_items':invoice_items,
         'payments':payments,
         'form':form,
         'category_form':category_form,
@@ -2183,6 +2200,18 @@ def add_invoice(request, pk):
     return render(request, 'trip/invoice/add-invoice.html', context)
 #--ends
 '''
+#generate an invoice given estimate
+@login_required(login_url='login')
+def get_invoice(request, pk):
+    trip = get_object_or_404(Trip, id=pk)
+    if trip.status in ['Dispatched', 'Completed']:
+        invoice = generate_invoice(trip.estimate)
+        messages.success(request, 'Invoice generated successfully.')
+        return redirect('view_trip', trip.id)
+    else:
+        messages.error(request, 'One or more Load(s) must be of status "loaded" to generate an invoice.')
+        return redirect('view_trip', trip.id)
+
 # update trip
 @login_required(login_url='login')
 @permission_required('trip.change_invoice')
@@ -2247,10 +2276,13 @@ def list_invoices(request):
 def view_invoice(request, pk):
     company = get_user_company(request)
     invoice = Invoice.objects.get(id=pk, company=get_user_company(request))
+    invoice_items = InvoiceItem.objects.filter(invoice=invoice)
+
     context={
         'invoice':invoice,
-        'company':company
-        }
+        'company':company,
+        'invoice_items':invoice_items
+    }
     return render(request, 'trip/invoice/view-invoice.html', context)
 #--ends
 
@@ -2299,7 +2331,9 @@ def send_trip_invoice(request, pk):
 def generate_invoice_pdf(request, pk):
     company = get_user_company(request)
     trip = Trip.objects.get(id=pk, company=company)
-    invoice = Invoice.objects.get(trip=trip)
+    invoice = Invoice.objects.get(estimate=trip.estimate)
+    invoice_items = InvoiceItem.objects.filter(invoice=invoice)
+
     # Path to your HTML template.
     template_path = 'trip/invoice/invoice-template.html'
 
@@ -2307,7 +2341,8 @@ def generate_invoice_pdf(request, pk):
     template = get_template(template_path)
     context = {
         'company':company,
-        'invoice':invoice
+        'invoice':invoice,
+        'invoice_items':invoice_items
     }  # You can pass context data here if needed
 
     # Render the template with the context data.
@@ -2341,7 +2376,7 @@ def add_estimate(request):
     border_points = BorderStop.objects.filter(company=company)
     form = EstimateForm(request.POST, company=company)  
     customer_form = CustomerForm(request.POST)
-    item_form = EstimateItemForm(request.POST)  
+    item_form = EstimateItemForm(request.POST, company=company)   
 
     if request.method == 'POST':
         customer_id = request.POST.get('customer')
@@ -2375,11 +2410,10 @@ def add_estimate(request):
                 trucks=int(item_data['trucks']),
                 rate=int(item_data['rate']),
                 amount=float(item_data['amount']),
+                description = route.description
             )
 
-            estimate.description = estimate_item.route.description
-            estimate.save()
-            print(f'Each item description: {estimate.description}')
+            
 
         messages.success(request, f'Estimate was added successfully.')
         return redirect('view_estimate', estimate.id)
@@ -2564,10 +2598,10 @@ def accept_estimate(request, pk):
     #the acceptance and assign trucks to the load link.
 
     estimate_url = request.build_absolute_uri(reverse('view_estimate', args=[pk]))
+    estimate_id = estimate.estimate_id
     context = {
-        'estimate':estimate.id,
+        'estimate':estimate_id,
         'estimate_url' : estimate_url,
-        'trip':trip 
     }
     
     send_email_task.delay(
@@ -2785,9 +2819,17 @@ def get_estimate_info(request, estimate_id):
 
 def add_register_entry(request, pk):
     company = get_user_company(request)
-    form = DailyRegisterForm(request.POST)
+    form = DailyRegisterForm(request.POST, company=company)
     trip = Trip.objects.get(id=pk)
-    vehicles = trip.load.assigned_trucks.all()
+
+    #get vehicles
+    loads = Load.objects.filter(estimate=trip.estimate)
+    vehicles = []
+    for load in loads:
+        if load.assigned_truck:
+            vehicle = load.assigned_truck
+            vehicles.append(vehicle)
+    #get drivers
     drivers = Driver.objects.filter(assigned_vehicle__in=vehicles)
 
     if request.method == 'POST':
@@ -2835,7 +2877,8 @@ def add_register_entry(request, pk):
 #view to render daily trip register report
 @login_required(login_url='login')
 def trip_daily_register_report(request):
-    form = DailyRegisterForm()
+    company = get_user_company(request)
+    form = DailyRegisterForm(company=company)
     
     if request.method == 'POST':
         #get the trip id 
@@ -2843,7 +2886,7 @@ def trip_daily_register_report(request):
         trip = Trip.objects.get(id=trip_id)
 
         # Calculate the number of days elapsed since the trip started
-        start_date = trip.date_added.date() #change later to start_time  
+        start_date = trip.start_time.date()
         current_date = datetime.now().date()
         elapsed_days = (current_date - start_date).days + 1  # +1 to include the current day
 
