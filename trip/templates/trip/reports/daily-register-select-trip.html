@@ -26,7 +26,8 @@
                 <div class="nk-block">
                     <div class="card card-bordered">
                         <div class="card-inner-group">
-                            <form action="{% url 'trip_daily_register_report' %}" method="POST" enctype="multipart/form-data" id="tripReportForm">
+                            <form action="{% url 'download_daily_report' %}" method="POST" enctype="multipart/form-data" >
+                            <!--<form action="{% url 'trip_daily_register_report' %}" method="POST" enctype="multipart/form-data" id="tripReportForm"></form>-->
                                 {% csrf_token %}
                                 <div class="card-inner">
                                     <div class="nk-block-head">
@@ -43,10 +44,13 @@
                                                         {{ form.trip }} 
                                                     </div>
                                                 </div>
+                                                <input type="hidden" id="selected-trip-id" name="selected_trip_id" value="">
                                             </div><!--col-->
                                             <div class="col-12">
                                                 <div class="form-group">
-                                                    <button type="submit" class="btn btn-primary" id="submitButton" >Submit</button>
+                                                   <!-- <button type="submit" class="btn btn-primary" id="submitButton" >View</button> -->
+                                                    <button type="submit" class="btn btn-primary" id="submitButton" >Download Report</button>
+                                                    <!--<a href="{% url 'download_daily_report' %}" data-trip_id="" class="btn btn-primary">Download Report</a>-->
                                                 </div>
                                             </div><!--col-->
                                         </div><!--row-->
@@ -64,23 +68,23 @@
 
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
-<!-- script to make ajax get request to server to source for 
-    daily register entries for 
--->
 <script>
-// add event listener on the selectedTrip id
-// store the value in variable selectedTrip
-// get the trip id
-// make ajax get request and get trip daily register data if any
-//increase the buttons based on the number of days since the trip started
+    // jQuery code to update the hidden input when the trip selection changes
+    $(document).ready(function() {
+        // Event delegation to ensure the change event is captured
+        $(document).on('change', '.form-control-wrap select', function() {
+            // Get the selected trip ID
+            var selectedTripId = $(this).val();
+            
+            // Update the hidden input with the selected trip ID
+            $('#selected-trip-id').attr('value', selectedTripId); // Set the attribute 'value'
+            
+
+        });
+    });
 </script>
 
-<!-- script to launch each day report modal-->
-<script>
-    //have envent listenr on each available button
-    //upon clicking , launch a modal the modal has 
-    // submission time, location and odemeter recording of the day so far
-</script>
+
 
 {% endblock content %} 
 

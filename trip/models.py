@@ -457,7 +457,7 @@ QUANTITY_TYPE = (
 LOAD_STATUS = (
     ('Not Loaded','Not Loaded'),
     ('On Transit','On Transit'),
-    ('Delivered','Delivered'),
+    ('Delivered','Delivered'), 
 )
 
 
@@ -491,6 +491,8 @@ class Load(models.Model):
     driver_accesory_pay = models.IntegerField(null=True)
     driver_advance = models.IntegerField(null=True)
     driver_milage = models.FloatField(null=True)
+    date_loaded = models.DateField(null=True)
+    date_offloaded = models.DateField(null=True)
 
     #generate customer_id 
     def save(self, *args, **kwargs):

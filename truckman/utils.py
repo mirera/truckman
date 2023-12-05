@@ -576,9 +576,8 @@ def get_location_data(coordinates):
         nearest_town, country = None, None
 
     return nearest_town, country
-
-
-
+    
+# country phone codes
 phone_codes = [
     ('+93', 'AF +93'),
     ('+355', 'AL +355'),
@@ -822,4 +821,3 @@ phone_codes = [
 ]
       
 
-#https://wa.erraniumsms.com/api/set_webhook?webhook_url=https://webhook.site/22e6def0-43fa-42b7-a216-9540a6abffbe&enable=true&instance_id=654F41322D6E3&access_token=654ca4132030a      

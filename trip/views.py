@@ -20,6 +20,7 @@ import io
 from django.conf import settings
 from django.urls import reverse
 from django.db.models import Sum
+from django.http import FileResponse
 
 from . models import (
     CustomUser,
@@ -73,7 +74,7 @@ from .forms import (
 
 from truckman.utils import get_user_company, generate_invoice_pdf, export_model_data, reverse_geocode, format_coordinates, get_location_data
 from truckman.tasks import send_email_task, send_email_with_attachment_task, send_whatsapp_text_task
-from truckman.processes import generate_invoice, generate_loading_list, create_daily_register
+from truckman.processes import generate_invoice, generate_loading_list, create_daily_register, generate_excel_daily_trip_report, get_trip_vehicles, create_workbook
 from authentication.models import WhatsappSetting
 
 
@@ -2822,13 +2823,9 @@ def add_register_entry(request, pk):
     form = DailyRegisterForm(request.POST, company=company)
     trip = Trip.objects.get(id=pk)
 
-    #get vehicles
-    loads = Load.objects.filter(estimate=trip.estimate)
-    vehicles = []
-    for load in loads:
-        if load.assigned_truck:
-            vehicle = load.assigned_truck
-            vehicles.append(vehicle)
+    # Get all vehicles assigned to loads
+    vehicles = get_trip_vehicles(trip)
+    
     #get drivers
     drivers = Driver.objects.filter(assigned_vehicle__in=vehicles)
 
@@ -2904,6 +2901,33 @@ def trip_daily_register_report(request):
     }
     return render(request, 'trip/reports/daily-register-select-trip.html', context)
 
+#ends
+
+'''
+#download daily report of a trip
+def download_daily_report(request):
+    trip_id = request.POST.get('selected_trip_id')
+    trip = get_object_or_404(Trip, id=trip_id)
+    generate_excel_daily_trip_report(trip, request)#create Excel documents
+    file_path = f'Trip_{trip.trip_id}_Daily_Report.xlsx' # Path to the generated Excel file
+    # Send the file as a response for download
+    with open(file_path, 'rb') as file:
+        response = FileResponse(file, as_attachment=True, filename=file_path)
+    return response
+'''
+#download daily report of a trip
+def download_daily_report(request):
+    trip_id = request.POST.get('selected_trip_id')
+    trip = get_object_or_404(Trip, id=trip_id)
+    #generate_excel_daily_trip_report(trip, request)#create Excel documents
+    #file_path = f'Trip_{trip.trip_id}_Daily_Report.xlsx' # Path to the generated Excel file
+    workbook = create_workbook(request, trip)
+    file_path = f'{trip.trip_id} Daily Report.xlsx'
+    print(f'This is the workbook:{workbook}')
+    # Send the file as a response for download
+    with open(file_path, 'rb') as file:
+        response = FileResponse(file, as_attachment=True, filename=file_path)
+    return response
 #--------------------------- Trip incident views _________________________________________________
 
 #-- add trip incident
@@ -2934,3 +2958,4 @@ def delete_trip_incident(request, trip_id, incident_id):
     incident.delete()
     messages.success(request, 'Incident deleted!')
     return redirect('view_trip', trip.id)
+#ends

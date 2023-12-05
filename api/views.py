@@ -35,8 +35,7 @@ def get_entries_for_day(request, trip_id, day_number):
         mid_sub_time = None
         evening_sub_time = None
         
-        
-
+    
         # Split the entries into morning, midday, and evening based on submission times
         for entry in entries:
             #get the user timezone from the request session
