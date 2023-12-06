@@ -7,7 +7,7 @@ from django.db.models import F
 import pandas as pd
 from openpyxl import Workbook
 import pytz
-
+from collections import defaultdict
 
 '''
 Function to get a trip vehicle(s)
@@ -231,33 +231,59 @@ def generate_excel_daily_trip_report(trip, request):
     return trip_excel_workbook  
 #--ends
 
-def create_sheetdata(request, worksheet, vehicle, day, n, m, p, q):
-    load = get_object_or_404(Load, assigned_truck=vehicle)
-    entries = get_load_daily_entries(load) #get load's all entries
-
-    for entry in entries:
+def create_sheetdata(request, worksheet, vehicle, entries_for_date, n, m, p, q, x):
+    for entry in entries_for_date:
         #split a day's entry into morning, mid and evening
         morning_entry, midday_entry, evening_entry, morning_sub_time, mid_sub_time, evening_sub_time = split_day_entry(entry, request)
 
-        #Create rows/columns and insert sheet data
-        worksheet['A1'] = f'{vehicle.plate_number} Report'
-        worksheet[f'A{n}'] = f'Trip Day {day} | {entry.submission_time.date()}' #
-        worksheet[f'B{n}'] = "#"
-        worksheet[f'C{n}'] = "Morning"
-        worksheet[f'D{n}'] = "Midday"
-        worksheet[f'E{n}'] = "Evening"
-        worksheet[f'B{m}'] = "Submission Time"
-        worksheet[f'B{p}'] = "Location"
-        worksheet[f'B{q}'] = "Odemeter"
-        worksheet[f'C{m}'] = 'morning_sub_time' #morning entry subtime
-        worksheet[f'C{p}'] = 'morning_entry.morning_location '#morning entry location
-        worksheet[f'C{q}'] = 'morning_entry.morning_odemeter_reading' #morning odemeter reading
+    #Create rows/columns and insert sheet data
+    worksheet['A1'] = f'{vehicle.plate_number} Report'
+    if entry:
+        worksheet[f'A{n}'] = f'Date | {entry.submission_time.date()}' 
+    else:
+        worksheet[f'A{n}'] = f'Date | Not Data Available'
+
+    worksheet[f'B{n}'] = "#"
+    worksheet[f'C{n}'] = "Morning"
+    worksheet[f'D{n}'] = "Midday"
+    worksheet[f'E{n}'] = "Evening"
+    worksheet[f'B{m}'] = "Submission Time"
+    worksheet[f'B{p}'] = "Location"
+    worksheet[f'B{q}'] = "Odemeter"
+    worksheet[f'B{x}'] = "Truck Status"
+    
+    if not morning_entry:
+        worksheet[f'C{m}'] = 'N/A'
+        worksheet[f'C{p}'] = 'N/A'
+        worksheet[f'C{q}'] = 'N/A'
+        worksheet[f'C{x}'] = 'N/A'
+    else:
+        worksheet[f'C{m}'] = morning_sub_time #morning entry subtime
+        worksheet[f'C{p}'] = morning_entry.morning_location #morning entry location
+        worksheet[f'C{q}'] = morning_entry.morning_odemeter_reading#morning odemeter reading
+        worksheet[f'C{x}'] = morning_entry.status #morning trip load status
+    
+    if not midday_entry:
+        worksheet[f'D{m}'] = 'N/A'
+        worksheet[f'D{p}'] = 'N/A'
+        worksheet[f'D{q}'] = 'N/A'
+        worksheet[f'D{x}'] = 'N/A'
+    else:
         worksheet[f'D{m}'] = mid_sub_time#midday entry subtime
         worksheet[f'D{p}'] = midday_entry.midday_location #midday entry location
         worksheet[f'D{q}'] = midday_entry.midday_odemeter_reading #midday odemeter reading
-        worksheet[f'E{m}'] = 'evening_sub_time' #evening entry subtime
+        worksheet[f'D{x}'] = midday_entry.vehicle_status #midday trip load status
+    
+    if not evening_entry:
+        worksheet[f'E{m}'] = 'N/A'
+        worksheet[f'E{p}'] = 'N/A'
+        worksheet[f'E{q}'] = 'N/A'
+        worksheet[f'E{x}'] = 'N/A'
+    else:
+        worksheet[f'E{m}'] = evening_sub_time #evening entry subtime
         worksheet[f'E{p}'] = 'evening_entry.evening_location' #evening entry location
         worksheet[f'E{q}'] = 'evening_entry.evening_odemeter_reading '#evening odemeter reading
+        worksheet[f'E{x}'] = 'evening_entry.status' #evening trip load status
  
 #--ends 
 
@@ -269,22 +295,25 @@ def create_workbook(request, trip):
     #create a worksheets for each vehicle on the trip
     for vehicle in get_trip_vehicles(trip):
         worksheet = workbook.create_sheet(title=f"{trip.trip_id} {vehicle.plate_number} Report")
-        #worksheet content
         load = get_object_or_404(Load, assigned_truck=vehicle)
-        days = load_trip_days(load)
-        print(f'load_trip_days:{days}')
-        days = [1,2,3] 
-        
-        n,m,p,q = 2,3,4,5 # these variables dynamically help write on excel vertically
-        for day in days:
-            create_sheetdata(request, worksheet, vehicle, day, n, m, p, q)
-            n += 5
-            m += 5
-            p += 5
-            q += 5
+        entries = get_load_daily_entries(load)#all entries made for this load
 
+        #group the entries into a list of lists of entries with the same date.
+        grouped_entries = defaultdict(list)
+        for entry in entries:
+            grouped_entries[entry.submission_time.date()].append(entry)
+        
+        n,m,p,q,x = 2,3,4,5,6 # these variables dynamically help write on excel vertically
+        for date, entries_for_date in grouped_entries.items():#create sheet data for each day
+                create_sheetdata(request, worksheet, vehicle, entries_for_date, n, m, p, q, x) 
+                n += 6
+                m += 6
+                p += 6
+                q += 6
+                x += 6
     # Save the file
-    workbook.save(f'{trip.trip_id} Daily Report.xlsx') 
+    #workbook.save(f'daily_reports/{trip.trip_id} Daily Report.xlsx') 
+    return workbook
 #--ends 
 
  

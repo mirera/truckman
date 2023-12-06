@@ -21,6 +21,7 @@ from django.conf import settings
 from django.urls import reverse
 from django.db.models import Sum
 from django.http import FileResponse
+from io import BytesIO
 
 from . models import (
     CustomUser,
@@ -2903,31 +2904,34 @@ def trip_daily_register_report(request):
 
 #ends
 
-'''
-#download daily report of a trip
 def download_daily_report(request):
     trip_id = request.POST.get('selected_trip_id')
     trip = get_object_or_404(Trip, id=trip_id)
-    generate_excel_daily_trip_report(trip, request)#create Excel documents
-    file_path = f'Trip_{trip.trip_id}_Daily_Report.xlsx' # Path to the generated Excel file
-    # Send the file as a response for download
-    with open(file_path, 'rb') as file:
-        response = FileResponse(file, as_attachment=True, filename=file_path)
-    return response
-'''
-#download daily report of a trip
-def download_daily_report(request):
-    trip_id = request.POST.get('selected_trip_id')
-    trip = get_object_or_404(Trip, id=trip_id)
-    #generate_excel_daily_trip_report(trip, request)#create Excel documents
-    #file_path = f'Trip_{trip.trip_id}_Daily_Report.xlsx' # Path to the generated Excel file
+    
+    # Create the workbook
     workbook = create_workbook(request, trip)
-    file_path = f'{trip.trip_id} Daily Report.xlsx'
-    print(f'This is the workbook:{workbook}')
+    
+    # Save the workbook to a BytesIO buffer
+    buffer = BytesIO()
+    workbook.save(buffer)
+    buffer.seek(0)
+    
+    # Prepare the response for file download
+    response = HttpResponse(buffer, content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
+    response['Content-Disposition'] = f'attachment; filename="{trip.trip_id} Daily Report.xlsx"'
+    
+    return response
+'''
+def download_daily_report(request):
+    trip_id = request.POST.get('selected_trip_id')
+    trip = get_object_or_404(Trip, id=trip_id)
+    workbook = create_workbook(request, trip)
+    file_path = f'daily_reports/{trip.trip_id} Daily Report.xlsx'
     # Send the file as a response for download
     with open(file_path, 'rb') as file:
         response = FileResponse(file, as_attachment=True, filename=file_path)
     return response
+'''
 #--------------------------- Trip incident views _________________________________________________
 
 #-- add trip incident
