@@ -59,6 +59,9 @@
                                     <li class="nav-item">
                                         <a class="nav-link" data-bs-toggle="tab" href="#tabItem6"><em class="icon ni ni-wallet-out"></em><span>Expenses</span> </a>
                                     </li>
+                                    <li class="nav-item">
+                                        <a class="nav-link" data-bs-toggle="tab" href="#tabItem7"><em class="icon ni ni-growth-fill"></em><span>Reports</span> </a>
+                                    </li>
                                 </ul>
                                 <div class="card-inner">
                                     <div class="tab-content">
@@ -480,7 +483,6 @@
                                         </div><!--tab pane-->
 
                                         <div class="tab-pane" id="tabItem6">
-                                            
                                             <div class="nk-block nk-block-between">
                                                 <div class="nk-block-head">
                                                     <h6 class="title">Expense Information</h6>
@@ -528,6 +530,41 @@
                                             </div><!-- .nk-block-head -->
                                             {% endif %}
                                         </div><!--tab pane-->
+                                        <div class="tab-pane" id="tabItem7">
+                                            <div class="nk-block nk-block-between">
+                                                <div class="nk-block-head">
+                                                    <h6 class="title">Trip Reports</h6>
+                                                    <p>Reports associated with this trip.</p>
+                                                </div><!-- .nk-block-head -->
+                                                
+                                            </div>
+                                            {% if trip.status != 'Not Started' %}
+                                            <div class="nk-block">
+                                                <div class="card">
+                                                    <div class="nk-tb-list nk-tb-ulist is-compact">
+                                                        <div class="nk-tb-item nk-tb-head">
+                                                            <div class="nk-tb-col"><span class="sub-text">Report</span></div>
+                                                            <div class="nk-tb-col tb-col-sm"><span class="sub-text">#</span></div>
+                                                        </div><!-- .nk-tb-item -->
+                                                        <div class="nk-tb-item">
+                                                            <div class="nk-tb-col">
+                                                                <span>Trip Register Daily Report</span>
+                                                            </div>
+                                                            <div class="nk-tb-col tb-col-sm">
+                                                                <span><a href="{% url 'download_day_report' trip.id %}">Download report</a></span>
+                                                            </div>
+                                                        </div><!-- .nk-tb-item -->
+                                                        
+                                                    </div><!-- .nk-tb-list -->
+                                                </div><!-- .card -->
+                                            </div><!-- .nk-block -->
+                                            {% else %}
+                                            <div class="nk-block-head">
+                                                <p class="title">Reports Not Available!</p>
+                                            </div><!-- .nk-block-head -->
+                                            {% endif %}
+                                        </div><!--tab pane-->
+
                                     </div><!--tab content--> 
                                 </div><!--card inner-->
                             </div><!-- .card-content -->

@@ -289,6 +289,9 @@
                                                                     <ul class="link-list-opt no-bdr">
                                                                         <li><a  href="{% url 'update_trip' trip.id %}"><em class="icon ni ni-edit"></em><span>Update</span></a></li>
                                                                         <li><a  href="{% url 'view_trip' trip.id %}"><em class="icon ni ni-eye"></em><span>View Details</span></a></li>
+                                                                        {% if trip.status != 'Not Started' %}
+                                                                        <li><a  href="{% url 'download_day_report' trip.id %}"><em class="icon ni ni-eye"></em><span>Download Register Report</span></a></li>
+                                                                        {% endif %}
                                                                         <li><a data-bs-toggle="modal" class="delete-button" href="#deleteTrip" data-pk="{{ trip.id }}"><em class="icon ni ni-trash"></em><span>Remove Trip</span></a></li>
                                                                     </ul>
                                                                 </div>

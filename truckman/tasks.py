@@ -1,11 +1,12 @@
 from celery import shared_task 
 from .utils import send_email, send_email_with_attachment, send_sms, shorten_url, create_wa_instance, get_wa_qrcode, send_whatsapp_text, send_whatsapp_media, reset_wa_instance, reconnect_wa_instance, reboot_wa_instance
+from .processes import get_trip_vehicles, generate_client_daily_report
 from django.conf import settings
 from django.urls import reverse
 #from django.contrib.sites.models import Site
 from django.shortcuts import get_object_or_404
-from trip.models import Trip, Driver, Load
-from authentication.models import WhatsappSetting
+from trip.models import Trip, Driver, Customer
+from authentication.models import WhatsappSetting, Preference
 
 
 
@@ -96,13 +97,10 @@ def send_driver_sms_url_task():
     trips = Trip.objects.filter(status='Dispatched') # from this we get driver and vehicle
     
     for trip in trips:
-        loads = Load.objects.filter(estimate=trip.estimate)
         # Get all vehicles assigned to loads
-        vehicles = []
-        for load in loads:
-            if load.assigned_truck:
-                vehicles.append(load.assigned_truck)
+        vehicles = get_trip_vehicles(trip)
 
+        #get drivers
         drivers = Driver.objects.filter(assigned_vehicle__in=vehicles)
         for driver in drivers:
             trip_id = str(trip.id)
@@ -126,3 +124,44 @@ def send_driver_sms_url_task():
                 message=message
             )
 # -- end --
+
+
+'''
+Share daily regsiter report with client
+'''
+@shared_task
+def share_daily_reister_report_task():
+    trips = Trip.objects.filter(status='Dispatched')
+    for trip in trips:
+        company = trip.company
+        customer = get_object_or_404(Customer, estimate=trip.estimate) 
+        #provide link to download the report
+        download_report_url = reverse('download_day_report', args=[trip.id])
+        context = {
+            'customer':customer.name, 
+            'company':company.name,
+            'download_report_url':download_report_url
+        }
+        preference = Preference.objects.get(company=company)
+        # share via email address
+        send_email(
+                context, 
+                template_path='trip/reports/daily-report-email-template.html', 
+                from_name=preference.email_from_name, 
+                from_email=preference.from_email, 
+                subject=f'Trip {trip.trip_id} Day Report', 
+                recipient_email=customer.email, 
+                replyto_email=preference.from_email
+            )
+
+        #share via whatsapp
+        message = f'Hello {customer.name} admin, click this link {download_report_url} to download daily trip report.'     
+        whatsapp_setting = get_object_or_404(WhatsappSetting, company=trip.company )
+        send_whatsapp_text(
+            instance_id=whatsapp_setting.instance_id,
+            access_token=whatsapp_setting.access_token, 
+            phone_no=customer.phone, 
+            message=message,
+        )
+
+    

@@ -20,6 +20,8 @@ import io
 from django.conf import settings
 from django.urls import reverse
 from django.db.models import Sum
+from django.http import FileResponse
+from io import BytesIO
 
 from . models import (
     CustomUser,
@@ -71,9 +73,9 @@ from .forms import (
     EstimateItemForm
 )
 
-from truckman.utils import get_user_company, generate_invoice_pdf, export_model_data, reverse_geocode, format_coordinates, get_location_data
+from truckman.utils import get_user_company, enerate_invoice_pdf, export_model_data, reverse_geocode, format_coordinates
 from truckman.tasks import send_email_task, send_email_with_attachment_task, send_whatsapp_text_task
-from truckman.processes import generate_invoice, generate_loading_list, create_daily_register
+from truckman.processes import generate_invoice, generate_loading_list, create_daily_register, get_trip_vehicles, create_workbook
 from authentication.models import WhatsappSetting
 
 
@@ -1579,7 +1581,8 @@ def view_trip(request, pk):
     payment_form = PaymentForm(request.POST, company=company) # for payment modal
     
     trip_incidents = TripIncident.objects.filter(trip=trip) 
-    incident_form = TripIncidentForm(request.POST, company=company)    
+    incident_form = TripIncidentForm(request.POST, company=company)  
+        
     context={
         'company':company,
         'trip':trip,
@@ -1597,7 +1600,7 @@ def view_trip(request, pk):
         'loading_list_items':loading_list_items,
         'loads':loads,
         'loaded_loads':loaded_loads,
-        'delivered_loads':delivered_loads
+        'delivered_loads':delivered_loads,
 
     }
     return render(request, 'trip/trip/view-trip.html', context)
@@ -2311,7 +2314,7 @@ def send_trip_invoice(request, pk):
         'customer_name': trip.load.estimate.customer.name,
     }
 
-    pdf_invoice = generate_invoice_pdf(trip)
+    pdf_invoice = enerate_invoice_pdf(trip)
 
     send_email_with_attachment_task.delay(
         context=context,  
@@ -2334,6 +2337,8 @@ def generate_invoice_pdf(request, pk):
     invoice = Invoice.objects.get(estimate=trip.estimate)
     invoice_items = InvoiceItem.objects.filter(invoice=invoice)
 
+    #enerate_invoice_pdf(invoice, invoice_items)
+
     # Path to your HTML template.
     template_path = 'trip/invoice/invoice-template.html'
 
@@ -2348,12 +2353,21 @@ def generate_invoice_pdf(request, pk):
     # Render the template with the context data.
     html = template.render(context)
 
+    '''
     # Create a response object with PDF content type.
     response = HttpResponse(content_type='application/pdf')
     response['Content-Disposition'] = f'attachment; filename="{invoice.invoice_id}.pdf"'
-
+    '''
+    pdf_buffer = generate_invoice_pdf(invoice, invoice_items)
+    # Prepare the response for file download
+    response = HttpResponse(pdf_buffer, content_type='application/pdf')
+    response['Content-Disposition'] = f'attachment; filename="{invoice.invoice_id}.pdf"'
+    
+    return response
+    '''
     # Create a PDF object using xhtml2pdf's pisa.CreatePDF.
-    pdf = pisa.CreatePDF(html, dest=response)
+    #pdf = pisa.CreatePDF(html, dest=response)
+    
 
     # Check if PDF generation was successful.
     if not pdf.err:
@@ -2361,7 +2375,7 @@ def generate_invoice_pdf(request, pk):
 
     # If PDF generation failed, return an error message.
     return HttpResponse('PDF generation failed: %s' % pdf.err)
-
+    '''
 
 #---------------------------------- Estimate/Quotations views------------------------------------------
 
@@ -2822,13 +2836,9 @@ def add_register_entry(request, pk):
     form = DailyRegisterForm(request.POST, company=company)
     trip = Trip.objects.get(id=pk)
 
-    #get vehicles
-    loads = Load.objects.filter(estimate=trip.estimate)
-    vehicles = []
-    for load in loads:
-        if load.assigned_truck:
-            vehicle = load.assigned_truck
-            vehicles.append(vehicle)
+    # Get all vehicles assigned to loads
+    vehicles = get_trip_vehicles(trip)
+    
     #get drivers
     drivers = Driver.objects.filter(assigned_vehicle__in=vehicles)
 
@@ -2873,7 +2883,6 @@ def add_register_entry(request, pk):
 
 #---ends
 
-
 #view to render daily trip register report
 @login_required(login_url='login')
 def trip_daily_register_report(request):
@@ -2903,6 +2912,45 @@ def trip_daily_register_report(request):
         'form':form
     }
     return render(request, 'trip/reports/daily-register-select-trip.html', context)
+#ends
+
+#View to download daily report for staff
+def download_daily_report(request):
+    trip_id = request.POST.get('selected_trip_id')
+    trip = get_object_or_404(Trip, id=trip_id)
+    
+    # Create the workbook
+    workbook = create_workbook(request, trip)
+    
+    # Save the workbook to a BytesIO buffer
+    buffer = BytesIO()
+    workbook.save(buffer)
+    buffer.seek(0)
+    
+    # Prepare the response for file download
+    response = HttpResponse(buffer, content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
+    response['Content-Disposition'] = f'attachment; filename="{trip.trip_id} Daily Report.xlsx"'
+    
+    return response
+
+#download day report for clients
+def download_day_report(request, trip_id):#for client
+    trip = get_object_or_404(Trip, id=trip_id)
+    
+    # Create the workbook
+    workbook = create_workbook(request, trip)
+    
+    # Save the workbook to a BytesIO buffer
+    buffer = BytesIO()
+    workbook.save(buffer)
+    buffer.seek(0)
+    
+    # Prepare the response for file download
+    response = HttpResponse(buffer, content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
+    response['Content-Disposition'] = f'attachment; filename="{trip.trip_id} Daily Report.xlsx"'
+    
+    return response
+#--ends
 
 #--------------------------- Trip incident views _________________________________________________
 
@@ -2934,3 +2982,4 @@ def delete_trip_incident(request, trip_id, incident_id):
     incident.delete()
     messages.success(request, 'Incident deleted!')
     return redirect('view_trip', trip.id)
+#ends

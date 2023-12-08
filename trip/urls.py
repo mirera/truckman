@@ -179,6 +179,8 @@ urlpatterns = [
 
     #-- reports urls
     path('trip_daily_register_report', views.trip_daily_register_report, name='trip_daily_register_report'),
+    path('download_daily_report', views.download_daily_report, name='download_daily_report'),
+    path('download_day_report/<str:trip_id>', views.download_day_report, name='download_day_report'),#for client
 
     #-- trip incident urls
     path('add_trip_incident/<str:trip_id>/', views.add_trip_incident, name='add_trip_incident'),
