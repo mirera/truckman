@@ -469,7 +469,7 @@ def enerate_invoice_pdf(invoice, invoice_items):
 
 #pdf invoice generator
 '''
-def generate_invoice_pdf(invoice):
+def generate_invoice_pdf(invoice):#not to be used
     # Create an in-memory buffer to store the PDF
     pdf_buffer = io.BytesIO()
 
