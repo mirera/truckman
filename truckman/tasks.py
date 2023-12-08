@@ -135,35 +135,33 @@ def share_daily_reister_report_task():
     for trip in trips:
         company = trip.company
         customer = get_object_or_404(Customer, estimate=trip.estimate) 
-        trip_report = generate_client_daily_report(trip) #generate report
-        attachment_path = '' #get the path to the generated report.
+        #provide link to download the report
+        download_report_url = reverse('download_day_report', args=[trip.id])
         context = {
             'customer':customer.name, 
-            'company':company.name 
+            'company':company.name,
+            'download_report_url':download_report_url
         }
-        attachment_path = ''
         preference = Preference.objects.get(company=company)
         # share via email address
-        send_email_with_attachment(
+        send_email(
                 context, 
                 template_path='trip/reports/daily-report-email-template.html', 
                 from_name=preference.email_from_name, 
                 from_email=preference.from_email, 
                 subject=f'Trip {trip.trip_id} Day Report', 
                 recipient_email=customer.email, 
-                replyto_email=preference.from_email, 
-                attachment_path=attachment_path
+                replyto_email=preference.from_email
             )
 
         #share via whatsapp
-        message = f'Hello {customer.name} admin, find the attached daily trip report.'     
+        message = f'Hello {customer.name} admin, click this link {download_report_url} to download daily trip report.'     
         whatsapp_setting = get_object_or_404(WhatsappSetting, company=trip.company )
-        send_whatsapp_media(
+        send_whatsapp_text(
             instance_id=whatsapp_setting.instance_id,
             access_token=whatsapp_setting.access_token, 
             phone_no=customer.phone, 
             message=message,
-            media_url=attachment_path #path to the media (attachment_path)
         )
 
     

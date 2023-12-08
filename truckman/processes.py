@@ -176,14 +176,6 @@ def get_load_daily_entries(load):
 #--ends
 
 '''
-Get days elapsed since the load status changed to load.date_loaded
-'''
-def load_days_elapsed(day_entry):
-    days_elapsed = 3 # to be changed
-    return days_elapsed
-#--ends
-
-'''
 Split the entries into morning, midday, and evening based on submission times
 '''
 def split_day_entry(entry, request):
@@ -207,29 +199,6 @@ def split_day_entry(entry, request):
     return morning_entry, midday_entry, evening_entry, morning_sub_time, mid_sub_time, evening_sub_time
 #--ends
 
-'''
-Number of days since a load.date_loaded 
-and date_offloaded
-'''
-def load_trip_days(load):
-    load_days = load.date_offloaded - load.date_loaded 
-    return load_days
-#--ends
-
-
-'''
-Function to generate daily register Excel workbook 
-'''
-def generate_excel_daily_trip_report(trip, request):
-    loads = Load.objects.filter(estimate=trip.estimate) # Get trip loads 
-    # Create an Excel writer object
-    excel_writer = pd.ExcelWriter(f'Trip_{trip.trip_id}_Daily_Report.xlsx', engine='openpyxl')
-    for load in loads: # Loop through each load 
-        load_excel_sheet = create_load_excel_sheet(load, excel_writer, request) #create a sheet for each load 
-        print(f'load_excel_sheet:{load_excel_sheet}')
-    trip_excel_workbook = excel_writer.save() # Save the Excel file
-    return trip_excel_workbook  
-#--ends
 
 def create_sheetdata(request, worksheet, vehicle, entries_for_date, n, m, p, q, x):
     for entry in entries_for_date:
@@ -295,7 +264,7 @@ def create_workbook(request, trip):
     #create a worksheets for each vehicle on the trip
     for vehicle in get_trip_vehicles(trip):
         worksheet = workbook.create_sheet(title=f"{trip.trip_id} {vehicle.plate_number} Report")
-        load = get_object_or_404(Load, assigned_truck=vehicle)
+        load = get_object_or_404(Load, assigned_truck=vehicle, status='On Transit') #find a way to accomodate  completed and on transit loads
         entries = get_load_daily_entries(load)#all entries made for this load
 
         #group the entries into a list of lists of entries with the same date.

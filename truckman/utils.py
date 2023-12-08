@@ -5,8 +5,12 @@ from django.core.mail import EmailMessage
 from django.template.loader import render_to_string 
 import pytz
 import io
-from reportlab.lib.pagesizes import letter
 from reportlab.pdfgen import canvas
+from reportlab.lib.pagesizes import letter
+from reportlab.lib.styles import getSampleStyleSheet
+from reportlab.lib.utils import ImageReader
+from reportlab.lib.units import inch
+from reportlab.platypus import SimpleDocTemplate, Frame, Image, Paragraph
 from django.utils.timezone import localtime
 import csv
 from django.http import HttpResponse
@@ -375,7 +379,96 @@ def receiving_webhook(access_token, instance_id, webhook_url):
 
 
 #-------------------------------------------------- PDF Generation ----------------------------------------------------------------
+
 #pdf invoice generator
+
+def enerate_invoice_pdf(invoice, invoice_items):
+    pass
+'''
+    # Create an in-memory buffer to store the PDF
+    pdf_buffer = io.BytesIO()
+
+    # Create the PDF object, using the buffer as its "file."
+    #c = SimpleDocTemplate(pdf_buffer, pagesize=letter)
+    c = canvas.Canvas(pdf_buffer, pagesize=letter)
+    
+    # Assuming you have a standard style sheet
+    styles = getSampleStyleSheet()
+    style = styles['Normal']
+    style.fontName = 'Helvetica-Bold' 
+
+    # Create Frames for layout
+    left_margin = 50
+    top_margin = 750
+    right_margin = 550
+
+    # Create a Frame for left content (logo, From)
+    left_frame = Frame(left_margin, top_margin, right_margin / 2, 200, showBoundary=0)
+
+    # Create a Frame for right content (Invoice ID, Date, Status, To)
+    right_frame = Frame(right_margin / 2, top_margin, right_margin, 200, showBoundary=0)
+
+    # Add content to the left frame
+    left_content = []
+    if invoice.company.logo:
+        logo_path = invoice.company.logo.path
+        try:
+            left_content.append(Image(logo_path, width=100, height=100))
+        except:
+            pass
+    left_content.append(Paragraph("<b>From:</b>", style))
+    left_content.append(Paragraph(f"{invoice.company.name}", style))
+    left_content.append(Paragraph(f"{invoice.company.phone_no}", style))
+    # Add more details as needed...
+
+    # Add content to the right frame
+    right_content = []
+    right_content.append(Paragraph(f'Invoice ID: {invoice.invoice_id}', style))
+    right_content.append(Paragraph(f'Invoice Date: {invoice.invoice_date}', style))
+    # Draw the invoice status in a rectangle
+    c.rect(right_margin - 100, top_margin - 20, 80, 30, fill=1)
+    right_content.append(Paragraph(f'{invoice.status}', style))
+
+    # Set up styles for paragraphs
+    styles = getSampleStyleSheet()
+    style = styles["Normal"]
+
+    # Add the frames to the canvas
+    left_frame.addFromList(left_content, c)
+    right_frame.addFromList(right_content, c)
+
+    # Add items table header using the left_frame
+    table_headers = ['Item', 'Route', 'Description', 'Rate', 'Trucks', 'Amount']
+    x_positions = [left_margin, left_margin + 100, left_margin + 200, left_margin + 300, left_margin + 400, left_margin + 500]
+    y = 670
+    for header, x in zip(table_headers, x_positions):
+        left_frame.add(Paragraph(header, style), c, x, y)
+    
+    # Add invoice line items using left_frame
+    for item in invoice_items:
+        y -= 20
+        left_frame.add(Paragraph(item.item_type, style), c, left_margin, y)
+        left_frame.add(Paragraph(str(item.route), style), c, left_margin + 100, y)
+        left_frame.add(Paragraph(item.description, style), c, left_margin + 200, y)
+        left_frame.add(Paragraph(f'${item.rate}', style), c, left_margin + 300, y)
+        left_frame.add(Paragraph(str(item.trucks), style), c, left_margin + 400, y)
+        left_frame.add(Paragraph(f'${item.amount}', style), c, left_margin + 500, y)
+    
+    # Add total amount using left_frame
+    y -= 20
+    left_frame.add(Paragraph(f'Total Amount: ${invoice.total}', style), c, left_margin, y)
+
+    # Save the PDF content
+    c.save()
+
+    # Move the buffer's cursor to the beginning
+    pdf_buffer.seek(0)
+
+    return pdf_buffer
+#--ends
+
+#pdf invoice generator
+'''
 def generate_invoice_pdf(invoice):
     # Create an in-memory buffer to store the PDF
     pdf_buffer = io.BytesIO()
@@ -396,7 +489,7 @@ def generate_invoice_pdf(invoice):
         c.drawString(120, y, f'{item.description}')
         c.drawString(300, y, f'Quantity: {item.quantity}')
         c.drawString(400, y, f'Unit Price: ${item.unit_price}')
-        c.drawString(500, y, f'Total: ${item.total}')
+        c.drawString(500, y, f'Total: ${item.total}') 
         y -= 20
     
     # Add total amount
@@ -409,7 +502,8 @@ def generate_invoice_pdf(invoice):
     pdf_buffer.seek(0)
 
     return pdf_buffer 
-    
+#--ends
+   
 #format phone number to 254706384073
 def format_phone_number(phone_no, phone_code):
     # Remove any non-digit characters from the phone number
