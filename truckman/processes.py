@@ -3,11 +3,13 @@ from datetime import timedelta
 from trip.models import Estimate, Invoice, LoadingList, LoadingListItem, DailyRegister, Load, DailyRegister, Driver, Trip, EstimateItem, InvoiceItem
 from django.shortcuts import get_object_or_404
 from truckman.utils import get_location_data
+from truckman.utils import send_email, send_whatsapp_text
 from django.db.models import F
 import pandas as pd
 from openpyxl import Workbook
 import pytz
 from collections import defaultdict
+from authentication.models import WhatsappSetting
 
 '''
 Function to get a trip vehicle(s)
@@ -296,6 +298,29 @@ def generate_client_daily_report(trip, path_to_workbook):
     return trip_workbook #this should be a path to the workbook
 
 
+#send trip ,dispatched, vehicles tracking uri to client
+def send_trip_vehicle_tURI(trip):
+    company = trip.company
+    if trip.status == 'Dispatched':
+        #get customer 
+        customer = trip.estimate.customer
+        #get trip vehicles
+        vehicles = get_trip_vehicles(trip)
+        for vehicle in vehicles:
+            #get vehicle traking uri
+            
+            whatsapp_setting = get_object_or_404(WhatsappSetting, company=company ) 
+            message = f'Dear {company.name}, your load {load.load_id} has been loaded and dispatchd. Here is the tracking link for vehicle {vehicle.plate_number}. Click here to see location {vehicle.tracking_uri}'
+            send_whatsapp_text(
+                instance_id=whatsapp_setting.instance_id, 
+                access_token=whatsapp_setting.access_token, 
+                phone_no=company.phone_no, 
+                message=message
+            )
+        
+#--ends
+
+
 '''
 This updates trip status to dispatched or completed dep
 depening on load status
@@ -312,6 +337,8 @@ def update_trip_status(load):
             trip.status = 'Dispatched'
             trip.start_time = timezone.now()
             trip.save()
+            #send client vehicle tracking uris
+            send_trip_vehicle_tURI(Trip)
         
         # Check if all loads' status are 'Delivered'
         if associated_loads.exclude(status='Delivered').exists():
@@ -333,5 +360,6 @@ def update_trip_status(load):
             vehicle.is_available = True
             vehicle.save()
 #--ends
+
 
 

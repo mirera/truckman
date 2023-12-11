@@ -81,6 +81,7 @@ class Vehicle(models.Model):
     is_assigned_driver = models.BooleanField(default=False)
     is_available = models.BooleanField(default=True)
     tonnage = models.IntegerField(null=True)
+    tracking_uri = models.URLField(null=True)
      
 
     def __str__(self):
@@ -787,8 +788,8 @@ class DailyRegister(models.Model):
     morning_odemeter_reading = models.IntegerField(null=True)
     midday_odemeter_reading = models.IntegerField(null=True)
     evening_odemeter_reading = models.IntegerField(null=True)
-    vehicle_status = models.CharField(choices=VEHICLE_CHOICES)
-    reason_parked = models.CharField(choices=PARKING_REASONS, null=True, blank=True)
+    vehicle_status = models.CharField(max_length=50, choices=VEHICLE_CHOICES)
+    reason_parked = models.CharField(max_length=200, choices=PARKING_REASONS, null=True, blank=True)
     
     def __str__(self):
         return self.driver.first_name

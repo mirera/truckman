@@ -95,6 +95,7 @@ class VehicleForm(forms.ModelForm):
                 'trailer_logbook': forms.FileInput(attrs={'class': 'form-file-input', 'id': 'customFile'}),
                 'good_transit_licence': forms.FileInput(attrs={'class': 'form-file-input', 'id': 'customFile'}),
                 'tonnage': forms.NumberInput(attrs={'class': 'form-control number-spinner','value': '0', 'placeholder':'32'}),
+                'tracking_uri': forms.URLInput(attrs={'class': 'form-control', 'placeholder':'https://www.track.com'}),
             } 
         
 #---------------------------------- Driver forms ------------------------------------------

@@ -1,6 +1,6 @@
 from celery import shared_task 
-from .utils import send_email, send_email_with_attachment, send_sms, shorten_url, create_wa_instance, get_wa_qrcode, send_whatsapp_text, send_whatsapp_media, reset_wa_instance, reconnect_wa_instance, reboot_wa_instance
-from .processes import get_trip_vehicles, generate_client_daily_report
+from .utils import send_email, send_email_with_attachment, send_sms, create_wa_instance, get_wa_qrcode, send_whatsapp_text, send_whatsapp_media, reset_wa_instance, reconnect_wa_instance, reboot_wa_instance
+from .processes import get_trip_vehicles
 from django.conf import settings
 from django.urls import reverse
 #from django.contrib.sites.models import Site
@@ -95,7 +95,6 @@ driver to add a daily entry.
 @shared_task
 def send_driver_sms_url_task():
     trips = Trip.objects.filter(status='Dispatched') # from this we get driver and vehicle
-    
     for trip in trips:
         # Get all vehicles assigned to loads
         vehicles = get_trip_vehicles(trip)
@@ -125,12 +124,11 @@ def send_driver_sms_url_task():
             )
 # -- end --
 
-
 '''
 Share daily regsiter report with client
 '''
 @shared_task
-def share_daily_reister_report_task():
+def share_daily_register_report_task():
     trips = Trip.objects.filter(status='Dispatched')
     for trip in trips:
         company = trip.company
