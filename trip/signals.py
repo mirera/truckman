@@ -32,9 +32,5 @@ def update_loading_offloading_dates(sender, instance, created, **kwargs):
             instance.date_offloaded = timezone.now().date()
             instance.save()
 
-#send vehicle tacking uris to client when trip status changes to "Dispatched"
-@receiver(post_save, sender=Trip)
-def send_vehicle_tracking_uri(sender, instance, **kwargs):
-    send_trip_vehicle_tURI(Trip)
     
 

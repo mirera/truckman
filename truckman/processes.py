@@ -302,22 +302,19 @@ def generate_client_daily_report(trip, path_to_workbook):
 def send_trip_vehicle_tURI(trip):
     company = trip.company
     if trip.status == 'Dispatched':
-        #get customer 
-        customer = trip.estimate.customer
-        #get trip vehicles
-        vehicles = get_trip_vehicles(trip)
+        customer = trip.estimate.customer #get customer 
+        vehicles = get_trip_vehicles(trip) #get trip vehicles
         for vehicle in vehicles:
-            #get vehicle traking uri
-            
             whatsapp_setting = get_object_or_404(WhatsappSetting, company=company ) 
-            message = f'Dear {company.name}, your load {load.load_id} has been loaded and dispatchd. Here is the tracking link for vehicle {vehicle.plate_number}. Click here to see location {vehicle.tracking_uri}'
+            load = get_object_or_404(Load, assigned_truck=vehicle)
+            tracking_uri = vehicle.tracking_uri #later on make this url expire when the load status is delivered. 
+            message = f'Dear {company.name}, your load {load.load_id} on truck of plate number {vehicle.plate_number} has been loaded and dispatched. Here is the tracking link {tracking_url}.'
             send_whatsapp_text(
                 instance_id=whatsapp_setting.instance_id, 
                 access_token=whatsapp_setting.access_token, 
-                phone_no=company.phone_no, 
+                phone=customer.phone_no, 
                 message=message
             )
-        
 #--ends
 
 
@@ -338,7 +335,7 @@ def update_trip_status(load):
             trip.start_time = timezone.now()
             trip.save()
             #send client vehicle tracking uris
-            send_trip_vehicle_tURI(Trip)
+            send_trip_vehicle_tURI(trip)
         
         # Check if all loads' status are 'Delivered'
         if associated_loads.exclude(status='Delivered').exists():
