@@ -222,6 +222,7 @@ def add_vehicle(request):
             trailer_logbook = request.FILES.get('trailer_logbook'),
             good_transit_licence = request.FILES.get('good_transit_licence'),
             tonnage = int(request.POST.get('tonnage')),
+            tracking_uri = request.POST.get('tracking_uri'),
         )
 
         messages.success(request, f'Vehicle {vehicle.plate_number} was added successfully.')
@@ -270,6 +271,7 @@ def update_vehicle(request, pk):
         vehicle.notes = request.POST.get('notes')
         vehicle.good_transit_licence = request.FILES.get('good_transit_licence')
         vehicle.tonnage = int(request.POST.get('tonnage'))
+        vehicle.tracking_uri = request.POST.get('tracking_uri')
 
         # Check if new images/files are provided
         if request.FILES.get('truck_image'):
@@ -310,7 +312,8 @@ def update_vehicle(request, pk):
             'purchase_year': vehicle.purchase_year,
             'condition': vehicle.condition,
             'notes': vehicle.notes,
-            'tonnage': vehicle.tonnage
+            'tonnage': vehicle.tonnage,
+            'tracking_uri':vehicle.tracking_uri,
         }
 
         form = VehicleForm(initial=form_data, company=company )
