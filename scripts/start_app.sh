@@ -21,8 +21,8 @@ redis-server --port 6379 --daemonize yes --logfile /home/ubuntu/truckman/truckma
 
 sudo systemctl daemon-reload
 
-sudo systemctl start redis.service
-sudo systemctl enable redis.service 
+#sudo systemctl start redis.service
+#sudo systemctl enable redis.service 
 
 sudo systemctl start celery-beat-truckman
 sudo systemctl enable celery-beat-truckman

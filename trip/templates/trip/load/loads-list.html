@@ -227,6 +227,7 @@
                                                 <div class="nk-tb-col tb-col-lg"><span class="sub-text">Commodity</span></div>
                                                 <div class="nk-tb-col tb-col-md"><span class="sub-text">Total Quantity</span></div>
                                                 <div class="nk-tb-col tb-col-md"><span class="sub-text">Quotation</span></div>
+                                                <div class="nk-tb-col tb-col-md"><span class="sub-text">Vehicle</span></div>
                                                 <div class="nk-tb-col tb-col-md"><span class="sub-text">Status</span></div>
                                                 <div class="nk-tb-col nk-tb-col-tools">
                                                     <ul class="nk-tb-actions gx-1 my-n1">
@@ -267,15 +268,30 @@
                                                 <div class="nk-tb-col tb-col-md">
                                                     <a href="{% url 'view_estimate' load.estimate.id  %}"><span>{{ load.estimate }}</span></a>
                                                 </div>
-                                                {% if not load.assigned_truck %}
-                                                <div class="nk-tb-col tb-col-mb">
-                                                    <a  data-bs-toggle="modal" class="assigntruck-button btn btn-primary btn-sm" href="#assignLoadTrucks" data-pk="{{ load.id }}"> <span>Assign Trucks</span></a>
-                                                </div>  
+                                                {% if load.status != 'Delivered'%}
+                                                    {% if not load.assigned_truck %}
+                                                    <div class="nk-tb-col tb-col-mb">
+                                                        <a  data-bs-toggle="modal" class="assigntruck-button btn btn-primary btn-sm" href="#assignLoadTrucks" data-pk="{{ load.id }}"> <span>Assign Trucks</span></a>
+                                                    </div>  
+                                                    {% else %} 
+                                                    <div class="nk-tb-col tb-col-mb">
+                                                        <span>Assigned</span>
+                                                    </div>   
+                                                    {% endif %}   
                                                 {% else %} 
                                                 <div class="nk-tb-col tb-col-mb">
                                                     <span>Assigned</span>
                                                 </div>   
-                                                {% endif %}                                           
+                                                {% endif %}
+                                                <div class="nk-tb-col tb-col-mb">
+                                                    {% if load.status == 'Delivered' %}
+                                                    <span class="text-success">{{ load.status }}</span>
+                                                    {% elif load.status == 'Not Loaded' %}
+                                                    <span class="text-secondary">{{ load.status }}</span>
+                                                    {% elif load.status == 'On Transit' %}
+                                                    <span class="text-warning">{{ load.status }}</span>
+                                                    {% endif %}
+                                                </div>                                       
                                                 <div class="nk-tb-col nk-tb-col-tools">
                                                     <ul class="nk-tb-actions gx-1">
                                                         <li>

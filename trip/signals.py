@@ -32,5 +32,12 @@ def update_loading_offloading_dates(sender, instance, created, **kwargs):
             instance.date_offloaded = timezone.now().date()
             instance.save()
 
+#release assigned_truck when load status changes to delivered.
+@receiver(pre_save, sender=Load)
+def deassign_truck(sender, instance, **kwargs):
+    if instance.status == "Delivered" and instance.assigned_truck:
+        instance.truck_used = instance.assigned_truck
+        instance.assigned_truck = None
+        
     
 

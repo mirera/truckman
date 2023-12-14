@@ -182,7 +182,7 @@ GOOGLE_MAPS_API_KEY = os.environ['GOOGLE_MAPS_API_KEY']
 
 SITE_ID = 1
 
-PRODUCTION_DOMAIN = 'https://truckman.loginit.co.ke/'
+PRODUCTION_DOMAIN = 'https://truckman.loginit.co.ke'
 
-DEVELOPMENT_DOMAIN = 'http://127.0.0.1:8000/'
+DEVELOPMENT_DOMAIN = 'http://127.0.0.1:8000'
 
