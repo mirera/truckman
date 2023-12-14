@@ -32,5 +32,6 @@ def update_loading_offloading_dates(sender, instance, created, **kwargs):
             instance.date_offloaded = timezone.now().date()
             instance.save()
 
+
     
 

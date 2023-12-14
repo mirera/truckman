@@ -2586,7 +2586,7 @@ def accept_estimate(request, pk):
         company = estimate.company,
         estimate = estimate
     )
-
+    print(f'Trip estimate upon creation estimate accept:{trip.estimate}')
     estimate_items = EstimateItem.objects.filter(estimate=estimate)
     
     # Calculate the total number of trucks for all estimate items
@@ -2856,11 +2856,11 @@ def add_register_entry(request, pk):
         current_time = current_datetime.astimezone(user_tz).time()
 
         # Determine the datetime field based on the current time
-        if 5 <= current_time.hour < 11:
+        if 6 <= current_time.hour < 12:
             datetime_field = 'morning'
         elif 12 <= current_time.hour < 16:
             datetime_field = 'midday' 
-        elif 17 <= current_time.hour < 21:
+        elif 16 <= current_time.hour < 21:
             datetime_field = 'evening'
         else:
             context = {

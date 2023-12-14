@@ -466,6 +466,7 @@ class Load(models.Model):
     id = models.UUIDField(default=uuid.uuid4, unique=True, primary_key=True) 
     company = models.ForeignKey(Client, on_delete=models.CASCADE)
     load_id = models.CharField(max_length=7, unique=True, editable=False)
+    estimate = models.ForeignKey(Estimate, on_delete=models.SET_NULL, null=True)
     shipper = models.ForeignKey(Shipper, on_delete=models.SET_NULL, null=True)
     consignee = models.ForeignKey(Consignee, on_delete=models.SET_NULL, null=True)
     #load details
@@ -477,7 +478,7 @@ class Load(models.Model):
     delivery_date = models.DateField(null=True)
     driver_instructions = models.TextField(null=True, blank=True)
     #--primary fee--
-    estimate = models.ForeignKey(Estimate, on_delete=models.SET_NULL, null=True)
+    
     #quote_amount = models.FloatField(null=True)
     #others
     legal_disclaimer = models.TextField(null=True, blank=True)

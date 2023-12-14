@@ -98,9 +98,10 @@ def send_driver_sms_url_task():
     for trip in trips:
         # Get all vehicles assigned to loads
         vehicles = get_trip_vehicles(trip)
-
+        print(f'Vehicles:{vehicles}') 
         #get drivers
         drivers = Driver.objects.filter(assigned_vehicle__in=vehicles)
+        print(f'Drivers:{drivers}')
         for driver in drivers:
             trip_id = str(trip.id)
             url = reverse('add_register_entry', args=[trip_id]) 
@@ -114,8 +115,7 @@ def send_driver_sms_url_task():
             message = f'Hello {driver.first_name} {driver.last_name}, click this link {ready_url} to mark daily register. Regards, {driver.company.name}'
             
             whatsapp_setting = get_object_or_404(WhatsappSetting, company=trip.company )
-            
-            
+        
             send_whatsapp_text_task(
                 instance_id=whatsapp_setting.instance_id,
                 access_token=whatsapp_setting.access_token, 

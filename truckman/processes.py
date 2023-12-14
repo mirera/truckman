@@ -16,13 +16,13 @@ Function to get a trip vehicle(s)
 '''
 def get_trip_vehicles(trip):
     loads = Load.objects.filter(estimate=trip.estimate)
-
     # Get all vehicles assigned to loads
     vehicles = []
     for load in loads:
         if load.assigned_truck:
             vehicles.append(load.assigned_truck) 
     return vehicles
+#--ends
 
 '''
 #helper function to calculate due date 
@@ -102,7 +102,7 @@ It creates a loading list
 '''
 def generate_loading_list(estimate):
         # Get all vehicles assigned to loads
-        trip = Trip.objects.filter(estimate=estimate)
+        trip = Trip.objects.get(estimate=estimate)
         vehicles = get_trip_vehicles(trip)
         
         #create instance of a loading list
@@ -187,14 +187,14 @@ def split_day_entry(entry, request):
     morning_entry, midday_entry, evening_entry = None, None, None
     morning_sub_time, mid_sub_time, evening_sub_time = None, None, None
     
-    if 5 <= submission_time.hour < 11:
+    if 6 <= submission_time.hour < 12:
         # Convert sub_time UTC time to the user's local time format to HMS
         morning_sub_time = entry.submission_time.astimezone(user_tz).strftime('%H:%M:%S')
         morning_entry = entry
     elif 12 <= submission_time.hour < 16:
         mid_sub_time = entry.submission_time.astimezone(user_tz).strftime('%H:%M:%S')
         midday_entry = entry
-    elif 17 <= submission_time.hour < 21:
+    elif 16 <= submission_time.hour < 21:
         evening_sub_time = entry.submission_time.astimezone(user_tz).strftime('%H:%M:%S')
         evening_entry = entry
 
@@ -203,14 +203,32 @@ def split_day_entry(entry, request):
 
 
 def create_sheetdata(request, worksheet, vehicle, entries_for_date, n, m, p, q, x):
+    morning = None
+    midday = None
+    evening = None
+    morning_time = None
+    midday_time = None
+    evening_time = None
+
     for entry in entries_for_date:
         #split a day's entry into morning, mid and evening
         morning_entry, midday_entry, evening_entry, morning_sub_time, mid_sub_time, evening_sub_time = split_day_entry(entry, request)
 
+        if morning_entry:
+            morning = morning_entry
+            morning_time = morning_sub_time
+        if midday_entry:
+            midday = midday_entry
+            midday_time = mid_sub_time
+        if evening_entry:
+            evening = evening_entry
+            evening_time = evening_sub_time
+
+
     #Create rows/columns and insert sheet data
     worksheet['A1'] = f'{vehicle.plate_number} Report'
-    if entry:
-        worksheet[f'A{n}'] = f'Date | {entry.submission_time.date()}' 
+    if entries_for_date:
+        worksheet[f'A{n}'] = f'Date | {entries_for_date[0].submission_time.date()}' 
     else:
         worksheet[f'A{n}'] = f'Date | Not Data Available'
 
@@ -223,40 +241,40 @@ def create_sheetdata(request, worksheet, vehicle, entries_for_date, n, m, p, q, 
     worksheet[f'B{q}'] = "Odemeter"
     worksheet[f'B{x}'] = "Truck Status"
     
-    if not morning_entry:
+    if not morning:
         worksheet[f'C{m}'] = 'N/A'
         worksheet[f'C{p}'] = 'N/A'
         worksheet[f'C{q}'] = 'N/A'
         worksheet[f'C{x}'] = 'N/A'
     else:
-        worksheet[f'C{m}'] = morning_sub_time #morning entry subtime
-        worksheet[f'C{p}'] = morning_entry.morning_location #morning entry location
-        worksheet[f'C{q}'] = morning_entry.morning_odemeter_reading#morning odemeter reading
-        worksheet[f'C{x}'] = morning_entry.status #morning trip load status
+        worksheet[f'C{m}'] = morning_time #morning entry subtime
+        worksheet[f'C{p}'] = morning.morning_location #morning entry location
+        worksheet[f'C{q}'] = morning.morning_odemeter_reading#morning odemeter reading
+        worksheet[f'C{x}'] = morning.vehicle_status #morning trip load status
     
-    if not midday_entry:
+    if not midday:
         worksheet[f'D{m}'] = 'N/A'
         worksheet[f'D{p}'] = 'N/A'
         worksheet[f'D{q}'] = 'N/A'
         worksheet[f'D{x}'] = 'N/A'
     else:
-        worksheet[f'D{m}'] = mid_sub_time#midday entry subtime
-        worksheet[f'D{p}'] = midday_entry.midday_location #midday entry location
-        worksheet[f'D{q}'] = midday_entry.midday_odemeter_reading #midday odemeter reading
-        worksheet[f'D{x}'] = midday_entry.vehicle_status #midday trip load status
+        worksheet[f'D{m}'] = midday_time#midday entry subtime
+        worksheet[f'D{p}'] = midday.midday_location #midday entry location
+        worksheet[f'D{q}'] = midday.midday_odemeter_reading #midday odemeter reading
+        worksheet[f'D{x}'] = midday.vehicle_status #midday trip load status
     
-    if not evening_entry:
+    if not evening:
         worksheet[f'E{m}'] = 'N/A'
         worksheet[f'E{p}'] = 'N/A'
         worksheet[f'E{q}'] = 'N/A'
         worksheet[f'E{x}'] = 'N/A'
     else:
-        worksheet[f'E{m}'] = evening_sub_time #evening entry subtime
-        worksheet[f'E{p}'] = 'evening_entry.evening_location' #evening entry location
-        worksheet[f'E{q}'] = 'evening_entry.evening_odemeter_reading '#evening odemeter reading
-        worksheet[f'E{x}'] = 'evening_entry.status' #evening trip load status
+        worksheet[f'E{m}'] = evening_time #evening entry subtime
+        worksheet[f'E{p}'] = evening.evening_location #evening entry location
+        worksheet[f'E{q}'] = evening.evening_odemeter_reading #evening odemeter reading
+        worksheet[f'E{x}'] = evening.vehicle_status #evening trip load status
  
-#--ends 
+#--ends
 
 def create_workbook(request, trip):
     '''
@@ -308,7 +326,7 @@ def send_trip_vehicle_tURI(trip):
             whatsapp_setting = get_object_or_404(WhatsappSetting, company=company ) 
             load = get_object_or_404(Load, assigned_truck=vehicle)
             tracking_uri = vehicle.tracking_uri #later on make this url expire when the load status is delivered. 
-            message = f'Dear {company.name}, your load {load.load_id} on truck of plate number {vehicle.plate_number} has been loaded and dispatched. Here is the tracking link {tracking_url}.'
+            message = f'Dear {company.name}, your load {load.load_id} on truck of plate number {vehicle.plate_number} has been loaded and dispatched. Here is the tracking link {tracking_uri}.'
             send_whatsapp_text(
                 instance_id=whatsapp_setting.instance_id, 
                 access_token=whatsapp_setting.access_token, 

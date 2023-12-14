@@ -25,7 +25,7 @@ app.conf.beat_schedule = {
         'task': 'truckman.tasks.send_driver_sms_url_task',
         'schedule': crontab(
             minute='0',  # Run at the 0th minute of the specified hours
-            hour='6,13,18',  # Run at 6am, 1pm, and 6pm
+            hour='6,12,18',  # Run at 6am, 12pm, and 6pm
         ),
     },
     'share_daily_reister_report_task': {
@@ -35,12 +35,6 @@ app.conf.beat_schedule = {
             hour='6',  # Run at 6am
         ),
     },
-    'send_driver_sms_url_task': {
-        'task': 'truckman.tasks.send_driver_sms_url_task',
-        'schedule': crontab(minute='*'),
-    }, 
-    
-    
 } 
 '''
 'send_driver_sms_url_task': {
