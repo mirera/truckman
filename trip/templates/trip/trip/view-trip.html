@@ -160,6 +160,7 @@
                                                             <th scope="col">Commodity</th>
                                                             <th scope="col">Assigned Vehicle</th>
                                                             <th scope="col">Load Status</th>
+                                                            <th scope="col">Action</th>
                                                           </tr>
                                                         </thead>
                                                         <tbody>
@@ -168,9 +169,24 @@
                                                             <th scope="row">{{ forloop.counter }}</th>
                                                             <td><a href="{% url 'view_load' load.id %}">{{ load.load_id }}</a></td>
                                                             <td>{{ load.commodity }}</td>
-                                                            <td>{{ load.assigned_truck }}</td>
-                                                            <td>{{ load.status }}</td>
+                                                            {% if load.status != 'Delivered'%}
+                                                                {% if not load.assigned_truck %}
+                                                                    <td><a  data-bs-toggle="modal" class="assigntruck-button btn btn-primary btn-sm" href="#assignLoadTrucks" data-pk="{{ load.id }}"> <span>Assign Trucks</span></a></td>
+                                                                {% else %} 
+                                                                    <td><a href="{% url 'view_vehicle' load.assigned_truck.id %}">{{ load.assigned_truck.plate_number }}</a></td>
+                                                                {% endif %}   
+                                                            {% else %} 
+                                                                <td>{{ load.truck_used }}</td>
+                                                            {% endif %}
                                                             
+                                                            {% if load.status == 'On Transit' %}
+                                                            <td class="text-warning">{{ load.status }}</td>
+                                                            {% elif load.status == 'Not Loaded' %}
+                                                            <td class="text-secondary">{{ load.status }}</td>
+                                                            {% elif load.status == 'Delivered' %}
+                                                            <td class="text-success">{{ load.status }}</td>
+                                                            {% endif %}
+                                                            <td><a class="btn btn-outline-light btn-sm" href="{% url 'update_load' load.id %}"><span>Add Load Details</span> </a></td>
                                                           </tr>
                                                           {% endfor %}
                                                         </tbody>
@@ -885,6 +901,54 @@
     </div><!-- .modal-dialog -->
 </div><!-- .modal -->
 
+
+<!-- Assign Load Trucks/Vehicles -->
+<div class="modal fade" tabindex="-1" role="dialog" id="assignLoadTrucks">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <a href="#" class="close" data-bs-dismiss="modal"><em class="icon ni ni-cross-sm"></em></a>
+            <div class="modal-body modal-body-md">
+                <h5 class="modal-title">Assign Truck </h5>
+                <form action="" class="mt-4" method="POST" id="assignLoadTrucksForm">
+                    {% csrf_token %}
+                    <div class="row g-gs">
+                        <div class="col-md-6">
+                                <ul class="preview-list">
+                                    <li class="preview-item">
+                                        <ul class="d-flex g-3">
+                                            <li>
+                                                <div class="dropdown">
+                                                    <a href="#" class="dropdown-toggle btn btn-light" data-bs-toggle="dropdown">Select Truck<em class="icon ni ni-chevron-down"></em></a>
+                                                    <div class="dropdown-menu">
+                                                        {% for vehicle in vehicles %} <!-- form.permissions.field.queryset -->
+                                                        <ul class="link-tidy">
+                                                            <li>
+                                                                <div class="custom-control custom-control-sm custom-radio">
+                                                                    <input type="radio" class="custom-control-input" id="{{ vehicle.plate_number }}" name="selected_vehicle" value="{{ vehicle.id }}" {% if vehicle in load.assigned_trucks.all %}checked{% endif %}>
+                                                                    <label class="custom-control-label" for="{{ vehicle.plate_number }}">{{ vehicle.plate_number }}</label>
+                                                                </div>
+                                                            </li>
+                                                        </ul>
+                                                        {% endfor%}
+                                                    </div>
+                                                </div>
+                                            </li><!-- li -->
+                                        </ul>
+                                    </li><!-- li -->
+                                </ul>
+                        </div><!-- .col -->
+                        <div class="col-12">
+                            <ul class="align-center flex-wrap flex-sm-nowrap gx-4 gy-2">
+                                <button type="submit" class="btn btn-primary">Assign</button>
+                            </ul>
+                        </div>
+                    </div>
+                </form>
+            </div><!-- .modal-body -->
+        </div><!-- .modal-content -->
+    </div><!-- .modal-dialog -->
+</div><!-- .modal -->
+
 <!-- Include jQuery -->
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
@@ -1043,5 +1107,24 @@
     </div>
 </div>
 <!-- Modal ends -->
-
+<!-- script to assign load truck-->
+<script>
+    $(document).ready(function() {
+        // Listen for the click event on the "Assign Trucks" button
+        $(".assigntruck-button").on("click", function(e) {
+            e.preventDefault();
+    
+            // Get the load ID from the data-pk attribute of the clicked button
+            var loadId = $(this).data("pk");
+    
+            // Set the form action to the appropriate URL with the load ID
+            var form = $("#assignLoadTrucksForm");
+            var url = "{% url 'assign_load_trucks' 0 %}".replace("0", loadId);
+            form.attr("action", url);
+    
+            // Show the modal
+            $("#assignLoadTrucks").modal("show");
+        });
+    });
+    </script>
 {% endblock content %} 

@@ -484,7 +484,8 @@ class Load(models.Model):
     legal_disclaimer = models.TextField(null=True, blank=True)
     notes = models.TextField(null=True, blank=True)
     date_added = models.DateTimeField(auto_now_add=True)
-    assigned_truck = models.ForeignKey(Vehicle, on_delete=models.SET_NULL, null=True)
+    assigned_truck = models.ForeignKey(Vehicle, on_delete=models.SET_NULL, null=True) #before load is delivered
+    truck_used = models.ForeignKey(Vehicle, on_delete=models.SET_NULL, null=True, related_name='vehicle_used') #after load has been delivered
     status = models.CharField(max_length=50, choices=LOAD_STATUS, default='Not Loaded')
 
     pick_up_location = models.CharField(null=True, max_length=150)

@@ -2,8 +2,7 @@ from django.utils import timezone
 from datetime import timedelta
 from trip.models import Estimate, Invoice, LoadingList, LoadingListItem, DailyRegister, Load, DailyRegister, Driver, Trip, EstimateItem, InvoiceItem
 from django.shortcuts import get_object_or_404
-from truckman.utils import get_location_data
-from truckman.utils import send_email, send_whatsapp_text
+from truckman.utils import send_email, send_whatsapp_text, get_location_data
 from django.db.models import F
 import pandas as pd
 from openpyxl import Workbook
@@ -330,7 +329,7 @@ def send_trip_vehicle_tURI(trip):
             send_whatsapp_text(
                 instance_id=whatsapp_setting.instance_id, 
                 access_token=whatsapp_setting.access_token, 
-                phone=customer.phone_no, 
+                phone_no=customer.phone, 
                 message=message
             )
 #--ends

@@ -106,6 +106,20 @@
                                                 <div class="profile-ud-list">
                                                     <div class="profile-ud-item">
                                                         <div class="profile-ud wider">
+                                                            <span class="profile-ud-label">Load Status</span>
+                                                            {% if load.status == 'On Transit' %}
+                                                            <span class="text-warning">{{ load.status }}</span>
+                                                            {% elif load.status == 'Not Loaded' %}
+                                                            <span class="text-secondary">{{ load.status }}</span>
+                                                            {% elif load.status == 'Delivered' %}
+                                                            <span class="text-success">{{ load.status }}</span>
+                                                            {% endif %}
+                                                        </div>
+                                                    </div>
+                                                </div><!-- .profile-ud-list -->
+                                                <div class="profile-ud-list">
+                                                    <div class="profile-ud-item">
+                                                        <div class="profile-ud wider">
                                                             <span class="profile-ud-label">Associated Quotation</span>
                                                             <span class="profile-ud-value"><a href="{% url 'view_estimate' load.estimate.id %}">{{ load.estimate.estimate_id }}</a></span>
                                                         </div>
@@ -115,10 +129,14 @@
                                                     <div class="profile-ud-item">
                                                         <div class="profile-ud wider">
                                                             <span class="profile-ud-label">Assigned Truck</span>
-                                                            {% if load.assigned_truck %}
-                                                            <span class="profile-ud-value"><a href="{% url 'view_vehicle' load.assigned_truck.id %}">{{ load.assigned_truck.plate_number }}</a></span>
+                                                            {% if load.status != "Delivered" %}
+                                                                {% if load.assigned_truck %}
+                                                                <span class="profile-ud-value"><a href="{% url 'view_vehicle' load.assigned_truck.id %}">{{ load.assigned_truck.plate_number }}</a></span>
+                                                                {% else %}
+                                                                <span class="profile-ud-value"><a href="{% url 'assign_load_trucks' load.id %}"> Assign Truck?</a> No truck assigned!</span>
+                                                                {% endif %}
                                                             {% else %}
-                                                            <span class="profile-ud-value"><a href="{% url 'assign_load_trucks' load.id %}"> Assign Truck?</a> No truck assigned!</span>
+                                                            <span class="profile-ud-value"><a href="{% url 'view_vehicle' load.truck_used.id %}">{{ load.truck_used.plate_number }}</a></span>
                                                             {% endif %}
                                                         </div>
                                                     </div>

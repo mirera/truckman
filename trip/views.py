@@ -1181,6 +1181,8 @@ def list_loads(request):
 @permission_required('trip.view_load')
 def view_load(request, pk):
     load = Load.objects.get(id=pk, company=get_user_company(request))
+    
+    
     try:
         loading_list = LoadingList.objects.get(estimate=load.estimate)
         loading_list_items = loading_list.loadinglistitem_set.all()
@@ -1552,6 +1554,7 @@ def list_trips(request):
 def view_trip(request, pk):
     company=get_user_company(request)
     trip = get_object_or_404(Trip, id=pk)
+    vehicles = Vehicle.objects.filter(company=company, is_available=True)
 
     expenses = Expense.objects.filter(company=company, trip=trip)
     loads = Load.objects.filter(estimate=trip.estimate)
@@ -1604,8 +1607,10 @@ def view_trip(request, pk):
         'loads':loads,
         'loaded_loads':loaded_loads,
         'delivered_loads':delivered_loads,
+        'vehicles':vehicles,
 
     }
+
     return render(request, 'trip/trip/view-trip.html', context)
 #--ends
 
