@@ -48,105 +48,14 @@
                         </div><!-- .nk-block-head-content -->
                     </div><!-- .nk-block-between -->
                 </div><!-- .nk-block-head -->
-                <div class="nk-block">
-                    <div class="row g-gs">
-                        <div class="col-xxl-3 col-sm-6">
-                            <div class="card">
-                                <div class="nk-ecwg nk-ecwg6">
-                                    <div class="card-inner">
-                                        <div class="card-title-group">
-                                            <div class="card-title">
-                                                <h6 class="title">Electricity Charges</h6>
-                                            </div>
-                                        </div>
-                                        <div class="data">
-                                            <div class="data-group">
-                                                <div class="amount">$7,955</div>
-                                                <div class="nk-ecwg6-ck">
-                                                    <canvas class="ecommerce-line-chart-s3" id="electricity"></canvas>
-                                                </div>
-                                            </div>
-                                            <div class="info"><span class="change down text-danger"><em class="icon ni ni-arrow-long-down"></em>2.23%</span><span> vs. last month</span></div>
-                                        </div>
-                                    </div><!-- .card-inner -->
-                                </div><!-- .nk-ecwg -->
-                            </div><!-- .card -->
-                        </div><!-- .col -->
-                        <div class="col-xxl-3 col-sm-6">
-                            <div class="card">
-                                <div class="nk-ecwg nk-ecwg6">
-                                    <div class="card-inner">
-                                        <div class="card-title-group">
-                                            <div class="card-title">
-                                                <h6 class="title">Equipements</h6>
-                                            </div>
-                                        </div>
-                                        <div class="data">
-                                            <div class="data-group">
-                                                <div class="amount">$8,830</div>
-                                                <div class="nk-ecwg6-ck">
-                                                    <canvas class="ecommerce-line-chart-s3" id="equipements"></canvas>
-                                                </div>
-                                            </div>
-                                            <div class="info"><span class="change up text-danger"><em class="icon ni ni-arrow-long-up"></em>1.12%</span><span> vs. last month</span></div>
-                                        </div>
-                                    </div><!-- .card-inner -->
-                                </div><!-- .nk-ecwg -->
-                            </div><!-- .card -->
-                        </div><!-- .col -->
-                        <div class="col-xxl-3 col-sm-6">
-                            <div class="card">
-                                <div class="nk-ecwg nk-ecwg6">
-                                    <div class="card-inner">
-                                        <div class="card-title-group">
-                                            <div class="card-title ">
-                                                <h6 class="title">Maintenance</h6>
-                                            </div>
-                                        </div>
-                                        <div class="data">
-                                            <div class="data-group">
-                                                <div class="amount">$8,974</div>
-                                                <div class="nk-ecwg6-ck">
-                                                    <canvas class="ecommerce-line-chart-s3" id="maintenance"></canvas>
-                                                </div>
-                                            </div>
-                                            <div class="info"><span class="change down text-danger"><em class="icon ni ni-arrow-long-down"></em>1.36%</span><span> vs. last month</span></div>
-                                        </div>
-                                    </div><!-- .card-inner -->
-                                </div><!-- .nk-ecwg -->
-                            </div><!-- .card -->
-                        </div><!-- .col -->
-                        <div class="col-xxl-3 col-sm-6">
-                            <div class="card">
-                                <div class="nk-ecwg nk-ecwg6">
-                                    <div class="card-inner">
-                                        <div class="card-title-group">
-                                            <div class="card-title">
-                                                <h6 class="title">Rents</h6>
-                                            </div>
-                                        </div>
-                                        <div class="data">
-                                            <div class="data-group">
-                                                <div class="amount">$30,485</div>
-                                                <div class="nk-ecwg6-ck">
-                                                    <canvas class="ecommerce-line-chart-s3" id="rents"></canvas>
-                                                </div>
-                                            </div>
-                                            <div class="info"><span class="change up text-primary"><em class="icon ni ni-arrow-long-up"></em>1.34%</span><span> vs. last month</span></div>
-                                        </div>
-                                    </div><!-- .card-inner -->
-                                </div><!-- .nk-ecwg -->
-                            </div><!-- .card -->
-                        </div><!-- .col -->
-                    </div><!-- .row -->
-                </div><!-- .nk-block -->
+                
                 <div class="nk-block">
                     <div class="card card-bordered card-stretch">
                         <div class="card-inner-group">
                             <div class="card-inner position-relative card-tools-toggle">
                                 <div class="card-title-group">
                                     <div class="card-title">
-                                        <h5 class="title">Expenses List</h5>
+                                        <h5 class="title">Payments List</h5>
                                     </div>
                                     <div class="card-tools me-n1">
                                         <ul class="btn-toolbar gx-1">
@@ -201,10 +110,10 @@
                                                 <label class="custom-control-label" for="uid"></label>
                                             </div>
                                         </div>
+                                        <div class="nk-tb-col tb-col-mb"><span class="sub-text">Payment</span></div>
                                         <div class="nk-tb-col tb-col-mb"><span class="sub-text">Invoice</span></div>
                                         <div class="nk-tb-col"><span class="sub-text">Customer</span></div>
                                         <div class="nk-tb-col tb-col-lg"><span class="sub-text">Payment Date</span></div>
-                                        <div class="nk-tb-col tb-col-md"><span class="sub-text">Load</span></div>
                                         <div class="nk-tb-col"><span class="sub-text">Amount</span></div>
                                     </div><!-- .nk-tb-item -->
                                     {% for payment in payments %}
@@ -216,17 +125,18 @@
                                             </div>
                                         </div>
                                         <div class="nk-tb-col tb-col-mb">
+                                            <span class="fw-medium">#{{ payment.payment_id }}</span>
+                                        </div>
+                                        <div class="nk-tb-col tb-col-mb">
                                             <span class="fw-medium"><a href="{% url 'view_invoice' payment.invoice.id %}">#{{ payment.invoice.invoice_id }}</a></span>
                                         </div>
                                         <div class="nk-tb-col">
-                                            <span>{{ payment.invoice.trip.load.customer.name }}</span>
+                                            <span>{{ payment.invoice.estimate.customer.name }}</span> 
                                         </div>
                                         <div class="nk-tb-col tb-col-lg">
                                             <span>{{ payment.paid_on}}</span>
                                         </div>
-                                        <div class="nk-tb-col tb-col-md">
-                                            <span><a href="{% url 'view_load' payment.invoice.trip.load.id %}">#{{ payment.invoice.trip.load.load_id }}</a></span>
-                                        </div>
+                                        
                                         <div class="nk-tb-col">
                                             <span class="tb-amount">{{ payment.amount }}</span>
                                         </div>

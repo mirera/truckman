@@ -435,6 +435,9 @@ class Trip(models.Model):
     def __str__(self):
         return self.trip_id
 
+    class Meta:
+        ordering = ['-date_added']
+
 #Load model
 FEE_TYPE = (
     ('FLAT FEE','Flat Fee'),
@@ -514,7 +517,8 @@ class Load(models.Model):
 
     def __str__(self):
         return self.load_id
-
+    class Meta:
+        ordering = ['-date_added']
 
 #---------------------------------- Invoice Modules -----------------------------------------------
 # invoice model
@@ -575,6 +579,9 @@ class Invoice(models.Model):
     def __str__(self):
         return self.invoice_id
 
+    class Meta:
+        ordering = ['-invoice_date']
+
 
 # invoice item
 INVOICE_ITEM_TYPE = (
@@ -627,6 +634,9 @@ class Payment(models.Model):
 
     def __str__(self):
         return self.invoice.invoice_id
+
+    class Meta:
+        ordering = ['-paid_on']
     
 #---------------------------------- Expense & ExpenseCategory Modules ------------------------------
 #expense_category model
@@ -668,6 +678,9 @@ class Expense(models.Model):
 
     def __str__(self):
         return self.expense_id
+
+    class Meta:
+        ordering = ['-date_paid']
 
 #---------------------------------- Reminder Modules -----------------------------------------------
 # reminder model

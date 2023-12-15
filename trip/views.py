@@ -2313,13 +2313,12 @@ def remove_invoice(request, pk):
 @permission_required('trip.view_invoice') 
 def send_trip_invoice(request, pk):
     company = get_user_company(request)
-    trip = get_object_or_404(Trip, id=pk, company=company)
-    invoice = Invoice.objects.get(trip=trip)
+    trip = get_object_or_404(Trip, id=pk)
+    invoice = Invoice.objects.get(estimate=trip.estimate)
     preference = Preference.objects.get(company=company)
 
-    #having this context because delay() need model serialzation
     context = {
-        'customer_name': trip.load.estimate.customer.name,
+        'customer_name': trip.estimate.customer.name,
     }
 
     pdf_invoice = enerate_invoice_pdf(trip)
@@ -2330,7 +2329,7 @@ def send_trip_invoice(request, pk):
         from_name=preference.email_from_name, 
         from_email=preference.from_email, 
         subject=f'Trip Invoice:{invoice.invoice_id}', 
-        recipient_email=trip.load.estimate.customer.email, 
+        recipient_email=trip.estimate.customer.email, 
         replyto_email=company.email,
         attachment_path=invoice_path
     )
@@ -2437,7 +2436,7 @@ def add_estimate(request):
 
             
 
-        messages.success(request, f'Estimate was added successfully.')
+        messages.success(request, f'Quotation was created successfully. Click on the "Send to Customer" button for he customer to accept/decline the quotation.')
         return redirect('view_estimate', estimate.id)
 
     context= {
@@ -2558,8 +2557,7 @@ def send_estimate(request, pk):
     company = get_user_company(request)
     estimate = get_object_or_404(Estimate, id=pk)
     preference = get_object_or_404(Preference, company=company)
-
-    estimate_url = request.build_absolute_uri(reverse('view_estimate', args=[estimate.id]))
+    estimate_url = request.build_absolute_uri(reverse('view_estimate_negotiate_mode', args=[estimate.id]))
     #having this context because delay() need model serialzation
     context = {
         'customer_name': estimate.customer.name,
@@ -2570,14 +2568,26 @@ def send_estimate(request, pk):
     send_email_task.delay(
         context=context, 
         template_path='trip/estimate/load-estimate.html', 
-        from_name='Loginit Truckman', #revert back to this preference.email_from_name
+        from_name=company.name, 
         from_email=settings.EMAIL_HOST_USER, #revert back to this preference.from_email
-        subject='Quotation', 
+        subject='Approve Quotation', 
         recipient_email=estimate.customer.email, 
         replyto_email=company.email
     )
+    # send whatsapp notification 
+    whatsapp_setting = get_object_or_404(WhatsappSetting, company=company )
+    message = f'Dear {estimate.customer.name}, The attached is the Quotation/estimate as requested.Click here to view {estimate_url}. If you have any questions or concerns, please do not hesitate to contact us. Best regards,{estimate.company.name}'
+    send_whatsapp_text_task.delay(
+        instance_id=whatsapp_setting.instance_id, 
+        access_token=whatsapp_setting.access_token, 
+        phone_no=estimate.customer.phone, 
+        message=message
+    )
 
-    messages.success(request, 'Estimate sent to customer.')
+    estimate.is_sent = True
+    estimate.save()
+
+    messages.success(request, 'Quotation sent to customer. Once customer accepts the quotation you will be notified on email.')
     return redirect('view_estimate', estimate.id)
 
 #accept estimate
@@ -2585,13 +2595,14 @@ def accept_estimate(request, pk):
     estimate = get_object_or_404(Estimate, id=pk)
     estimate.status = 'Accepted'
     estimate.save()
+    company = estimate.company
 
     #create a trip instance, to be used later.
     trip = Trip.objects.create(
-        company = estimate.company,
+        company = company,
         estimate = estimate
     )
-    print(f'Trip estimate upon creation estimate accept:{trip.estimate}')
+
     estimate_items = EstimateItem.objects.filter(estimate=estimate)
     
     # Calculate the total number of trucks for all estimate items
@@ -2600,20 +2611,19 @@ def accept_estimate(request, pk):
     # instatiate load instances based on the number of trucks 
     while int(total_trucks) > 0:
         Load.objects.create(
-            company = estimate.company,
+            company = company,
             estimate = estimate
         )
         total_trucks -= 1
 
     # send whatsapp notifications to indicate creation of Trip and loads. 
-    user = request.user
-    whatsapp_setting = get_object_or_404(WhatsappSetting, company=user.company )
+    whatsapp_setting = get_object_or_404(WhatsappSetting, company=company )
     trip_url = request.build_absolute_uri(reverse('view_trip', args=[trip.id]))
-    message = f'Hello {user.first_name} {user.last_name}, a trip {trip.trip_id} has been created. Click the link below to view and edit associated loads {trip_url}'
+    message = f'Hello {company.name}, your quotation {estimate.estimate_id} has been accepted. Consenquently, a trip {trip.trip_id} has been initiated. Click the link below to view and assign associated loads trucks {trip_url} .'
     send_whatsapp_text_task.delay(
         instance_id=whatsapp_setting.instance_id, 
         access_token=whatsapp_setting.access_token, 
-        phone_no=user.phone, 
+        phone_no=company.phone, 
         message=message
     )
     #send email to admin notify them about 
@@ -2624,18 +2634,20 @@ def accept_estimate(request, pk):
     context = {
         'estimate':estimate_id,
         'estimate_url' : estimate_url,
+        'trip_url' :trip_url,
+        'trip':trip,
     }
     
     send_email_task.delay(
         context=context, 
         template_path='trip/estimate/estimate-accepted.html', 
-        from_name='Loginit Truckman', 
+        from_name= company.name, 
         from_email=settings.EMAIL_HOST_USER, 
         subject='Estimate Accepted', 
-        recipient_email=estimate.company.email, 
+        recipient_email=company.email, 
         replyto_email=settings.EMAIL_HOST_USER
     )
-    messages.success(request, 'Quotation accepted successfully.')
+    messages.success(request, 'Quotation accepted successfully. We will share a loading list shortly.')
     return redirect('view_estimate_negotiate_mode', estimate.id )
 
 #decline estimate
