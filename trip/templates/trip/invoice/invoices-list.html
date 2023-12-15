@@ -27,12 +27,12 @@
                         <div class="nk-block-head-content">
                             <ul class="nk-block-tools g-3">
                                 <li>
-                                    <div class="drodown">
+                                    <!--<div class="drodown">
                                         <a href="" class=" btn btn-icon btn-primary" ><em class="icon ni ni-plus"></em></a>
-                                    </div>
+                                    </div> -->
                                 </li>
                             </ul>
-                        </div><!-- .nk-block-head-content -->
+                        </div><!-- .nk-block-head-content --> 
                     </div><!-- .nk-block-between -->
                 </div><!-- .nk-block-head -->
                 <div class="nk-block">
@@ -90,7 +90,7 @@
                                     <thead class="tb-odr-head">
                                         <tr class="tb-odr-item">
                                             <th class="tb-odr-info">
-                                                <span class="tb-odr-id">Trip ID</span>
+                                                <!--<span class="tb-odr-id">Trip ID</span> -->
                                                 <span class="tb-odr-date d-none d-md-inline-block">Invoice</span>
                                             </th>
                                             <th class="tb-odr-amount">
@@ -108,15 +108,15 @@
                                         {% for invoice in invoices %}
                                         <tr class="tb-odr-item">
                                             <td class="tb-odr-info">
-                                                <span class="tb-odr-id"><a href="html/pharmacy/invoice-details.html">#{{ invoice.trip.trip_id }}</a></span>
-                                                <span class="tb-odr-date">#{{ invoice.invoice_id }}</span>
+                                                <!-- <span class="tb-odr-id"><a href="html/pharmacy/invoice-details.html">#{{ invoice.trip.trip_id }}</a></span> -->
+                                                <span class="tb-odr-date"><a href="{% url 'view_invoice' invoice.id %}">#{{ invoice.invoice_id }}</a></span>
                                             </td>
                                             <td class="tb-odr-amount">
                                                 <span class="tb-odr-total">
                                                     <span class="amount">{{ invoice.invoice_date}}</span>
                                                 </span>
                                                 <span class="tb-odr-status">
-                                                    <span>{{ invoice.trip.load.customer.name }}</span>
+                                                    <span>{{ invoice.estimate.customer.name }}</span>
                                                 </span>
                                             </td>
                                             <td class="tb-odr-amount">

@@ -24,9 +24,11 @@
                                 </ul>
                             </div>
                         </div>
-                        <a href="{% url 'view_estimate_negotiate_mode' estimate.id %}" class="btn btn-outline-light" ><span>Copy Acceptance Link</span><em class="icon ni ni-clipboard"></em></a>
+                        {% if not estimate.is_sent %}
+                        <a href="{% url 'send_estimate' estimate.id %}" class="btn btn-primary" ><span>Send Quotation to Customer</span><em class="icon ni ni-send"></em></a>
+                        {% endif %}
                         <div class="dropdown">
-                            <a href="#" class="btn btn-primary" data-bs-toggle="dropdown"><span>Actions</span><em class="icon ni ni-chevron-down"></em></a>
+                            <a href="#" class="btn btn-outline-light " data-bs-toggle="dropdown"><span>Actions</span><em class="icon ni ni-chevron-down"></em></a>
                             <div class="dropdown-menu dropdown-menu-end dropdown-menu-auto mt-1">
                                 <ul class="link-list-plain">
                                     <li><a href="#">Download</a></li>
