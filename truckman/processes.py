@@ -415,5 +415,76 @@ def generate_loadinglist_pdf(trip):
     return temp_file_path #the path should be 
 #--ends
 
+#generate invoice pdf
+def generate_invoice_pdf(trip):
+    invoice = Invoice.objects.get(estimate=trip.estimate)
+    invoice_items = InvoiceItem.objects.filter(invoice=invoice)
+
+    # Path to your HTML template.
+    template_path = 'trip/invoice/invoice-template.html'
+
+    # Load the HTML template 
+    template = get_template(template_path)
+    context = {
+        'company':trip.company,
+        'invoice':invoice,
+        'invoice_items':invoice_items
+    }  
+
+    # Render the template with the context data.
+    html = template.render(context)
+
+    # Create a BytesIO buffer to store the PDF content.
+    buffer = BytesIO()
+
+    # Create a PDF object using xhtml2pdf's pisa.CreatePDF.
+    pdf = pisa.CreatePDF(html, dest=buffer)
+
+    if not pdf.err:
+        # Reset the buffer's file pointer.
+        buffer.seek(0)
+
+        # Save the PDF temporarily
+        temp_file_path = os.path.join(settings.MEDIA_ROOT, 'temp', f'{invoice.invoice_id}.pdf')
+        with open(temp_file_path, 'wb') as temp_file:
+            temp_file.write(buffer.getvalue())
+    return temp_file_path #the path should be 
+#--ends
+
+#generate invoice pdf
+def generate_estimate_pdf(estimate):
+    estimate_items = EstimateItem.objects.filter(estimate=estimate)
+
+    # Path to your HTML template.
+    #template_path = 'trip/invoice/invoice-template.html'
+    template_path = 'trip/estimate/estimate-template.html'
+
+    # Load the HTML template 
+    template = get_template(template_path)
+    context = {
+        'company':estimate.company,
+        'estimate':estimate,
+        'estimate_items':estimate_items
+    }  
+
+    # Render the template with the context data.
+    html = template.render(context)
+
+    # Create a BytesIO buffer to store the PDF content.
+    buffer = BytesIO()
+
+    # Create a PDF object using xhtml2pdf's pisa.CreatePDF.
+    pdf = pisa.CreatePDF(html, dest=buffer)
+
+    if not pdf.err:
+        # Reset the buffer's file pointer.
+        buffer.seek(0)
+
+        # Save the PDF temporarily
+        temp_file_path = os.path.join(settings.MEDIA_ROOT, 'temp', f'{estimate.estimate_id}.pdf')
+        with open(temp_file_path, 'wb') as temp_file:
+            temp_file.write(buffer.getvalue())
+    return temp_file_path #the path should be 
+#--ends
 
 

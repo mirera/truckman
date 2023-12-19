@@ -291,6 +291,14 @@
                                                 </div>
                                                 <!-- content @e -->
                                             </div><!-- .nk-block -->
+                                            <div class="nk-block">
+                                                <a class="btn btn-icon btn-primary" href="{% url 'download_loading_list_pdf' trip.id %}" data-bs-toggle="tooltip" data-bs-placement="top" title="Download Loading List">
+                                                    <em class="icon ni ni-download-cloud"></em>
+                                                </a>
+                                                <a class="btn btn-icon btn-primary" href="{% url 'send_loading_list_customer' trip.id %}" data-bs-toggle="tooltip" data-bs-placement="top" title="Send To Customer">
+                                                    <em class="icon ni ni-send"></em>
+                                                </a>
+                                            </div>
                                             {% else %}
                                             <div class="nk-block-head">
                                                 <p class="title">Documents not uploaded.</p>
@@ -311,16 +319,13 @@
                                                     <a class="btn  btn-primary" data-bs-toggle="modal" href="#addPayment">
                                                         <span>Add Payment</span>
                                                     </a>
-                                                    <a class="btn  btn-outline-light"  href="{% url 'generate_invoice_pdf' trip.id %}">
+                                                    <a class="btn  btn-outline-light"  href="{% url 'download_invoice_pdf' trip.id %}">
                                                         <span>Download</span>
                                                     </a>
                                                 </div>
                                             </div><!-- .nk-block-between  -->
                                             <div class="nk-block">
                                                 <div class="invoice">
-                                                    <div class="invoice-action">
-                                                        <a class="btn btn-icon btn-lg btn-white btn-dim btn-outline-primary" href="html/pharmacy/invoice-print.html" target="_blank"><em class="icon ni ni-printer-fill"></em></a>
-                                                    </div><!-- .invoice-actions -->
                                                     <div class="invoice-wrap">
                                                         {% if company.logo %}
                                                         <div class="invoice-brand text-left">
