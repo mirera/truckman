@@ -76,7 +76,7 @@ from .forms import (
 )
 
 from truckman.utils import get_user_company, enerate_invoice_pdf, export_model_data, reverse_geocode, format_coordinates
-from truckman.tasks import send_email_task, send_email_with_attachment_task, send_whatsapp_text_task, send_whatsapp_media_task
+from truckman.tasks import send_email_task, send_email_with_attachment_task, send_whatsapp_text_task, send_whatsapp_media_task, delete_temp_files_task
 from truckman.processes import generate_invoice, generate_loading_list, create_daily_register, get_trip_vehicles, create_workbook, generate_loadinglist_pdf
 from authentication.models import WhatsappSetting
 
@@ -1312,6 +1312,7 @@ def send_loading_list_customer(request, pk):
         message=message,
         media_url=temp_file_path  # Attach the PDF file
     )
+    delete_temp_files_task.delay()
     
     messages.success(request, 'Loading list sent to customer')
     return redirect('view_trip', trip.id )
@@ -1337,6 +1338,9 @@ def download_loading_list_pdf(request, pk):
         # Handle exceptions here or log them
         print(f"Error: {e}")
         return HttpResponse("Error downloading file")
+    finally:
+        # Delete temporary files regardless of success or failure
+        delete_temp_files_task.delay()
     
 
 #---------------------------------- Route views------------------------------------------
