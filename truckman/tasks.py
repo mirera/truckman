@@ -1,5 +1,5 @@
 from celery import shared_task 
-from .utils import send_email, send_email_with_attachment, send_sms, create_wa_instance, get_wa_qrcode, send_whatsapp_text, send_whatsapp_media, reset_wa_instance, reconnect_wa_instance, reboot_wa_instance
+from .utils import send_email, send_email_with_attachment, send_sms, create_wa_instance, get_wa_qrcode, send_whatsapp_text, send_whatsapp_media, reset_wa_instance, reconnect_wa_instance, reboot_wa_instance, delete_temp_files
 from .processes import get_trip_vehicles
 from django.conf import settings
 from django.urls import reverse
@@ -14,6 +14,9 @@ from authentication.models import WhatsappSetting, Preference
 def hello_engima():
     print('Developed by Loginit Engineers!!') 
 
+@shared_task
+def delete_temp_files_task():
+    delete_temp_files()
 
 @shared_task
 def send_email_task(context, template_path, from_name, from_email, subject, recipient_email, replyto_email):

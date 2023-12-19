@@ -1,56 +1,19 @@
 <!DOCTYPE html>
-<html lang="zxx" class="js"> 
+<html lang="zxx" class="js">
 {% load static %}
 <head>
-    <base href="../../../">
-    <meta charset="utf-8">
-    <meta name="author" content="Loginit Cybersec">
-    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <meta name="description" content="A powerful and conceptual apps base dashboard template that especially build for developers and programmers.">
-    <!-- Fav Icon  -->
-    <link rel="shortcut icon" href="{% static 'assets/favicon.ico' %}">
-    <!-- Page Title  -->
-    <title>Review Quotation | Truckman </title>
     <!-- StyleSheets  -->
     <link rel="stylesheet" href="{% static 'css/dashlite.css' %}">
-    <link id="skin-default" rel="stylesheet" href="{% static 'css/dashlite.css' %}">
+    <link id="skin-default" rel="stylesheet" href="{% static 'css/theme.css' %}">
 </head>
-
-{% if messages %}
-{% for message in messages %}
-    <div class="alert {% if message.tags == 'error' %}alert-danger{% elif message.tags == 'success' %}alert-success{% else %}alert-primary{% endif %}">
-        {{ message }}
-    </div>
-{% endfor %}
-{% endif %}
+<!-- content @s -->
 <div class="nk-content ">
     <div class="container-fluid">
         <div class="nk-content-inner">
             <div class="nk-content-body">
-                <div class="nk-block-head">
-                    <div class="nk-block-between g-3">
-                        <div class="nk-block-head-content">
-                            <h3 class="nk-block-title page-title">Quotation <strong class="text-primary small">#{{ estimate.estimate_id}}</strong></h3>
-                            <div class="nk-block-des text-soft">
-                                <ul class="list-inline">
-                                    <li>Created At: <span class="text-base">{{ estimate.date_added }}</span></li>
-                                </ul>
-                            </div>
-                        </div>
-                        <div class="nk-block-head-content">
-                            {% if estimate.status != 'Accepted' %}
-                            <a href="{% url 'accept_estimate' estimate.id %}" class="btn btn-primary"><span>Accept</span></a>
-                           <!-- <a href="#" class="btn btn-outline-primary"><span>Negotiate</span></a> -->
-                            <a href="{% url 'decline_estimate' estimate.id %}" class="btn btn-light"><span>Decline</span></a>
-                            {% endif %}
-                            <a href="{% url 'download_estimate_pdf' estimate.id %}" class="btn btn-outline-secondary"><span>Download</span></a>
-                        </div>
-                    </div>
-                </div><!-- .nk-block-head -->
+                
                 <div class="nk-block">
                     <div class="invoice">
-                        <div class="invoice-action">
-                        </div><!-- .invoice-actions -->
                         <div class="invoice-wrap">
                             {% if company.logo %}
                             <div class="invoice-brand text-left">
@@ -61,7 +24,7 @@
                                 <div class="row">
                                     <div class="col-md-8 mb-4">
                                         <div class="invoice-contact">
-                                            <span class="overline-title">Quote From</span>
+                                            <span class="overline-title">Quotation From</span>
                                             <div class="invoice-contact-info">
                                                 <h4 class="title">{{ company.name }}</h4>
                                                 <ul class="list-plain">
@@ -92,8 +55,8 @@
                                         <h3 class="title">Quotation</h3>
                                         <ul class="list-plain">
                                             <li class="invoice-id"><span>Quote ID</span>:<span>{{ estimate.estimate_id }}</span></li>
-                                            <li class="invoice-date"><span>Quote Date</span>:<span>{{ estimate.date_added.date }}</span></li>
-                                            <li class="invoice-date"><span>Valid Till</span>:<span>{{ estimate.valid_till }}</span></li>
+                                            <li class="invoice-date"><span>Quote Date</span>:<span>{{ estimate.date_added }}</span></li>
+                                            <li class="invoice-date"><span>Date Due</span>:<span>{{ estimate.valid_till }}</span></li>
                                         </ul>
                                     </div>
                                     <div>
@@ -114,7 +77,7 @@
                                             <tr>
                                                 <th class="w-150px">Item </th>
                                                 <th class="w-150px">Route </th>
-                                                <th class="w-60">Description</th> 
+                                                <th class="w-60">Description</th>
                                                 <th>Rate</th>
                                                 <th>Trucks</th>
                                                 <th>Amount</th>
@@ -148,21 +111,28 @@
                                                 <td colspan="2">Tax</td>
                                                 <td>${{ estimate.tax }}</td>
                                             </tr>
-                                            
-                                            
                                             <tr>
                                                 <td colspan="2"></td>
-                                                <td colspan="2" class="fw-bold">Grand Total</td>
-                                                <td class="fw-bold">${{ estimate.total }}</td>
+                                                <td colspan="2">Total</td>
+                                                <td>${{ estimate.total }}</td>
+                                            </tr>
+                                            <tr>
+                                                <td colspan="2"></td>
+                                                <td colspan="2">Amount Paid</td>
+                                                <td>${{ estimate.amount_paid }}</td>
+                                            </tr>
+                                            <tr>
+                                                <td colspan="2"></td>
+                                                <td colspan="2" class="fw-bold">Balance</td>
+                                                <td class="fw-bold">${{ estimate.balance }}</td>
                                             </tr>
                                         </tfoot>
                                     </table>
                                     <div class="col-6">
-                                        <h6 class="text-soft fs-11px">Remarks:</h6>
+                                        <h6 class="text-soft fs-11px">Payment Details:</h6>
                                         <span class="text-soft fs-11px">{{ estimate.note }}</span>
-                                        </div> 
-                                        <br>
-                                    <div class="nk-notes ff-italic fs-12px text-soft"> Quotation was system generated and is valid without the signature and seal. </div>
+                                    </div> <br>
+                                    <div class="nk-notes ff-italic fs-12px text-soft"> The Quotation was system generated and is valid without the signature and seal. </div>
                                 </div>
                             </div><!-- .invoice-bills -->
                         </div><!-- .invoice-wrap -->

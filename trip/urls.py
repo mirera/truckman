@@ -79,6 +79,7 @@ urlpatterns = [
     path('load_export_to_csv', views.load_export_to_csv, name='load_export_to_csv'),
     path('assign_load_trucks/<str:pk>', views.assign_load_trucks, name='assign_load_trucks'),
 
+    path('send_loading_list_customer/<str:pk>', views.send_loading_list_customer, name='send_loading_list_customer'),
     path('download_loading_list_pdf/<str:pk>', views.download_loading_list_pdf, name='download_loading_list_pdf'),
     path('view_loading_list/<str:pk>', views.view_loading_list, name='view_loading_list'),
     #--ends
@@ -142,8 +143,9 @@ urlpatterns = [
     path('list_invoices', views.list_invoices, name='list_invoices'),
 
     path('send_trip_invoice/<str:pk>', views.send_trip_invoice, name='send_trip_invoice'),
-    path('generate_invoice_pdf/<str:pk>', views.generate_invoice_pdf, name='generate_invoice_pdf'),
+    #path('download_invoice_pdf/<str:pk>', views.generate_invoice_pdf, name='generate_invoice_pdf'),
     path('get_invoice/<str:pk>', views.get_invoice, name='get_invoice'),
+    path('download_invoice_pdf/<str:pk>', views.download_invoice_pdf, name='download_invoice_pdf'),
 
     #--ends
 
@@ -159,7 +161,7 @@ urlpatterns = [
     path('accept_estimate/<str:pk>', views.accept_estimate, name='accept_estimate'),
     path('decline_estimate/<str:pk>', views.decline_estimate, name='decline_estimate'),
     path('generate_associated_invoice/<str:pk>', views.generate_associated_invoice, name='generate_associated_invoice'),
-    #path('generate_associated_invoice/<str:pk>', views.generate_associated_invoice, name='generate_associated_invoice'),
+    path('download_estimate_pdf/<str:pk>', views.download_estimate_pdf, name='download_estimate_pdf'),
     #--ends
 
     #reminder urls

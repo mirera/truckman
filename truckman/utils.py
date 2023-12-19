@@ -64,7 +64,20 @@ def get_user_company(request):
         except:
             company = None
         return company
-    
+
+
+# Function to handle deletion of temporary files
+def delete_temp_files():
+    temp_dir = os.path.join(settings.MEDIA_ROOT, 'temp')
+    for file_name in os.listdir(temp_dir):
+        file_path = os.path.join(temp_dir, file_name)
+        try:
+            if os.path.isfile(file_path):
+                os.remove(file_path)
+        except Exception as e:
+            print(f"Error deleting file: {e}")
+#ends
+
 #------------------------------------------------ e-mail calls ----------------------------------------------------------------
 #send email 
 def send_email(context, template_path, from_name, from_email, subject, recipient_email, replyto_email):
@@ -237,7 +250,6 @@ def send_whatsapp_text(instance_id, access_token, phone_no, message):
 
 #send whatsapp text
 def send_whatsapp_media(instance_id, access_token, phone_no, message, media_url):
-    
     #get decrypted access_token from db
     access_token_decrypted = decrypt_secret(access_token)
 
@@ -248,12 +260,12 @@ def send_whatsapp_media(instance_id, access_token, phone_no, message, media_url)
         'Accept': 'application/json'
     }
     data = {
-        'number': phone_no,
         'instance_id': instance_id,
-        'type': 'text',
+        "access_token": access_token_decrypted,
+        'number': phone_no,
         'message': message,
-        "media_url": media_url,
-        "access_token": access_token_decrypted
+        'media_url': media_url,
+        'type': 'media',  
     }
     response = requests.post(url, headers=headers, data=json.dumps(data))
     # check the status code of the response
@@ -263,7 +275,7 @@ def send_whatsapp_media(instance_id, access_token, phone_no, message, media_url)
         
         # check the status field in the JSON data
         if json_data['status'] == 'success':
-            return True, json_data['data']
+            return True
         else:
             error_msg = json_data['message']
             return False, error_msg
@@ -503,7 +515,7 @@ def generate_invoice_pdf(invoice):#not to be used
 
     return pdf_buffer 
 #--ends
-   
+
 #format phone number to 254706384073
 def format_phone_number(phone_no, phone_code):
     # Remove any non-digit characters from the phone number
