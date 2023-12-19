@@ -211,7 +211,10 @@
                                                     <p>Assigned trucks(s)/vehicle(s)</p>
                                                 </div><!-- .nk-block-head -->
                                                 <div class="nk-block">
-                                                    <a class="btn btn-icon btn-primary" href="#">
+                                                    <a class="btn btn-icon btn-primary" href="{% url 'download_loading_list_pdf' trip.id %}" data-bs-toggle="tooltip" data-bs-placement="top" title="Download Loading List">
+                                                        <em class="icon ni ni-download-cloud"></em>
+                                                    </a>
+                                                    <a class="btn btn-icon btn-primary" href="{% url 'send_loading_list_customer' trip.id %}" data-bs-toggle="tooltip" data-bs-placement="top" title="Send To Customer">
                                                         <em class="icon ni ni-send"></em>
                                                     </a>
                                                 </div>

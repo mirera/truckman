@@ -79,6 +79,7 @@ urlpatterns = [
     path('load_export_to_csv', views.load_export_to_csv, name='load_export_to_csv'),
     path('assign_load_trucks/<str:pk>', views.assign_load_trucks, name='assign_load_trucks'),
 
+    path('send_loading_list_customer/<str:pk>', views.send_loading_list_customer, name='send_loading_list_customer'),
     path('download_loading_list_pdf/<str:pk>', views.download_loading_list_pdf, name='download_loading_list_pdf'),
     path('view_loading_list/<str:pk>', views.view_loading_list, name='view_loading_list'),
     #--ends

@@ -21,7 +21,9 @@ from django.conf import settings
 from django.urls import reverse
 from django.db.models import Sum
 from django.http import FileResponse
+import mimetypes
 from io import BytesIO
+from django.core.serializers import serialize
 
 from . models import (
     CustomUser,
@@ -74,8 +76,8 @@ from .forms import (
 )
 
 from truckman.utils import get_user_company, enerate_invoice_pdf, export_model_data, reverse_geocode, format_coordinates
-from truckman.tasks import send_email_task, send_email_with_attachment_task, send_whatsapp_text_task
-from truckman.processes import generate_invoice, generate_loading_list, create_daily_register, get_trip_vehicles, create_workbook
+from truckman.tasks import send_email_task, send_email_with_attachment_task, send_whatsapp_text_task, send_whatsapp_media_task
+from truckman.processes import generate_invoice, generate_loading_list, create_daily_register, get_trip_vehicles, create_workbook, generate_loadinglist_pdf
 from authentication.models import WhatsappSetting
 
 
@@ -343,8 +345,6 @@ def list_vehicles(request):
 @permission_required('trip.view_vehicle')
 def view_vehicle(request, pk):
     vehicle = Vehicle.objects.get(id=pk)
-    
-
     try:
         driver = Driver.objects.get(assigned_vehicle=vehicle)
     except:
@@ -1181,8 +1181,6 @@ def list_loads(request):
 @permission_required('trip.view_load')
 def view_load(request, pk):
     load = Load.objects.get(id=pk, company=get_user_company(request))
-    
-    
     try:
         loading_list = LoadingList.objects.get(estimate=load.estimate)
         loading_list_items = loading_list.loadinglistitem_set.all()
@@ -1258,12 +1256,9 @@ def assign_load_trucks(request, pk):
 
 def get_loading_list(request, pk):
     trip = get_object_or_404(Trip, id=pk)  
-    print(f'Trip:{trip}')
     estimate = trip.estimate
-    print(f'Estimate:{estimate}')
     # Get all the estimate/trip related loads
     loads = Load.objects.filter(estimate=estimate)
-    print(f'Count:{loads.count()}')
     # Check if all the loads are assigned trucks
     if all(load.assigned_truck for load in loads):
         # Generate loading list here using `generate_loading_list` function 
@@ -1287,40 +1282,62 @@ def view_loading_list(request, pk):
     }  
     return render(request, 'trip/load/loading-list-template.html', context)
 
-'''
-download loading list pdf
-'''
-def download_loading_list_pdf(request, pk):
-    loading_list = get_object_or_404(LoadingList, id=pk)
-    loading_list_items = loading_list.loadinglistitem_set.all()
-
-    # Path to  HTML template.
-    template_path = 'trip/load/loading-list-template-download.html'
-
-    # Load the HTML template using Django's get_template method.
-    template = get_template(template_path)
+#send loading list to customer
+def send_loading_list_customer(request, pk):
+    trip = get_object_or_404(Trip, id=pk)
+    temp_file_path = generate_loadinglist_pdf(trip) #helper func to generate and return loading list file path
     context = {
-        'company':loading_list.company,
-        'loading_list_items':loading_list_items
-    }  
+        'client_name':trip.estimate.customer.name,
+        'company_name':trip.company.name,
+        'trip_id':trip.trip_id
+    }
+    send_email_with_attachment_task.delay(
+        context=context,
+        template_path='trip/load/loadlist-email.html',
+        from_name=trip.company.name,
+        from_email=settings.EMAIL_HOST_USER,
+        subject='Loading List',
+        recipient_email=trip.estimate.customer.email,
+        replyto_email=trip.company.email,
+        attachment_path=temp_file_path
+    )
+    
+    # Send WhatsApp notification with the generated file
+    whatsapp_setting = get_object_or_404(WhatsappSetting, company=trip.company)
+    message = f'Dear {trip.estimate.customer.name}, The attached is the Loading list as requested. If you have any questions or concerns, please do not hesitate to contact us. Best regards,{trip.estimate.company.name}'
+    send_whatsapp_media_task.delay(
+        instance_id=whatsapp_setting.instance_id,
+        access_token=whatsapp_setting.access_token,
+        phone_no=trip.estimate.customer.phone,
+        message=message,
+        media_url=temp_file_path  # Attach the PDF file
+    )
+    
+    messages.success(request, 'Loading list sent to customer')
+    return redirect('view_trip', trip.id )
+    # --ends
 
-    # Render the template with the context data.
-    html = template.render(context)
+#download loading list pdf
+def download_loading_list_pdf(request, pk): 
+    trip = get_object_or_404(Trip, id=pk)
+    loading_list = get_object_or_404(LoadingList, estimate=trip.estimate)
+    temp_file_path = generate_loadinglist_pdf(trip) # how do i download this file. 
+    try:
+        # Open the generated file
+        file = open(temp_file_path, 'rb')
+        response = FileResponse(file)
 
-    # Create a response object with PDF content type.
-    response = HttpResponse(content_type='application/pdf')
-    response['Content-Disposition'] = f'attachment; filename="{loading_list.loading_list_id}.pdf"'
+        # Set the content type to force download
+        content_type, _ = mimetypes.guess_type(temp_file_path)
+        response['Content-Type'] = content_type
+        response['Content-Disposition'] = f'attachment; filename="{loading_list.loading_list_id}.pdf"'
 
-    # Create a PDF object using xhtml2pdf's pisa.CreatePDF.
-    pdf = pisa.CreatePDF(html, dest=response)
-
-    # Check if PDF generation was successful.
-    if not pdf.err:
         return response
-
-    # If PDF generation failed, return an error message.
-    return HttpResponse('PDF generation failed: %s' % pdf.err)
-
+    except Exception as e:
+        # Handle exceptions here or log them
+        print(f"Error: {e}")
+        return HttpResponse("Error downloading file")
+    
 
 #---------------------------------- Route views------------------------------------------
 # add route
