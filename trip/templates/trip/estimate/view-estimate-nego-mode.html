@@ -23,6 +23,7 @@
     </div>
 {% endfor %}
 {% endif %}
+
 <div class="nk-content ">
     <div class="container-fluid">
         <div class="nk-content-inner">
@@ -40,7 +41,7 @@
                         <div class="nk-block-head-content">
                             {% if estimate.status != 'Accepted' %}
                             <a href="{% url 'accept_estimate' estimate.id %}" class="btn btn-primary"><span>Accept</span></a>
-                           <!-- <a href="#" class="btn btn-outline-primary"><span>Negotiate</span></a> -->
+                        <!-- <a href="#" class="btn btn-outline-primary"><span>Negotiate</span></a> -->
                             <a href="{% url 'decline_estimate' estimate.id %}" class="btn btn-light"><span>Decline</span></a>
                             {% endif %}
                             <a href="{% url 'download_estimate_pdf' estimate.id %}" class="btn btn-outline-secondary"><span>Download</span></a>
@@ -172,4 +173,3 @@
         </div>
     </div>
 </div>
-<!-- content @e -->
