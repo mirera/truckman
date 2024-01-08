@@ -2,12 +2,12 @@
 from django import forms
 from django.contrib.auth.models import Permission
 from django.core.exceptions import ValidationError  
-from .models import CustomUser, Client, Role, WhatsappSetting
+from .models import CustomUser, Client, Role, WhatsappSetting, Preference, EmailSetting
 from django.forms.widgets import CheckboxSelectMultiple
 from pytz import all_timezones
 from iso4217 import Currency
 import pycountry
-from truckman.utils import phone_codes
+from truckman.utils import phone_codes 
 
 #-------------------- Client form -------------------------------------------------------------------
 class ClientForm(forms.ModelForm):
@@ -160,4 +160,22 @@ class WhatsappForm(forms.ModelForm):
         
         widgets = {
             'access_token': forms.PasswordInput(attrs={'class': 'form-control', 'placeholder': 'enter your access token', 'required':'True'}),
+        }
+
+
+#-------------------- Preference settings form ---------------------------------------------
+class EmailSettingForm(forms.ModelForm):
+    class Meta:
+        model = EmailSetting
+        fields = '__all__'
+        exclude = ['company']
+        
+        widgets = {
+            'email_from_name': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Loginit CyberSec', 'required':'True'}),
+            'from_email': forms.EmailInput(attrs={'class': 'form-control', 'placeholder': 'e.g. info@loginit.co.ke', 'required':'True'}),
+            'smtp_host': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'e.g. smtp.loginit.com', 'required':'True'}),
+            'encryption': forms.Select(attrs={'class': 'form-select js-select2'}),
+            'smtp_port': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': 'e.g. 587', 'required':'True'}),
+            'smtp_username': forms.EmailInput(attrs={'class': 'form-control', 'placeholder': 'e.g info@loginit.com', 'required':'True'}),
+            'smtp_password': forms.PasswordInput(attrs={'class': 'form-control', 'required':'True'}),
         }

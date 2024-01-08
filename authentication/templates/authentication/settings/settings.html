@@ -33,10 +33,11 @@
                             <li class="nav-item">
                                 <a class="nav-link" data-bs-toggle="tab" href="#system"><em class="icon ni ni-setting"></em><span>Preferences</span></a>
                             </li>
+                            -->
                             <li class="nav-item">
                                 <a class="nav-link" data-bs-toggle="tab" href="#email"><em class="icon ni ni-mail-fill"></em><span>Email</span> </a>
                             </li>
-                            -->
+                            
                             <li class="nav-item">
                                 <a class="nav-link" data-bs-toggle="tab" href="#whatsapp"><em class="icon ni ni-whatsapp"></em><span>Whatsapp</span></a>
                             </li>
@@ -366,7 +367,7 @@
                             </div><!-- .tab-pane -->
                             <!--tab pan -->
                             <div class="tab-pane" id="email">
-                                <form action="{% url 'update_email' company.id %}" method="POST" class="form-validate">
+                                <form action="{% url 'update_email' %}" method="POST" class="form-validate">
                                     {% csrf_token %}
                                     <div class="card-inner pt-0">
                                         <div class="nk-block-head">
@@ -386,7 +387,7 @@
                                                 <div class="col-lg-7">
                                                     <div class="form-group">
                                                         <div class="form-control-wrap">
-                                                            {{ form_email.from_email }}
+                                                            {{ form_email.from_email }} 
                                                         </div>
                                                     </div>
                                                 </div>
@@ -401,7 +402,7 @@
                                                 <div class="col-lg-7">
                                                     <div class="form-group">
                                                         <div class="form-control-wrap">
-                                                            {{ form_email.from_name }}
+                                                            {{ form_email.email_from_name }}
                                                         </div>
                                                     </div>
                                                 </div>
@@ -549,7 +550,7 @@
                                 </div>
                             </div><!-- .tab-pane -->
                             <div class="tab-pane" id="whatsapp">
-                                <form id="connectForm" action="{% url 'update_whatsapp' company.id %}" method="POST" >
+                                <form id="connectForm" action="{% url 'update_whatsapp' %}" method="POST" >
                                     {% csrf_token %}
                                     <div class="card-inner pt-0">
                                         <div class="nk-block-head">

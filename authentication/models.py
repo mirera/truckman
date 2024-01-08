@@ -30,12 +30,33 @@ class Client(models.Model):
     
 
 #--------------------------Preference model-----------------------------------------
+#email setting model
+HTTPS_ENCRYPTION = (
+    ('tls','TLS'),
+    ('ssl', 'SSL'),
+    ('none', 'NONE')
+)
+
 #client prefereces model
 class Preference(models.Model):
     id = models.UUIDField(default=uuid.uuid4, unique=True, primary_key=True) 
     company = models.ForeignKey(Client, on_delete=models.CASCADE)
-    email_from_name = models.CharField(max_length=12, null=True) 
-    from_email = models.EmailField(null=True)
+
+
+    def __str__(self):
+        return self.company.name
+
+#client email setting model
+class EmailSetting(models.Model):
+    id = models.UUIDField(default=uuid.uuid4, unique=True, primary_key=True) 
+    company = models.ForeignKey(Client, on_delete=models.CASCADE)
+    email_from_name = models.CharField(max_length=50, null=True) 
+    from_email = models.EmailField(blank=True, null=True)
+    smtp_host = models.CharField(max_length=200, blank=True, null=True)
+    encryption = models.CharField(max_length=200, choices=HTTPS_ENCRYPTION, default='tls')
+    smtp_port = models.IntegerField(blank=True, null=True)
+    smtp_username = models.EmailField(blank=True, null=True)
+    smtp_password = models.CharField(max_length=200, blank=True, null=True)
     
     def __str__(self):
         return self.company.name

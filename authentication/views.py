@@ -9,8 +9,8 @@ from django.urls import reverse
 from django.contrib import messages
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.models import Permission
-from .forms import CustomUserCreationForm, StaffForm, RoleForm, ClientForm, WhatsappForm
-from .models import Client, CustomUser, Role, Preference, WhatsappSetting
+from .forms import CustomUserCreationForm, StaffForm, RoleForm, ClientForm, WhatsappForm, EmailSettingForm
+from .models import Client, CustomUser, Role, Preference, WhatsappSetting, EmailSetting
 from truckman.utils import get_user_company, format_phone_number, deformat_phone_no, encrypt_secret, create_wa_instance, get_wa_qrcode, send_whatsapp_text
 from truckman.tasks import send_email_task, send_whatsapp_text_task, reconnect_wa_instance_task
 
@@ -530,7 +530,7 @@ def resetpass_email_send(request):
 #-- ends
 
 # reset password form
-def render_reset_form(request):
+def render_reset_form(request): 
     return render(request, 'authentication/user/reset-form.html')
 #-- ends
 
@@ -651,16 +651,21 @@ def global_settings(request):
             whatsapp_setting = WhatsappSetting.objects.get(company=company)
         except WhatsappSetting.DoesNotExist:
             whatsapp_setting = WhatsappSetting.objects.create(company=company)
+
+        try:
+            email_setting = EmailSetting.objects.get(company=company)
+        except EmailSetting.DoesNotExist:
+            email_setting = EmailSetting.objects.create(company=company)
             
 
         # prefill the whatsapp form 
         form_data_whatsapp = {
             'access_token': whatsapp_setting.access_token,
         }
-        '''
+        
         # prefill the email form 
         form_data_email = {
-            'from_name': email_setting.from_name,
+            'from_name': email_setting.email_from_name,
             'from_email': email_setting.from_email,
             'smtp_host': email_setting.smtp_host,
             'encryption': email_setting.encryption,
@@ -669,6 +674,7 @@ def global_settings(request):
             'smtp_password': email_setting.smtp_password
         }
         # prefill the system preference form 
+        '''
         form_data_preferences = {
             'is_auto_disburse': preferences.is_auto_disburse,
             'is_send_sms': preferences.is_send_sms,
@@ -684,7 +690,7 @@ def global_settings(request):
         }
        '''
         #form_preferences = PreferenceForm(initial=form_data_preferences)
-        #form_email = EmailSettingForm(initial=form_data_email)
+        form_email = EmailSettingForm(initial=form_data_email)
         form_whatsapp = WhatsappForm(initial=form_data_whatsapp)
         #form_sms = SmsForm(initial=form_data_sms)
         form = ClientForm(initial=form_data)
@@ -692,7 +698,7 @@ def global_settings(request):
             'form':form,
             #'form_sms':form_sms,
             'form_whatsapp':form_whatsapp,
-            #'form_email':form_email,
+            'form_email':form_email,
             #'form_preferences':form_preferences,
             'company':company,
 
@@ -717,7 +723,7 @@ def update_sms(request, pk):
 update_whatsapp() function basically connects whatsapp 
 after updating access token and instance id
 '''
-def update_whatsapp(request, pk): 
+def update_whatsapp(request): 
     whatsapp_setting = get_object_or_404(WhatsappSetting, company=get_user_company(request))
     if request.method == 'POST':
         #update object
@@ -765,8 +771,46 @@ def reconnect_whatsapp(request):
     return redirect('global_settings')
 # --end 
 
-def update_email(request, pk):
-    pass
+def update_email(request):
+    company = get_user_company(request)
+    email_setting = get_object_or_404(EmailSetting, company=company)
+    form_email = EmailSettingForm()
+
+    if request.method == 'POST':
+        raw_smtp_password = request.POST.get('smtp_password')
+        encrypted_smtp_password= encrypt_secret(raw_smtp_password)#encrypt password 
+
+        email_setting.company = company
+        email_setting.email_from_name = request.POST.get('email_from_name')
+        email_setting.from_email = request.POST.get('from_email')
+        email_setting.smtp_host = request.POST.get('smtp_host')
+        email_setting.encryption = request.POST.get('smtp_host')
+        email_setting.smtp_port = request.POST.get('smtp_port')
+        email_setting.smtp_username = request.POST.get('smtp_username')
+        email_setting.smtp_password = encrypted_smtp_password
+        email_setting.save()
+
+        messages.success(request, 'Email credentials updated successfully. Send Test Email to confirm if they work as expected.')
+        return redirect('global_settings')
+    else:
+        # prepopulate the form with existing data
+        form_data = {
+            'email_from_name': email_setting.email_from_name,
+            'from_email': email_setting.from_email,
+            'smtp_host': email_setting.smtp_host,
+            'encryption': email_setting.encryption,
+            'smtp_port': email_setting.smtp_port,
+            'smtp_username': email_setting.smtp_username,
+            'smtp_password': email_setting.smtp_password,
+        }
+        form_email = EmailSettingForm(initial=form_data)
+ 
+    context = {
+            'form_email':form_email
+        }
+
+    return render(request, 'authentication/settings/settings.html', context)
+# -- ends
 
 def send_test_email(request, pk):
     pass
