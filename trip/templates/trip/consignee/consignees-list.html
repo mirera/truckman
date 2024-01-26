@@ -4,7 +4,7 @@
 <!-- content @s -->
 <!-- displaying flash messages -->
 {% if messages %}
-{% for message in messages %}
+{% for message in messages %} 
     <div class="alert {% if message.tags == 'error' %}alert-danger{% elif message.tags == 'success' %}alert-success{% else %}alert-primary{% endif %}">
         {{ message }}
     </div>
@@ -167,11 +167,10 @@
                                         </div>
                                         <div class="nk-tb-col"><span class="sub-text">Consignee</span></div>
                                         <div class="nk-tb-col tb-col-md"><span class="sub-text">ID</span></div>
+                                        <div class="nk-tb-col tb-col-sm"><span class="sub-text">Contact Person</span></div>
                                         <div class="nk-tb-col tb-col-md"><span class="sub-text">Phone</span></div>
-                                        <div class="nk-tb-col tb-col-xxl"><span class="sub-text">Address</span></div>
-                                        <div class="nk-tb-col tb-col-lg"><span class="sub-text">Trip Details</span></div>
-                                        <div class="nk-tb-col tb-col-sm"><span class="sub-text">Balance</span></div>
-                                        <div class="nk-tb-col tb-col-md"><span class="sub-text">Status</span></div>
+                                        <div class="nk-tb-col tb-col-lg"><span class="sub-text">Address</span></div>
+                                        <div class="nk-tb-col tb-col-md"><span class="sub-text">Country</span></div>
                                         <div class="nk-tb-col nk-tb-col-tools">
                                             <ul class="nk-tb-actions gx-1 my-n1">
                                                 <li>
@@ -215,25 +214,21 @@
                                             </a>
                                         </div>
                                         <div class="nk-tb-col tb-col-md">
+                                            <span>{{consignee.contact_person}}</span>
+                                        </div>
+                                        <div class="nk-tb-col tb-col-md">
                                             <span>{{consignee.phone}}</span>
                                         </div>
-                                        <div class="nk-tb-col tb-col-xxl">
+                                        <div class="nk-tb-col tb-col-lg">
                                             <span>{{consignee.address_one}}</span>
                                         </div>
                                         <div class="nk-tb-col tb-col-lg">
                                             <div>
-                                                <span>Item: Omidon10mg</span>
-                                            </div>
-                                            <div>
-                                                <span>Quantity: 10pcs</span>
+                                                <span>{{ consignee.country }}</span>
                                             </div>
                                         </div>
-                                        <div class="nk-tb-col tb-col-sm">
-                                            <span class="tb-amount">78.55 <span class="currency">USD</span></span>
-                                        </div>
-                                        <div class="nk-tb-col tb-col-md">
-                                            <span class="tb-status text-warning">Inactive</span>
-                                        </div>
+                                        
+                                        
                                         <div class="nk-tb-col nk-tb-col-tools">
                                             <ul class="nk-tb-actions gx-1">
                                                 <li class="nk-tb-action-hidden">

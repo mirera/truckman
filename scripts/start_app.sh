@@ -4,7 +4,7 @@
 source /home/ubuntu/truckman_env/bin/activate
 
 
-sed -i 's/\[]/\["truckman.loginit.co.ke"]/' /home/ubuntu/truckman/truckman/settings.py 
+sed -i 's/\[]/\["truckman.loginit.co.ke"]/' /home/ubuntu/truckman/truckman/settings.py  
 sudo cp /home/ubuntu/truckman_secrets/.env  /home/ubuntu/truckman/.env 
 cd /home/ubuntu/truckman && python manage.py makemigrations
 python manage.py migrate      

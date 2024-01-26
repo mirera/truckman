@@ -79,7 +79,7 @@ from truckman.utils import get_user_company, enerate_invoice_pdf, export_model_d
 from truckman.tasks import send_email_task, send_email_with_attachment_task, send_whatsapp_text_task, send_whatsapp_media_task, delete_temp_files_task
 from truckman.processes import generate_invoice, generate_loading_list, create_daily_register, get_trip_vehicles, create_workbook, generate_loadinglist_pdf, generate_invoice_pdf, generate_estimate_pdf
 
-from authentication.models import WhatsappSetting
+from authentication.models import WhatsappSetting, EmailSetting
 
 
 #---------------------------------- Partner Views------------------------------------------
@@ -582,7 +582,7 @@ def driver_export_to_csv(request):
               'emergency_contact_person' ,'emergency_contact_person_rlshp', 'emergency_contact_no',
               'emergency_contact_person_two', 'emergency_contact_person_two_rlshp', 'emergency_contact_no_two',
               'emergency_contact_person_three', 'emergency_contact_person_three_rlshp', 'emergency_contact_no_three',
-              'assigned_vehicle' ]
+              'assigned_vehicle',]
     response = export_model_data(request, Driver, header)
     return response 
 
@@ -748,7 +748,7 @@ def remove_customer(request, pk):
 def customer_export_to_csv(request):
     header = ['customer_id','name', 'contact_person', 'phone',  
               'email', 'address_one', 'address_two', 'country', 
-              'city', 'payment_term', 
+              'city', 'tin', 'brn','payment_term', 
               'credit_limit' ,'date_added', 'website']
     response = export_model_data(request, Customer, header)
     return response 
@@ -1212,8 +1212,7 @@ def remove_load(request, pk):
 def load_export_to_csv(request):
     header = ['load_id','shipper', 'consignee', 'quantity',  
               'quantity_type', 'weight', 'commodity', 'pickup_date', 
-              'delivery_date', 'quote_amount', 
-              'date_added']
+              'delivery_date','date_added', 'estimate',]
     response = export_model_data(request, Load, header)
     return response 
 #--ends
@@ -1292,27 +1291,33 @@ def send_loading_list_customer(request, pk):
         'company_name':trip.company.name,
         'trip_id':trip.trip_id
     }
-    send_email_with_attachment_task.delay(
-        context=context,
-        template_path='trip/load/loadlist-email.html',
-        from_name=trip.company.name,
-        from_email=settings.EMAIL_HOST_USER,
-        subject='Loading List',
-        recipient_email=trip.estimate.customer.email,
-        replyto_email=trip.company.email,
-        attachment_path=temp_file_path
-    )
-    
+    email_setting = get_object_or_404(EmailSetting, company=trip.company)#check is email setting exist
+    if email_setting.smtp_username and email_setting.smtp_password:
+        send_email_with_attachment_task.delay(
+            context=context,
+            template_path='trip/load/loadlist-email.html',
+            from_name=email_setting.email_from_name,
+            from_email=email_setting.from_email,
+            subject='Loading List',
+            recipient_email=trip.estimate.customer.email,
+            replyto_email=email_setting.from_email,
+            attachment_path=temp_file_path
+        )
+    else:
+        messages.error(request, 'Not sent! Email settings are not set. Head to settings and set your email info.')
     # Send WhatsApp notification with the generated file
     whatsapp_setting = get_object_or_404(WhatsappSetting, company=trip.company)
     message = f'Dear {trip.estimate.customer.name}, The attached is the Loading list as requested. If you have any questions or concerns, please do not hesitate to contact us. Best regards,{trip.estimate.company.name}'
-    send_whatsapp_media_task.delay(
-        instance_id=whatsapp_setting.instance_id,
-        access_token=whatsapp_setting.access_token,
-        phone_no=trip.estimate.customer.phone,
-        message=message,
-        media_url=temp_file_path  # Attach the PDF file
-    )
+    if whatsapp_setting.access_token and whatsapp_setting.instance_id: #check is email setting exist
+        send_whatsapp_media_task.delay(
+            instance_id=whatsapp_setting.instance_id,
+            access_token=whatsapp_setting.access_token,
+            phone_no=trip.estimate.customer.phone,
+            message=message,
+            media_url=temp_file_path  # Attach the PDF file
+        )
+    else:
+        messages.error(request, 'Not sent! Whatsapp settings are not set. Head to settings and set your whatsapp info.')
     delete_temp_files_task.delay()
     
     messages.success(request, 'Loading list sent to customer')
@@ -1702,16 +1707,20 @@ def send_to_shipper(request, pk):
         'shipper':shipper.name,
         
     }
-    send_email_with_attachment_task(
-        context=context, 
-        template_path='trip/trip/trip-docs-email.html', 
-        from_name=company.name, 
-        from_email=company.email, 
-        subject="All Trip Documents", 
-        recipient_email=shipper.email, 
-        replyto_email=company.email,
-        attachment_path=merged_pdf_path,  # Attach the merged PDF doc
-    )
+    email_setting = get_object_or_404(EmailSetting, company=company)
+    if email_setting.smtp_username and email_setting.smtp_password:
+        send_email_with_attachment_task(
+            context=context, 
+            template_path='trip/trip/trip-docs-email.html', 
+            from_name=email_setting.email_from_name, 
+            from_email=email_setting.from_email, 
+            subject="All Trip Documents", 
+            recipient_email=shipper.email, 
+            replyto_email=email_setting.from_email,
+            attachment_path=merged_pdf_path,  # Attach the merged PDF doc
+        )
+    else:
+        messages.error(request, 'Not sent! Email settings are not set. Head to settings and set your email info.')
 
     messages.success(request, 'Documents sent to the shipper successfully')
     return redirect('view_trip', trip.id)
@@ -1720,10 +1729,8 @@ def send_to_shipper(request, pk):
 def docs_bulky_action(request, pk):
     company=get_user_company(request)
     if request.method == 'POST':
-        print('Its a post request')
         # Retrieve the selected option from the form data
         bulk_action = request.POST.get('bulk-action')
-        print(f'This is the sellected bulk action{bulk_action}')
         selected_ids = request.POST.getlist('selected_ids')
         selected_docs = []
         trip = Trip.objects.get(id=pk)
@@ -1776,8 +1783,7 @@ def remove_trip(request, pk):
 @login_required(login_url='login')
 @permission_required('trip.view_trip')
 def trip_export_to_csv(request):
-    header = ['trip_id','load', 'pick_up_location', 'drop_off_location',  
-              'distance', 'status', 'start_time', 'end_time', 'date_added']
+    header = ['trip_id','estimate', 'date_added', 'start_time', 'end_time', 'status',]
     response = export_model_data(request, Trip, header)
     return response 
 
@@ -1802,16 +1808,19 @@ def start_trip(request, pk):
             'invoice_url' : invoice_url,
             'company_name':company.name
         }
-
-        send_email_task.delay(
-            context=context,  
-            template_path='trip/invoice/trip-invoice.html', 
-            from_name=preference.email_from_name, 
-            from_email=preference.from_email, 
-            subject=f'Trip Started - Trip Invoice:{invoice.invoice_id}', 
-            recipient_email=trip.load.estimate.customer.email, 
-            replyto_email=company.email,
-        )
+        email_setting = get_object_or_404(EmailSetting, company=company)
+        if email_setting.smtp_username and email_setting.smtp_password:
+            send_email_task.delay(
+                context=context,  
+                template_path='trip/invoice/trip-invoice.html', 
+                from_name=preference.email_from_name, 
+                from_email=preference.from_email, 
+                subject=f'Trip Started - Trip Invoice:{invoice.invoice_id}', 
+                recipient_email=trip.load.estimate.customer.email, 
+                replyto_email=company.email,
+            )
+        else:
+            messages.error(request, 'Not sent! Email settings are not set. Head to settings and set your email info.')
 
         '''
         send_email_with_attachment_task.delay(
@@ -1892,7 +1901,7 @@ def add_payment_trip(request, pk):
     if request.method == 'POST':
 
         trip = Trip.objects.get(id=pk)
-        invoice = Invoice.objects.get(estimate=trip.load.estimate) 
+        invoice = Invoice.objects.get(estimate=trip.estimate) 
         amount = float(request.POST.get('amount'))
 
         #create instance of a payment
@@ -2339,32 +2348,39 @@ def send_trip_invoice(request, pk):
     trip = get_object_or_404(Trip, id=pk)
     invoice = get_object_or_404(Invoice, estimate=trip.estimate)
     invoice_temp_path = generate_invoice_pdf(trip)
-    preference = get_object_or_404(Preference, company=trip.company)
+    email_setting = get_object_or_404(EmailSetting, company=trip.company)
 
     context = {
         'customer_name': trip.estimate.customer.name,
     }
+    if email_setting.smtp_username and email.setting.smtp_password:
+        send_email_with_attachment_task.delay(
+            context=context,  
+            template_path='trip/invoice/trip-invoice.html', 
+            from_name=email_setting.email_from_name, 
+            from_email=email_setting.from_email, 
+            subject=f'Trip Invoice:{invoice.invoice_id}', 
+            recipient_email=trip.estimate.customer.email, 
+            replyto_email=email_setting.from_email,
+            attachment_path=invoice_temp_path
+        )
+    else:
+        messages.error(request, 'Not sent! Email settings are not set. Head to settings and set your email info.')
 
-    send_email_with_attachment_task.delay(
-        context=context,  
-        template_path='trip/invoice/trip-invoice.html', 
-        from_name=preference.email_from_name, 
-        from_email=preference.from_email, 
-        subject=f'Trip Invoice:{invoice.invoice_id}', 
-        recipient_email=trip.estimate.customer.email, 
-        replyto_email=trip.company.email,
-        attachment_path=invoice_temp_path
-    )
     # Send WhatsApp notification with the generated file
     whatsapp_setting = get_object_or_404(WhatsappSetting, company=trip.company)
     message = f'Dear {trip.estimate.customer.name}, The attached is the invoice for trip {trip.trip_id}. If you have any questions or concerns, please do not hesitate to contact us. Best regards,{trip.estimate.company.name}'
-    send_whatsapp_media_task.delay(
-        instance_id=whatsapp_setting.instance_id,
-        access_token=whatsapp_setting.access_token,
-        phone_no=trip.estimate.customer.phone,
-        message=message,
-        media_url=invoice_temp_path  # Attach the PDF file
-    )
+    if whatsapp_setting.instance_id and whatsapp_setting.access_token:
+        send_whatsapp_media_task.delay(
+            instance_id=whatsapp_setting.instance_id,
+            access_token=whatsapp_setting.access_token,
+            phone_no=trip.estimate.customer.phone,
+            message=message,
+            media_url=invoice_temp_path  # Attach the PDF file
+        )
+    else:
+        messages.error(request, 'Not sent! Whatsapp settings are not set. Head to settings and set your whatsapp info.')
+
     delete_temp_files_task.delay()
     messages.success(request, 'Invoice sent to customer.')
     return redirect('view_trip', trip.id)
@@ -2576,33 +2592,37 @@ def send_estimate(request, pk): # negotiation mode
         'estimate_url': estimate_url,
         'company_name': company.name
     }
+    email_setting = get_object_or_404(EmailSetting, company=company)
+    if email_setting.smtp_username and email.setting.smtp_password:
+        send_email_with_attachment_task.delay(
+            context=context, 
+            template_path='trip/estimate/load-estimate.html', 
+            from_name=email_setting.email_from_name, 
+            from_email=email_setting.from_email,
+            subject='Approve Quotation', 
+            recipient_email=estimate.customer.email, 
+            replyto_email=email_setting.from_email,
+            attachment_path=estimate_path
+        )
+    else:
+        messages.error(request, 'Not sent! Email settings are not set. Head to settings and set your email info.')
 
-    send_email_with_attachment_task.delay(
-        context=context, 
-        template_path='trip/estimate/load-estimate.html', 
-        from_name=company.name, 
-        from_email=settings.EMAIL_HOST_USER, #revert back to this preference.from_email
-        subject='Approve Quotation', 
-        recipient_email=estimate.customer.email, 
-        replyto_email=company.email,
-        attachment_path=estimate_path
-    )
     # send whatsapp notification 
     whatsapp_setting = get_object_or_404(WhatsappSetting, company=company )
     message = f'Dear {estimate.customer.name}, The attached is the Quotation/estimate as requested.Click here to view {estimate_url}. If you have any questions or concerns, please do not hesitate to contact us. Best regards,{estimate.company.name}'
-    send_whatsapp_media_task.delay(
-        instance_id=whatsapp_setting.instance_id, 
-        access_token=whatsapp_setting.access_token, 
-        phone_no=estimate.customer.phone, 
-        message=message,
-        media_url=estimate_path
-    )
-
-    estimate.is_sent = True
-    estimate.save()
-
-    messages.success(request, 'Quotation sent to customer. Once customer accepts the quotation you will be notified on email.')
-    return redirect('view_estimate', estimate.id)
+    if whatsapp_setting.access_token and whatsapp_setting.instance_id:
+        send_whatsapp_media_task.delay(
+            instance_id=whatsapp_setting.instance_id, 
+            access_token=whatsapp_setting.access_token, 
+            phone_no=estimate.customer.phone, 
+            message=message,
+            media_url=estimate_path
+        )
+        estimate.is_sent = True
+        estimate.save()
+        return redirect('view_estimate', estimate.id)
+    else:
+        messages.error(request, 'Not sent! Whatsapp settings are not set. Head to settings and set your whatsapp info.')
 
 # download estimate pdf view 
 def download_estimate_pdf(request, pk): 
@@ -2622,7 +2642,6 @@ def download_estimate_pdf(request, pk):
         return response
     except Exception as e:
         # Handle exceptions here or log them
-        print(f"Error: {e}")
         return HttpResponse("Error downloading file")
     finally:
         # Delete temporary files regardless of success or failure
@@ -2632,62 +2651,72 @@ def download_estimate_pdf(request, pk):
 #accept estimate
 def accept_estimate(request, pk):
     estimate = get_object_or_404(Estimate, id=pk)
-    estimate.status = 'Accepted'
-    estimate.save()
-    company = estimate.company
+    #prevent accepting quotation more than once
+    if estimate.status != 'Accepted':
+        estimate.status = 'Accepted'
+        estimate.save()
+        company = estimate.company
 
-    #create a trip instance, to be used later.
-    trip = Trip.objects.create(
-        company = company,
-        estimate = estimate
-    )
-
-    estimate_items = EstimateItem.objects.filter(estimate=estimate)
-    
-    # Calculate the total number of trucks for all estimate items
-    total_trucks = estimate_items.aggregate(total_trucks=Sum('trucks'))['total_trucks'] or 0
-    
-    # instatiate load instances based on the number of trucks 
-    while int(total_trucks) > 0:
-        Load.objects.create(
+        #create a trip instance, to be used later.
+        trip = Trip.objects.create(
             company = company,
             estimate = estimate
         )
-        total_trucks -= 1
 
-    # send whatsapp notifications to indicate creation of Trip and loads. 
-    whatsapp_setting = get_object_or_404(WhatsappSetting, company=company )
-    trip_url = request.build_absolute_uri(reverse('view_trip', args=[trip.id]))
-    message = f'Hello {company.name}, your quotation {estimate.estimate_id} has been accepted. Consenquently, a trip {trip.trip_id} has been initiated. Click the link below to view and assign associated loads trucks {trip_url} .'
-    send_whatsapp_text_task.delay(
-        instance_id=whatsapp_setting.instance_id, 
-        access_token=whatsapp_setting.access_token, 
-        phone_no=company.phone, 
-        message=message
-    )
-    #send email to admin notify them about 
-    #the acceptance and assign trucks to the load link.
+        estimate_items = EstimateItem.objects.filter(estimate=estimate)
+        
+        # Calculate the total number of trucks for all estimate items
+        total_trucks = estimate_items.aggregate(total_trucks=Sum('trucks'))['total_trucks'] or 0
+        
+        # instatiate load instances based on the number of trucks 
+        while int(total_trucks) > 0:
+            Load.objects.create(
+                company = company,
+                estimate = estimate
+            )
+            total_trucks -= 1
 
-    estimate_url = request.build_absolute_uri(reverse('view_estimate', args=[pk]))
-    estimate_id = estimate.estimate_id
-    context = {
-        'estimate':estimate_id,
-        'estimate_url' : estimate_url,
-        'trip_url' :trip_url,
-        'trip':trip,
-    }
-    
-    send_email_task.delay(
-        context=context, 
-        template_path='trip/estimate/estimate-accepted.html', 
-        from_name= company.name, 
-        from_email=settings.EMAIL_HOST_USER, 
-        subject='Estimate Accepted', 
-        recipient_email=company.email, 
-        replyto_email=settings.EMAIL_HOST_USER
-    )
-    messages.success(request, 'Quotation accepted successfully. We will share a loading list shortly.')
-    return redirect('view_estimate_negotiate_mode', estimate.id )
+        # send whatsapp notifications to indicate creation of Trip and loads. 
+        whatsapp_setting = get_object_or_404(WhatsappSetting, company=company )
+        trip_url = request.build_absolute_uri(reverse('view_trip', args=[trip.id]))
+        message = f'Hello {company.name}, your quotation {estimate.estimate_id} has been accepted. Consenquently, a trip {trip.trip_id} has been initiated. Click the link below to view and assign associated loads trucks {trip_url} .'
+        if whatsapp_setting.instance_id and whatsapp_setting.access_token:
+            send_whatsapp_text_task.delay(
+                instance_id=whatsapp_setting.instance_id, 
+                access_token=whatsapp_setting.access_token, 
+                phone_no=company.phone_no, 
+                message=message
+            )
+        else:
+            messages.error(request, 'Not sent! Whatsapp settings are not set. Head to settings and set your whatsapp info.')
+
+        #send email to admin notify them about 
+        #the acceptance and assign trucks to the load link.
+
+        estimate_url = request.build_absolute_uri(reverse('view_estimate', args=[pk]))
+        estimate_id = estimate.estimate_id
+        context = {
+            'estimate':estimate_id,
+            'estimate_url' : estimate_url,
+            'trip_url' :trip_url,
+            'trip':trip,
+        }
+        email_setting = get_object_or_404(EmailSetting, company=company)
+        if email_setting.smtp_username and email_setting.smtp_password:
+            send_email_task.delay(
+                context=context, 
+                template_path='trip/estimate/estimate-accepted.html', 
+                from_name= email_setting.email_from_name, 
+                from_email=email_setting.from_email, 
+                subject='Estimate Accepted', 
+                recipient_email=company.email, 
+                replyto_email=email_setting.from_email
+            )
+        messages.success(request, 'Quotation accepted successfully. We will share a loading list shortly.')
+        return redirect('view_estimate_negotiate_mode', estimate.id )
+    else:
+        messages.info(request, 'Quotation has been already accepted')
+        return redirect('view_estimate_negotiate_mode', estimate.id )
 
 #decline estimate
 def decline_estimate(request, pk):
@@ -2701,15 +2730,17 @@ def decline_estimate(request, pk):
         'estimate':estimate.id, 
         'estimate_url' : estimate_url
     }
-    send_email_task.delay(
-        context=context, 
-        template_path='trip/estimate/estimate-declined.html', 
-        from_name='Loginit Truckman', 
-        from_email=settings.EMAIL_HOST_USER, 
-        subject='Estimate Declined', 
-        recipient_email=estimate.company.email, 
-        replyto_email=settings.EMAIL_HOST_USER
-    )
+    email_setting = get_object_or_404(EmailSetting, company=company)
+    if email_setting.smtp_username and email_setting.smtp_password:
+        send_email_task.delay(
+            context=context, 
+            template_path='trip/estimate/estimate-declined.html', 
+            from_name=email_setting.email_from_name, 
+            from_email=email_setting.from_email, 
+            subject='Estimate Declined', 
+            recipient_email=estimate.company.email, 
+            replyto_email=email_setting.from_email
+        )
     messages.info(request, 'Quotation declined successfully.')
     return redirect('view_estimate_negotiate_mode', estimate.id )
 

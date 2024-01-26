@@ -167,11 +167,10 @@
                                         </div>
                                         <div class="nk-tb-col"><span class="sub-text">Shipper</span></div>
                                         <div class="nk-tb-col tb-col-md"><span class="sub-text">ID</span></div>
+                                        <div class="nk-tb-col tb-col-sm"><span class="sub-text">Contact Person</span></div>
                                         <div class="nk-tb-col tb-col-md"><span class="sub-text">Phone</span></div>
-                                        <div class="nk-tb-col tb-col-xxl"><span class="sub-text">Address</span></div>
-                                        <div class="nk-tb-col tb-col-lg"><span class="sub-text">Trip Details</span></div>
-                                        <div class="nk-tb-col tb-col-sm"><span class="sub-text">Balance</span></div>
-                                        <div class="nk-tb-col tb-col-md"><span class="sub-text">Status</span></div>
+                                        <div class="nk-tb-col tb-col-lg"><span class="sub-text">Address</span></div>
+                                        <div class="nk-tb-col tb-col-md"><span class="sub-text">Country</span></div>
                                         <div class="nk-tb-col nk-tb-col-tools">
                                             <ul class="nk-tb-actions gx-1 my-n1">
                                                 <li>
@@ -216,24 +215,18 @@
                                             </a>
                                         </div>
                                         <div class="nk-tb-col tb-col-md">
+                                            <span>{{shipper.contact_person}}</span>
+                                        </div>
+                                        <div class="nk-tb-col tb-col-md">
                                             <span>{{shipper.phone}}</span>
                                         </div>
-                                        <div class="nk-tb-col tb-col-xxl">
+                                        <div class="nk-tb-col tb-col-lg">
                                             <span>{{shipper.address_one}}</span>
                                         </div>
                                         <div class="nk-tb-col tb-col-lg">
                                             <div>
-                                                <span>Item: Omidon10mg</span>
+                                                <span>{{shipper.country}}</span>
                                             </div>
-                                            <div>
-                                                <span>Quantity: 10pcs</span>
-                                            </div>
-                                        </div>
-                                        <div class="nk-tb-col tb-col-sm">
-                                            <span class="tb-amount">78.55 <span class="currency">USD</span></span>
-                                        </div>
-                                        <div class="nk-tb-col tb-col-md">
-                                            <span class="tb-status text-warning">Inactive</span>
                                         </div>
                                         <div class="nk-tb-col nk-tb-col-tools">
                                             <ul class="nk-tb-actions gx-1">
