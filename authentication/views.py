@@ -812,8 +812,27 @@ def update_email(request):
     return render(request, 'authentication/settings/settings.html', context)
 # -- ends
 
-def send_test_email(request, pk):
-    pass
+def send_test_email(request):
+    if request.method == 'POST':
+        email_setting = get_object_or_404(EmailSetting, company=get_user_company(request) )
+    
+        email = request.POST.get('email')
+        message = 'Hey, your email configurations are correct and working as expected. ~Enigma'
+        context = {}
+        
+        send_email_task.delay(
+            context=context, 
+            template_path='authentication/settings/test-email.html', 
+            from_name=email_setting.email_from_name, 
+            from_email=email_setting.from_email, 
+            subject='Email Test Successful', 
+            recipient_email=email, 
+            replyto_email=email_setting.from_email
+            )
+        
+        messages.success(request, 'Email was sent successfully.')
+        return redirect('global_settings')
+    return redirect('global_settings') 
 
 def update_preferences(request, pk):
     pass

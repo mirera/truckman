@@ -499,7 +499,7 @@
                                     </div>
                                 </form> <br>
                                 <div class="card">
-                                    <form action="{% url 'test_email' company.id %}" method="POST" class="form-validate">
+                                    <form action="{% url 'test_email'%}" method="POST" class="form-validate">
                                         {% csrf_token %}
                                         <div class="card-inner pt-0">
                                             <div class="nk-block-head">
@@ -523,20 +523,7 @@
                                                         </div>
                                                     </div>
                                                 </div>
-                                                <div class="row g-3 align-center">
-                                                    <div class="col-lg-5">
-                                                        <div class="form-group">
-                                                            <label class="form-label" for="site-copyright">Message</label>
-                                                        </div>
-                                                    </div>
-                                                    <div class="col-lg-7">
-                                                        <div class="form-group">
-                                                            <div class="form-control-wrap">
-                                                                <textarea class="form-control" id="default-textarea" name="message" placeholder="Test message" required></textarea>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                </div>
+                                                
                                             </div> <!-- .row -->
                                             <div class="row g-3">
                                                 <div class="col-lg-7">
