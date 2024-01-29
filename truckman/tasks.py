@@ -6,7 +6,7 @@ from django.urls import reverse
 #from django.contrib.sites.models import Site
 from django.shortcuts import get_object_or_404
 from trip.models import Trip, Driver, Customer
-from authentication.models import WhatsappSetting, Preference
+from authentication.models import WhatsappSetting, Preference, EmailSetting
 
 
 
@@ -101,10 +101,8 @@ def send_driver_sms_url_task():
     for trip in trips:
         # Get all vehicles assigned to loads
         vehicles = get_trip_vehicles(trip)
-        print(f'Vehicles:{vehicles}') 
         #get drivers
         drivers = Driver.objects.filter(assigned_vehicle__in=vehicles)
-        print(f'Drivers:{drivers}')
         for driver in drivers:
             trip_id = str(trip.id)
             url = reverse('add_register_entry', args=[trip_id]) 
@@ -143,26 +141,29 @@ def share_daily_register_report_task():
             'company':company.name,
             'download_report_url':download_report_url
         }
-        preference = Preference.objects.get(company=company)
-        # share via email address
-        send_email(
-                context, 
-                template_path='trip/reports/daily-report-email-template.html', 
-                from_name=preference.email_from_name, 
-                from_email=preference.from_email, 
-                subject=f'Trip {trip.trip_id} Day Report', 
-                recipient_email=customer.email, 
-                replyto_email=preference.from_email
-            )
+        email_setting = EmailSetting.objects.get(company=company) 
+        if email_setting.smtp_username and email_setting.smtp_password:
+            # share via email address
+            send_email(
+                    context=context, 
+                    template_path='trip/reports/daily-report-email-template.html', 
+                    from_name=email_setting.email_from_name, 
+                    from_email=email_setting.from_email, 
+                    subject=f'Trip {trip.trip_id} Day Report', 
+                    recipient_email=customer.email, 
+                    replyto_email=email_setting.from_email
+                )
 
-        #share via whatsapp
+        
         message = f'Hello {customer.name} admin, click this link {download_report_url} to download daily trip report.'     
         whatsapp_setting = get_object_or_404(WhatsappSetting, company=trip.company )
-        send_whatsapp_text(
-            instance_id=whatsapp_setting.instance_id,
-            access_token=whatsapp_setting.access_token, 
-            phone_no=customer.phone, 
-            message=message,
-        )
+        if whatsapp_setting.access_token:
+            #share via whatsapp
+            send_whatsapp_text(
+                instance_id=whatsapp_setting.instance_id,
+                access_token=whatsapp_setting.access_token, 
+                phone_no=customer.phone, 
+                message=message,
+            )
 
     
