@@ -24,7 +24,6 @@ def register_user(request):
             email = form.cleaned_data['email']
             password = form.cleaned_data['password1']
 
-
             # Create a new client/tenant
             client = Client.objects.create(
                 name=company_name,
@@ -169,12 +168,17 @@ def login_user(request):
 
         user = authenticate(username=email, password=password)
         if user is not None:
-            if user.is_active:
-                login(request, user)
-                return redirect('home') 
+            if user.is_verified:
+                if user.is_active:
+                    login(request, user)
+                    return redirect('home') 
+                else:
+                    # Handle inactive user case
+                    messages.error(request, 'User is inactive!')
+                    return render(request, 'authentication/auth-login.html')
             else:
-                # Handle inactive user case
-                messages.error(request, 'User is inactive!')
+                # Handle unverified users
+                messages.error(request, 'You need to verify your email')
                 return render(request, 'authentication/auth-login.html')
         else:
             # Handle invalid login case
@@ -814,7 +818,7 @@ def update_email(request):
 
 def send_test_email(request):
     if request.method == 'POST':
-        email_setting = get_object_or_404(EmailSetting, company=get_user_company(request) )
+        email_setting = get_object_or_404(EmailSetting, company=get_user_company(request) ) 
     
         email = request.POST.get('email')
         message = 'Hey, your email configurations are correct and working as expected. ~Enigma'

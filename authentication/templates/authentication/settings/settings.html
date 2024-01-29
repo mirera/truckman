@@ -497,7 +497,8 @@
                                             </div><!-- .col -->
                                         </div><!-- .row -->
                                     </div>
-                                </form> <br>
+                                </form> 
+                            <div class="container">
                                 <div class="card">
                                     <form action="{% url 'test_email'%}" method="POST" class="form-validate">
                                         {% csrf_token %}
@@ -535,6 +536,7 @@
                                         </div>
                                     </form>
                                 </div>
+                            </div>
                             </div><!-- .tab-pane -->
                             <div class="tab-pane" id="whatsapp">
                                 <form id="connectForm" action="{% url 'update_whatsapp' %}" method="POST" >

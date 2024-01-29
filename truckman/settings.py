@@ -167,6 +167,7 @@ MEDIA_ROOT =  os.path.join(BASE_DIR, 'static/media')
 CELERY_BROKER_URL = 'redis://localhost:6379/1' 
 CELERY_RESULT_BACKEND = 'redis://localhost:6379/1'
 
+'''
 #email configurations
 EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
 EMAIL_HOST = 'smtp.gmail.com'
@@ -174,6 +175,15 @@ EMAIL_PORT = 587
 EMAIL_HOST_USER = 'mirera.moses@gmail.com'
 EMAIL_HOST_PASSWORD = 'ehwvqcdfvydltqka'
 EMAIL_USE_TLS = True
+'''
+#email configurations
+EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
+EMAIL_HOST = 'loginit.co.ke'
+EMAIL_PORT = 587
+EMAIL_HOST_USER = 'admin@loginit.co.ke'
+EMAIL_HOST_PASSWORD = 'Base64@Decoded'
+EMAIL_USE_TLS = True
+
 
 
 SMS_SENDER_ID = os.environ['SMS_SENDER_ID'] 
